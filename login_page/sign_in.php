@@ -60,7 +60,7 @@ if (isset($_POST['login'])) {
                 <div class="brand-pattern"></div>
 
                 <div class="brand-content text-center">
-                    <img src="img/musholla_logo.png" alt="Logo Musholla" class="brand-logo-img mb-4">
+                    <img src="../img/musholla_logo.png" alt="Logo Musholla" class="brand-logo-img mb-4">
 
                     <p class="brand-eyebrow mb-1">Sistem Informasi</p>
                     <h1 class="brand-title mb-2">Musholla</h1>
