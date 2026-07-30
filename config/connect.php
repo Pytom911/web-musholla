@@ -9,5 +9,4 @@ $connect = mysqli_connect($host, $username, $pass, $db_name);
 if (!$connect) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
-
 ?>
