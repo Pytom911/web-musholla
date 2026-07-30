@@ -1,36 +1,65 @@
 <?php
+
 include '../config/connect.php';
 session_start();
 
 if (isset($_POST['login'])) {
+
     $username = mysqli_real_escape_string($connect, $_POST['username']);
     $password = mysqli_real_escape_string($connect, $_POST['password']);
 
-    $query = mysqli_query($connect, "SELECT * FROM users WHERE username='$username'");
-    $data = mysqli_fetch_assoc($query);
+    $query = mysqli_query($connect, "SELECT * FROM users WHERE username = '$username'");
 
-    if ($data) {
+    if (mysqli_num_rows($query) > 0) {
+
+        $data = mysqli_fetch_assoc($query);
+
+        // Jika password masih plaintext
         if ($password == $data['password']) {
+
+            // Session Login
+            $_SESSION['login'] = true;
             $_SESSION['username'] = $data['username'];
             $_SESSION['role'] = $data['role'];
 
+            // Jika tabel users memiliki kolom foto
+            if (!empty($data['foto'])) {
+                $_SESSION['foto'] = $data['foto'];
+            } else {
+                $_SESSION['foto'] = 'default-profile.png';
+            }
+
+            // Redirect berdasarkan role
             if ($data['role'] == 'admin') {
+
                 header("Location: ../index.php");
                 exit;
-            } elseif($data['role'] == 'petugas') {
+
+            } elseif ($data['role'] == 'petugas') {
+
                 header("Location: ../dashboard-petugas.php");
                 exit;
+
             } else {
+
                 header("Location: ../dashboard-user.php");
                 exit;
+
             }
+
         } else {
+
             $error = "Password salah!";
+
         }
+
     } else {
-        $error = "User tidak ditemukan!";
+
+        $error = "Username tidak ditemukan!";
+
     }
-};
+
+}
 
 ?>
 
@@ -48,7 +77,7 @@ if (isset($_POST['login'])) {
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
@@ -60,7 +89,7 @@ if (isset($_POST['login'])) {
                 <div class="brand-pattern"></div>
 
                 <div class="brand-content text-center">
-                    <img src="../img/musholla_logo.png" alt="Logo Musholla" class="brand-logo-img mb-4">
+                    <img src="../assets/img/musholla_logo.png" alt="Logo Musholla" class="brand-logo-img mb-4">
 
                     <p class="brand-eyebrow mb-1">Sistem Informasi</p>
                     <h1 class="brand-title mb-2">Musholla</h1>
@@ -117,7 +146,6 @@ if (isset($_POST['login'])) {
                                     Ingat saya
                                 </label>
                             </div>
-                            <a href="forget_pass.php" class="forgot-link">Lupa password?</a>
                         </div>
 
                         <button type="submit" class="btn btn-signin w-100 mb-4" name="login">
