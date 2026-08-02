@@ -12,9 +12,26 @@
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.getElementById('mainWrapper');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarMenu = document.querySelector('.sidebar-menu');
 
         if (!sidebarToggle || !sidebar || !mainWrapper || !sidebarOverlay) {
             return;
+        }
+
+        if (sidebarMenu) {
+
+        // Kembalikan posisi scroll
+        const saved = sessionStorage.getItem('sidebar-scroll');
+
+        if (saved) {
+        sidebarMenu.scrollTop = parseInt(saved);
+        }
+
+        // Simpan setiap kali sidebar di-scroll
+        sidebarMenu.addEventListener('scroll', function () {
+        sessionStorage.setItem('sidebar-scroll', sidebarMenu.scrollTop);
+        });
+
         }
 
         function toggleSidebar() {
