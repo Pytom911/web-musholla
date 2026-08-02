@@ -1,0 +1,9 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<FilesMatch "^(\.gitignore|AGENTS\.md|composer\.(json|lock))$">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On
+RewriteRule ^(?:config|storage|\.git) - [F,L]
