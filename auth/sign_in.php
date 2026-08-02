@@ -123,22 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-eye-slash input-icon-toggle" id="togglePassword"></i>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4 text-small">
-                            <div class="form-check">
-                                <input class="form-check-input custom-checkbox" type="checkbox" id="rememberMe" checked>
-                                <label class="form-check-label text-muted" for="rememberMe">
-                                    Ingat saya
-                                </label>
-                            </div>
-                        </div>
-
                         <button type="submit" class="btn btn-signin w-100 mb-4" name="login">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Login
                         </button>
                     </form>
 
                     <div class="divider-text mb-4">
-                        <span>atau masuk dengan</span>
+                        <span>Selamat Datang</span>
                     </div>
 
                     <div class="text-center login-footer">
