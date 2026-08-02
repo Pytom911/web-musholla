@@ -1,66 +1,50 @@
 <?php
+require_once __DIR__ . '/../config/config.php';
 
-include '../config/connect.php';
-session_start();
+$error = '';
+$usernameInput = '';
 
-if (isset($_POST['login'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $usernameInput = trim(post('username'));
+    $password = (string) post('password');
 
-    $username = mysqli_real_escape_string($connect, $_POST['username']);
-    $password = mysqli_real_escape_string($connect, $_POST['password']);
+    if ($usernameInput === '' || $password === '') {
+        $error = 'Username dan password wajib diisi!';
+    } elseif ($connect) {
+        $stmt = mysqli_prepare($connect, 'SELECT * FROM users WHERE username = ?');
+        mysqli_stmt_bind_param($stmt, 's', $usernameInput);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $user = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
 
-    $query = mysqli_query($connect, "SELECT * FROM users WHERE username = '$username'");
+        if ($user) {
+            // password_verify untuk hash; fallback hash_equals untuk
+            // data plaintext lama (harap segera dimigrasi ke password_hash).
+            $passwordOk = password_verify($password, (string) $user['password'])
+                || hash_equals((string) $user['password'], $password);
 
-    if (mysqli_num_rows($query) > 0) {
+            if ($passwordOk) {
+                session_regenerate_id(true);
 
-        $data = mysqli_fetch_assoc($query);
+                $_SESSION['login'] = true;
+                $_SESSION['user_id'] = $user['id'] ?? null;
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['nama'] = $user['nama'] ?? $user['username'];
+                $_SESSION['foto'] = !empty($user['foto']) ? $user['foto'] : 'default_profile.jpg';
 
-        // Jika password masih plaintext
-        if ($password == $data['password']) {
-
-            // Session Login
-            $_SESSION['login'] = true;
-            $_SESSION['username'] = $data['username'];
-            $_SESSION['role'] = $data['role'];
-
-            // Jika tabel users memiliki kolom foto
-            if (!empty($data['foto'])) {
-                $_SESSION['foto'] = $data['foto'];
+                redirect('/');
             } else {
-                $_SESSION['foto'] = 'default-profile.png';
+                $error = 'Password salah!';
             }
-
-            // Redirect berdasarkan role
-            if ($data['role'] == 'admin') {
-
-                header("Location: ../index.php");
-                exit;
-
-            } elseif ($data['role'] == 'petugas') {
-
-                header("Location: ../dashboard-petugas.php");
-                exit;
-
-            } else {
-
-                header("Location: ../dashboard-user.php");
-                exit;
-
-            }
-
         } else {
-
-            $error = "Password salah!";
-
+            $error = 'Username tidak ditemukan!';
         }
-
     } else {
-
-        $error = "Username tidak ditemukan!";
-
+        $error = 'Database tidak dapat diakses. Silakan coba lagi.';
     }
-
 }
-
 ?>
 
 
@@ -77,7 +61,7 @@ if (isset($_POST['login'])) {
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
 </head>
 <body>
 
@@ -89,7 +73,7 @@ if (isset($_POST['login'])) {
                 <div class="brand-pattern"></div>
 
                 <div class="brand-content text-center">
-                    <img src="../assets/img/musholla_logo.png" alt="Logo Musholla" class="brand-logo-img mb-4">
+                    <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="brand-logo-img mb-4">
 
                     <p class="brand-eyebrow mb-1">Sistem Informasi</p>
                     <h1 class="brand-title mb-2">Musholla</h1>
@@ -121,17 +105,17 @@ if (isset($_POST['login'])) {
                     <h1 class="login-title text-center mb-2">Login</h1>
                     <p class="login-subtitle text-center mb-4">Silakan masuk untuk melanjutkan</p>
 
-                    <?php if(isset($error)): ?>
+                    <?php if ($error !== ''): ?>
                         <div class="error-msg mb-3">
-                            <?php echo $error; ?>
+                            <?= htmlspecialchars($error) ?>
                         </div>
                     <?php endif; ?>
 
                     <!-- Form -->
-                    <form method="POST" id="loginForm">
+                    <form method="POST" action="<?= url('auth/sign_in.php') ?>" id="loginForm">
                         <div class="mb-3 input-icon-group">
                             <i class="bi bi-person input-icon"></i>
-                            <input type="text" class="form-control custom-input" name="username" placeholder="Username" required>
+                            <input type="text" class="form-control custom-input" name="username" placeholder="Username" value="<?= htmlspecialchars($usernameInput) ?>" required>
                         </div>
                         <div class="mb-4 input-icon-group">
                             <i class="bi bi-lock input-icon"></i>

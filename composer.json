@@ -1,0 +1,10 @@
+{
+    "name": "smkn1kraksaan/sim-musholla",
+    "description": "Sistem Informasi Musholla SMK Negeri 1 Kraksaan (PHP Native)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=7.4",
+        "dompdf/dompdf": "3.1.4"
+    }
+}
