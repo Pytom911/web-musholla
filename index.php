@@ -1,6 +1,17 @@
 <?php
 $pageTitle = 'Beranda - Sistem Informasi Musholla';
 require_once __DIR__ . '/template/header.php';
+
+$qTotalInfaq = mysqli_query($connect, "
+    SELECT COALESCE(SUM(nominal),0) AS total
+    FROM infaq
+    WHERE MONTH(tanggal)=MONTH(CURDATE())
+    AND YEAR(tanggal)=YEAR(CURDATE())
+");
+
+$dataTotalInfaq = mysqli_fetch_assoc($qTotalInfaq);
+$totalInfaq = $dataTotalInfaq['total'];
+
 ?>
 
 <!-- Hero Section (Ringkas) -->
@@ -8,7 +19,8 @@ require_once __DIR__ . '/template/header.php';
     <div class="hero-content">
         <p class="hero-subtitle">Selamat Datang di</p>
         <h1 class="hero-title">Sistem Informasi Musholla SMK Negeri 1 Kraksaan</h1>
-        <p class="hero-desc">Informasi kegiatan, jadwal, dan laporan musholla sekolah dalam satu sistem yang mudah diakses.</p>
+        <p class="hero-desc">Informasi kegiatan, jadwal, dan laporan musholla sekolah dalam satu sistem yang mudah
+            diakses.</p>
     </div>
     <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="hero-logo-large">
 </section>
@@ -21,9 +33,11 @@ require_once __DIR__ . '/template/header.php';
             <div>
                 <div class="stat-header">
                     <div class="stat-icon green"><i class="bi bi-box2-heart"></i></div>
-                    <h3 class="stat-title">Total Infaq <span class="fw-normal">(Bulan ini)</span></h3>
+                    <h3 class="stat-title">Total Infaq <span class="fw-normal"></span></h3>
                 </div>
-                <div class="stat-value">Rp 12.500.000</div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalInfaq,0,',','.') ?>
+                </div>
             </div>
             <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
@@ -104,7 +118,7 @@ require_once __DIR__ . '/template/header.php';
 </div>
 
 <!-- Baris Bawah: Jadwal Hari Ini & Kegiatan Terbaru (satu baris) -->
-<div class="row g-4 mt-1 mb-3">
+<div class="row g-4 mt-1 mb-4">
     <!-- Kolom Kiri: Jadwal Hari Ini -->
     <div class="col-12 col-lg-6">
         <div class="section-header">
@@ -134,36 +148,41 @@ require_once __DIR__ . '/template/header.php';
         </div>
     </div>
 
-    <!-- Kolom Kanan: Kegiatan Terbaru -->
+    <!-- Kolom Kanan: Kegiatan Terbaru (SUDAH DI-REDESAIN) -->
     <div class="col-12 col-lg-6">
         <div class="section-header">
             <h4 class="section-title">Kegiatan Terbaru</h4>
             <a href="<?= url('kegiatan/index.php') ?>" class="section-link">Lihat Semua &rarr;</a>
         </div>
-        <div class="info-card">
-            <div class="kegiatan-list">
-                <!-- Item 1 -->
+
+        <!-- Info Card dengan desain baru -->
+        <div class="col-12">
+            <div class="info-card">
                 <div class="kegiatan-item">
-                    
+                    <div class="kegiatan-date-box-green">
+                        <div class="clock-icon"><i class="bi bi-clock-fill"></i></div>
+                        <span class="date-number">20</span>
+                        <span class="date-month-year">Jul<br>2026</span>
+                    </div>
                     <div class="kegiatan-info">
                         <h6>Kajian Islam</h6>
-                        <p><i class="bi bi-clock"></i> 20 Jul 2026</p>
+                    </div>
+                    <div class="text-secondary">
+                        <i class="bi bi-chevron-right"></i>
                     </div>
                 </div>
-                <!-- Item 2 -->
+
                 <div class="kegiatan-item">
-                    
+                    <div class="kegiatan-date-box-green">
+                        <div class="clock-icon"><i class="bi bi-clock-fill"></i></div>
+                        <span class="date-number">10</span>
+                        <span class="date-month-year">Mar<br>2026</span>
+                    </div>
                     <div class="kegiatan-info">
                         <h6>Pesantren Ramadhan</h6>
-                        <p><i class="bi bi-clock"></i> 10 Mar 2026</p>
                     </div>
-                </div>
-                <!-- Item 3 -->
-                <div class="kegiatan-item">
-                    
-                    <div class="kegiatan-info">
-                        <h6>Isra Mi'raj</h6>
-                        <p><i class="bi bi-clock"></i> 27 Feb 2026</p>
+                    <div class="text-secondary">
+                        <i class="bi bi-chevron-right"></i>
                     </div>
                 </div>
             </div>

@@ -292,8 +292,26 @@ img, svg {
     transition: background-color 0.2s ease;
 }
 
+.btn-back {
+    background-color: #a81717;
+    color: #fff;
+    height: 58px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
 .btn-signin:hover {
     background-color: var(--brand-green-dark);
+    color: #fff;
+}
+.btn-back:hover {
+    background-color: #750c0c;
     color: #fff;
 }
 
@@ -754,49 +772,85 @@ img, svg {
     font-weight: 500;
 }
 
-/* -- List Kegiatan -- */
+/* -- List Kegiatan (Redesain Kalender Hijau) -- */
 .kegiatan-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
 }
 
 .kegiatan-item {
     display: flex;
     align-items: center;
-    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
 }
 
-.kegiatan-img {
-    width: 68px;
-    height: 50px;
+.kegiatan-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.kegiatan-item:hover {
+    background-color: #f8fafc;
+}
+
+.kegiatan-date-box-green {
+    width: 56px;
+    height: 60px;
+    border: 2px solid #16A34A;
     border-radius: 8px;
-    object-fit: cover;
-    background-color: #E2E8F0;
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+    position: relative;
+    background-color: #ffffff;
+}
+
+.kegiatan-date-box-green .clock-icon {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #16A34A;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    border: 2px solid #ffffff;
+}
+
+.kegiatan-date-box-green .date-number {
+    color: #16A34A;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    margin-top: 4px;
+}
+
+.kegiatan-date-box-green .date-month-year {
+    color: #16A34A;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
 }
 
 .kegiatan-info {
-    min-width: 0;
+    flex-grow: 1;
 }
 
 .kegiatan-info h6 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--text-dark);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.kegiatan-info p {
-    font-size: 0.78rem;
-    color: var(--text-gray);
     margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
 
