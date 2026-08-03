@@ -1,0 +1,154 @@
+/* ==========================================
+   HEADER LAPORAN
+========================================== */
+
+.laporan-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    margin-bottom:28px;
+}
+
+.laporan-header h1,
+.laporan-header h3{
+    margin:0;
+    font-size:2.2rem;
+    font-weight:800;
+    color:#13294b;
+}
+
+.laporan-header p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:16px;
+}
+
+/* ==========================================
+   CARD FILTER
+========================================== */
+
+.laporan-card{
+    background:#fff;
+    border-radius:22px;
+    padding:24px;
+    margin-bottom:28px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.card-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:22px;
+    font-weight:700;
+    color:#14532d;
+    margin-bottom:22px;
+}
+
+.card-title i{
+    color:#16a34a;
+}
+
+/* ==========================================
+   BUTTON
+========================================== */
+
+.btn-export{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:#178b45;
+    color:#fff;
+    text-decoration:none;
+    padding:14px 26px;
+    border-radius:14px;
+    font-weight:600;
+    transition:.3s;
+    box-shadow:0 10px 20px rgba(22,163,74,.18);
+}
+
+.btn-export:hover{
+    background:#136d37;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+.btn-filter{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    height:48px;
+    padding:0 24px;
+    background:#178b45;
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-weight:600;
+}
+
+.btn-filter:hover{
+    background:#136d37;
+}
+
+.btn-reset{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    height:48px;
+    padding:0 24px;
+    background:#fff;
+    border:1px solid #d9e2ec;
+    border-radius:12px;
+    text-decoration:none;
+    color:#475569;
+}
+
+.btn-reset:hover{
+    background:#f8fafc;
+    color:#178b45;
+}
+
+/* ==========================================
+   EMPTY
+========================================== */
+
+.empty-report{
+    padding:70px 20px;
+    text-align:center;
+}
+
+.empty-report i{
+    font-size:70px;
+    color:#cbd5e1;
+    margin-bottom:15px;
+}
+
+.empty-report h5{
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.empty-report p{
+    color:#94a3b8;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:768px){
+
+    .laporan-header{
+        flex-direction:column;
+    }
+
+    .btn-export,
+    .btn-filter,
+    .btn-reset{
+        width:100%;
+    }
+
+}
