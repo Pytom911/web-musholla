@@ -126,6 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <button type="submit" class="btn btn-signin w-100 mb-4" name="login">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Login
                         </button>
+                    <a href="<?= url('/') ?>" class="btn btn-back w-100 mb-4">
+                        <i class="bi bi-arrow-left me-2"></i>Kembali
+                    </a>
                     </form>
 
                     <div class="divider-text mb-4">
