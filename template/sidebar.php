@@ -8,7 +8,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <!-- Sidebar Header dengan Logo -->
-    <div class="sidebar-header">
+    <div class="sidebar-header bg-white">
         <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="sidebar-logo">
         <div class="sidebar-brand-text">
             <span class="sidebar-brand-title">Sistem Informasi</span>
@@ -27,7 +27,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
         </a>
         <div class="brand-divider">
             <span></span>
-            <i class="bi bi-asterisk"></i>
+            <i class="fst-normal fw-semibold fs-7">Master Data</i>
             <span></span>
         </div>
         <a href="<?= url('users/index.php') ?>"class="sidebar-link <?= (strpos($currentPage, '/users/') !== false) ? 'active' : '' ?>">
@@ -50,7 +50,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
         </a>
         <div class="brand-divider">
             <span></span>
-            <i class="bi bi-asterisk"></i>
+            <i class="fst-normal fw-semibold fs-7">Jadwal</i>
             <span></span>
         </div>
         <a href="<?= url('jadwal_sholat/jadwal_sholat.php') ?>" class="sidebar-link <?= (strpos($currentPage, '/jadwal_sholat/') !== false) ? 'active' : '' ?>">
@@ -67,7 +67,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
         </a>
         <div class="brand-divider">
             <span></span>
-            <i class="bi bi-asterisk"></i>
+            <i class="fst-normal fw-semibold fs-7">Keuangan</i>
             <span></span>
         </div>
         <a href="<?= url('kegiatan/index.php') ?>" class="sidebar-link <?= (strpos($currentPage, '/kegiatan/') !== false) ? 'active' : '' ?>">
@@ -90,7 +90,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
         </a>
         <div class="brand-divider">
             <span></span>
-            <i class="bi bi-asterisk"></i>
+            <i class="fst-normal fw-semibold fs-7">Laporan</i>
             <span></span>
         </div>
 
