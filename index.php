@@ -1,6 +1,17 @@
 <?php
 $pageTitle = 'Beranda - Sistem Informasi Musholla';
 require_once __DIR__ . '/template/header.php';
+
+$qTotalInfaq = mysqli_query($connect, "
+    SELECT COALESCE(SUM(nominal),0) AS total
+    FROM infaq
+    WHERE MONTH(tanggal)=MONTH(CURDATE())
+    AND YEAR(tanggal)=YEAR(CURDATE())
+");
+
+$dataTotalInfaq = mysqli_fetch_assoc($qTotalInfaq);
+$totalInfaq = $dataTotalInfaq['total'];
+
 ?>
 
 <!-- Hero Section (Ringkas) -->
@@ -22,9 +33,11 @@ require_once __DIR__ . '/template/header.php';
             <div>
                 <div class="stat-header">
                     <div class="stat-icon green"><i class="bi bi-box2-heart"></i></div>
-                    <h3 class="stat-title">Total Infaq <span class="fw-normal">(Bulan ini)</span></h3>
+                    <h3 class="stat-title">Total Infaq <span class="fw-normal"></span></h3>
                 </div>
-                <div class="stat-value">Rp 12.500.000</div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalInfaq,0,',','.') ?>
+                </div>
             </div>
             <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>

@@ -79,7 +79,7 @@ $data = mysqli_query($connect,"SELECT * FROM infaq ORDER BY tanggal DESC,id_infa
         <div class="stats-card">
 
             <div class="icon icon-yellow">
-                <i class="fas fa-calendar-alt"></i>
+                <i class="bi bi-calendar-event-fill"></i>
             </div>
 
             <div class="stats-info">
@@ -94,8 +94,8 @@ $data = mysqli_query($connect,"SELECT * FROM infaq ORDER BY tanggal DESC,id_infa
     <div class="col-xl-3 col-md-6">
         <div class="stats-card">
 
-            <div class="icon icon-red">
-                <i class="fas fa-file-invoice"></i>
+            <div class="icon icon-blue">
+                <i class="bi bi-receipt"></i>
             </div>
 
             <div class="stats-info">
