@@ -114,6 +114,25 @@ $data = mysqli_query($connect,"SELECT * FROM infaq ORDER BY tanggal DESC,id_infa
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Cari nama donatur...">
         </div>
+
+        <div class="filter-box">
+            <select id="filterBulan">
+                <option value="">All Months</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </div>
+
     </div>
 
     <div class="table-responsive">
@@ -121,7 +140,7 @@ $data = mysqli_query($connect,"SELECT * FROM infaq ORDER BY tanggal DESC,id_infa
             <thead>
                 <tr>
                     <th width="70">No</th>
-                    <th>Nama Donatur</th>
+                    <th>Nama Donatur</th>   
                     <th width="220">Nominal</th>
                     <th width="180">Tanggal</th>
                     <th width="220">Aksi</th>
@@ -130,7 +149,7 @@ $data = mysqli_query($connect,"SELECT * FROM infaq ORDER BY tanggal DESC,id_infa
             <tbody>
                 <?php if(mysqli_num_rows($data) > 0): ?>
                     <?php $no=1; while($row=mysqli_fetch_assoc($data)): ?>
-                    <tr>
+                    <tr data-tanggal="<?= $row['tanggal']; ?>">
                         <td><?= $no++; ?></td>
                         <td><strong><?= htmlspecialchars($row['nama_donatur']); ?></strong></td>
                         <td><span class="nominal">Rp <?= number_format($row['nominal'],0,',','.'); ?></span></td>

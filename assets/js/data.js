@@ -1,26 +1,33 @@
-// ===============================
-// Data CRUD
-// Sistem Informasi Musholla
-// ===============================
-
-// Search Table
 const searchInput = document.getElementById("searchInput");
+const filterBulan = document.getElementById("filterBulan");
+const tableRows = document.querySelectorAll("#dataTable tbody tr[data-tanggal]");
 
-if (searchInput) {
-    searchInput.addEventListener("keyup", function () {
-        const keyword = this.value.toLowerCase();
-        const rows = document.querySelectorAll("#dataTable tbody tr");
+function filterData() {
+    const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const bulan = filterBulan ? filterBulan.value : "";
 
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(keyword) ? "" : "none";
-        });
+    tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const tanggal = row.dataset.tanggal;
+        const bulanData = tanggal ? tanggal.substring(5, 7) : "";
+
+        const cocokNama = text.includes(keyword);
+        const cocokBulan = bulan === "" || bulanData === bulan;
+
+        row.style.display = cocokNama && cocokBulan ? "" : "none";
     });
 }
 
-// Confirm Delete
+if (searchInput) {
+    searchInput.addEventListener("input", filterData);
+}
+
+if (filterBulan) {
+    filterBulan.addEventListener("change", filterData);
+}
+
 document.querySelectorAll(".btn-delete").forEach(button => {
-    button.addEventListener("click", function (e) {
+    button.addEventListener("click", function(e) {
         if (!confirm("Yakin ingin menghapus data ini?")) {
             e.preventDefault();
         }

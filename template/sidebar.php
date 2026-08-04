@@ -59,14 +59,14 @@ $currentFile = basename($_SERVER['PHP_SELF']);
             <i class="fst-normal fw-semibold fs-7">Jadwal</i>
             <span></span>
         </div>
-        <a href="<?= url('jadwal_sholat/jadwal_sholat.php') ?>"
+        <a href="<?= url('jadwal_sholat/index.php') ?>"
             class="sidebar-link <?= (strpos($currentPage, '/jadwal_sholat/') !== false) ? 'active' : '' ?>">
             <div class="sidebar-link-left">
                 <i class="bi bi-calendar-event"></i>
                 <span>Jadwal Sholat</span>
             </div>
         </a>
-        <a href="<?= url('jadwal_imam/jadwal_imam.php') ?>"
+        <a href="<?= url('jadwal_imam/index.php') ?>"
             class="sidebar-link <?= (strpos($currentPage, '/jadwal_imam/') !== false) ? 'active' : '' ?>">
             <div class="sidebar-link-left">
                 <i class="bi bi-person-badge"></i>

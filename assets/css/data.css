@@ -303,6 +303,44 @@
     border-radius:30px;
 }
 
+.nominal-red{
+    display:inline-block;
+    color:#ef4444;
+    font-weight:700;
+    font-size:15px;
+    background:#fdecec;
+    padding:6px 14px;
+    border-radius:30px;
+}
+
+/*==========================
+  ROLE BADGE
+==========================*/
+
+.role-badge{
+    display:inline-block;
+    padding:6px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:capitalize;
+}
+
+.role-admin{
+    background:#e8f0ff;
+    color:#2563eb;
+}
+
+.role-petugas{
+    background:#fff6d9;
+    color:#d97706;
+}
+
+.role-siswa{
+    background:#e7f8ec;
+    color:#16a34a;
+}
+
 /*==========================
   ACTION BUTTON
 ==========================*/
