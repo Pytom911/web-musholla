@@ -6,10 +6,17 @@ $role = $isLoggedIn ? ($_SESSION['role'] ?? null) : null;
 $isAdmin = $role === 'admin';
 $isPetugas = $role === 'petugas';
 
-$username = $_SESSION['username'] ?? '';
+$username = $_SESSION['nama'] ?? '';
 $nama = $_SESSION['nama'] ?? $username;
-$role = $_SESSION['role'] ?? '';
-$defaultPhoto = $isAdmin ? 'admin_profile.jpg' : 'petugas_profile.jpg';
+$akses = $_SESSION['role'] ?? '';
+
+$photos = [
+    'admin' => 'admin_profile.jpg',
+    'petugas' => 'petugas_profile.jpg',
+    'siswa' => 'siswa_profile.jpg',
+];
+
+$defaultPhoto = $photos[$akses] ?? 'default_profile.jpg';
 $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
 ?>
 <!DOCTYPE html>
@@ -74,6 +81,8 @@ $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
                             </li>
                             <li><a class="dropdown-item py-2 text-danger" href="<?= url('auth/logout.php') ?>"><i
                                         class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                            <li><a class="dropdown-item py-2" href="<?= url('auth/sign_in.php') ?>"><i
+                                        class="bi bi-person-fill me-2"></i> Switch Account</a></li>
                         </ul>
                     </div>
                 <?php else: ?>

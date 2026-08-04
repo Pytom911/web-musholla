@@ -1,18 +1,28 @@
 <?php
 require_once '../config/connect.php';
 
-if (isset($_POST['id_infaq'])) {
+if (isset($_POST['id_user'])) {
 
-    $id = (int)$_POST['id_infaq'];
-    $nama = mysqli_real_escape_string($connect, $_POST['nama_donatur']);
-    $nominal = $_POST['nominal'];
-    $tanggal = $_POST['tanggal'];
+    $id = (int)$_POST['id_user'];
+    $username = mysqli_real_escape_string($connect, $_POST['username']);
+    $nama = mysqli_real_escape_string($connect, $_POST['nama']);
+    $role = mysqli_real_escape_string($connect, $_POST['role']);
 
-    $query = mysqli_query($connect, "UPDATE infaq SET
-        nama_donatur='$nama',
-        nominal='$nominal',
-        tanggal='$tanggal'
-        WHERE id_infaq='$id'");
+    if (!empty($_POST['password'])) {
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $query = mysqli_query($connect, "UPDATE users SET
+            username='$username',
+            nama='$nama',
+            role='$role',
+            password='$password'
+            WHERE id_user='$id'");
+    } else {
+        $query = mysqli_query($connect, "UPDATE users SET
+            username='$username',
+            nama='$nama',
+            role='$role'
+            WHERE id_user='$id'");
+    }
 
     if ($query) {
         header('Location: index.php?pesan=update');

@@ -1,12 +1,12 @@
 <?php
-$pageTitle='Edit Data Infaq';
+$pageTitle = 'Edit Data Pengguna';
 require_once '../template/header.php';
 
-$id=mysqli_real_escape_string($connect,$_GET['id']);
-$data=mysqli_query($connect,"SELECT * FROM users WHERE id_user='$id'");
-$row=mysqli_fetch_assoc($data);
+$id = mysqli_real_escape_string($connect, $_GET['id']);
+$data = mysqli_query($connect, "SELECT * FROM users WHERE id_user='$id'");
+$row = mysqli_fetch_assoc($data);
 
-if(!$row){
+if (!$row) {
     echo "<script>alert('Data tidak ditemukan!');window.location='index.php';</script>";
     exit;
 }
@@ -23,38 +23,62 @@ if(!$row){
 
     <div class="form-card">
 
-        <h3 class="form-title">Edit Data Infaq</h3>
-        <p class="form-subtitle">Perbarui data infaq yang telah tersimpan.</p>
+        <h3 class="form-title">Edit Data Pengguna</h3>
+        <p class="form-subtitle">Perbarui data pengguna yang telah tersimpan.</p>
 
         <form action="update.php" method="POST">
 
-            <input type="hidden" name="id_infaq" value="<?= $row['id_infaq']; ?>">
+            <input type="hidden" name="id_user" value="<?= $row['id_user']; ?>">
 
             <div class="form-group">
-                <label>Nama Donatur <span class="required">*</span></label>
-                <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label>Nominal <span class="required">*</span></label>
+                <label>Username <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-cash-stack"></i>
+                        <i class="bi bi-person"></i>
                     </span>
 
-                    <input type="number" name="nominal" class="form-control" value="<?= $row['nominal']; ?>" min="1000" required>
+                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($row['username']); ?>" required>
                 </div>
             </div>
-                        <div class="form-group">
-                <label>Tanggal <span class="required">*</span></label>
+
+            <div class="form-group">
+                <label>Nama <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-calendar-event"></i>
+                        <i class="bi bi-person-vcard"></i>
                     </span>
 
-                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required>
+                    <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($row['nama']); ?>" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Role <span class="required">*</span></label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person-badge"></i>
+                    </span>
+                    <select name="role" class="form-select" required>
+                        <option value="">Pilih Role</option>
+                        <option value="admin" <?= $row['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                        <option value="petugas" <?= $row['role'] == 'petugas' ? 'selected' : ''; ?>>Petugas</option>
+                        <option value="siswa" <?= $row['role'] == 'siswa' ? 'selected' : ''; ?>>Siswa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-lock"></i>
+                    </span>
+
+                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
                 </div>
             </div>
 

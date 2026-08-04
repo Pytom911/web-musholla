@@ -26,7 +26,7 @@ require_once '../template/header.php';
 
             <div class="form-group">
                 <label>Nama <span class="required">*</span></label>
-                <input type="text" name="name" class="form-control" placeholder="Masukkan Nama" required>
+                <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama" required>
             </div>
 
             <div class="form-group">
