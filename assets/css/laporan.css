@@ -249,3 +249,13 @@
     }
 
 }
+
+.nominal-red{
+    display:inline-block;
+    color:#ef4444;
+    font-weight:700;
+    font-size:15px;
+    background:#fdecec;
+    padding:6px 14px;
+    border-radius:30px;
+}

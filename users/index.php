@@ -3,7 +3,6 @@ $pageTitle = 'Data Pengguna';
 require_once '../template/header.php';
 
 $totalUser = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users"));
-$totalSiswa = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users WHERE role='siswa'"));
 $totalPetugas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users WHERE role='petugas'"));
 $totalAdmin = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users WHERE role='admin'"));
 $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
@@ -43,7 +42,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-red">
@@ -59,23 +58,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="stats-card">
-
-                <div class="icon icon-green">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Total Siswa</small>
-                    <h2><?= $totalSiswa['total'] ?? 0 ?></h2>
-                    <span>Orang</span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-yellow">
@@ -91,7 +74,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-blue">

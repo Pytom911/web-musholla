@@ -12,6 +12,31 @@ $qTotalInfaq = mysqli_query($connect, "
 $dataTotalInfaq = mysqli_fetch_assoc($qTotalInfaq);
 $totalInfaq = $dataTotalInfaq['total'];
 
+$qTotalKegiatan = mysqli_query($connect,"
+    SELECT COUNT(*) AS total
+    FROM kegiatan
+");
+
+$dataTotalKegiatan = mysqli_fetch_assoc($qTotalKegiatan);
+$totalKegiatan = $dataTotalKegiatan['total'];
+
+$qTotalPengeluaran = mysqli_query($connect,"
+    SELECT COALESCE(SUM(pengeluaran),0) AS total
+    FROM kegiatan
+");
+
+$dataTotalPengeluaran = mysqli_fetch_assoc($qTotalPengeluaran);
+$totalPengeluaran = $dataTotalPengeluaran['total'];
+
+// Saldo Keuangan (sementara Infaq - Pengeluaran)
+$saldoKeuangan = $totalInfaq - $totalPengeluaran;
+
+$qKegiatanTerbaru = mysqli_query($connect,"
+    SELECT *
+    FROM kegiatan
+    ORDER BY tanggal DESC,id_kegiatan DESC
+    LIMIT 2
+");
 ?>
 
 <!-- Hero Section (Ringkas) -->
@@ -49,11 +74,24 @@ $totalInfaq = $dataTotalInfaq['total'];
             <div>
                 <div class="stat-header">
                     <div class="stat-icon blue"><i class="bi bi-coin"></i></div>
-                    <h3 class="stat-title">Total Shodaqoh <span class="fw-normal">(Bulan ini)</span></h3>
+                    <h3 class="stat-title">Total Shodaqoh <span class="fw-normal"></span></h3>
                 </div>
-                <div class="stat-value">Rp 8.000.000</div>
+                <div class="stat-value">Rp -</div>
             </div>
             <a href="<?= url('shodaqoh/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Card 4: Total Kelas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon cyan"><i class="bi bi-wallet2"></i></div>
+                    <h3 class="stat-title">Total Infaq dan Shodaqoh</h3>
+                </div>
+                <div class="stat-value">Rp -</div>
+            </div>
         </div>
     </div>
 
@@ -65,26 +103,16 @@ $totalInfaq = $dataTotalInfaq['total'];
                     <div class="stat-icon orange"><i class="bi bi-card-checklist"></i></div>
                     <h3 class="stat-title">Total Kegiatan</h3>
                 </div>
-                <div class="stat-value">25</div>
+                <div class="stat-value">
+                    <?= $totalKegiatan ?>
+                </div>
             </div>
             <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
-
-    <!-- Card 4: Total Kelas -->
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div>
-                <div class="stat-header">
-                    <div class="stat-icon purple"><i class="bi bi-backpack3"></i></div>
-                    <h3 class="stat-title">Total Kelas</h3>
-                </div>
-                <div class="stat-value">39</div>
-            </div>
-            <a href="<?= url('kelas/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
-        </div>
-    </div>
 </div>
+
+
 
 <!-- Baris Kedua: Total Infaq & Shodaqoh, Total Pengeluaran -->
 <div class="row g-3 mt-1">
@@ -93,10 +121,12 @@ $totalInfaq = $dataTotalInfaq['total'];
         <div class="stat-card">
             <div>
                 <div class="stat-header">
-                    <div class="stat-icon cyan"><i class="bi bi-wallet2"></i></div>
-                    <h3 class="stat-title">Total Infaq dan Shodaqoh</h3>
+                    <div class="stat-icon purple"><i class="bi bi-wallet2"></i></div>
+                    <h3 class="stat-title">Saldo Keuangan</h3>
                 </div>
-                <div class="stat-value">Rp 20.500.000</div>
+                <div class="stat-value">
+                    Rp<?= number_format($saldoKeuangan,0,',','.') ?>
+                </div>
             </div>
             <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
@@ -110,7 +140,9 @@ $totalInfaq = $dataTotalInfaq['total'];
                     <div class="stat-icon red"><i class="bi bi-cash-stack"></i></div>
                     <h3 class="stat-title">Total Pengeluaran</h3>
                 </div>
-                <div class="stat-value">Rp 5.250.000</div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalPengeluaran,0,',','.') ?>
+                </div>
             </div>
             <a href="<?= url('laporan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
@@ -154,40 +186,42 @@ $totalInfaq = $dataTotalInfaq['total'];
             <h4 class="section-title">Kegiatan Terbaru</h4>
             <a href="<?= url('kegiatan/index.php') ?>" class="section-link">Lihat Semua &rarr;</a>
         </div>
-
-        <!-- Info Card dengan desain baru -->
         <div class="col-12">
             <div class="info-card">
-                <div class="kegiatan-item">
-                    <div class="kegiatan-date-box-green">
-                        <div class="clock-icon"><i class="bi bi-clock-fill"></i></div>
-                        <span class="date-number">20</span>
-                        <span class="date-month-year">Jul<br>2026</span>
-                    </div>
-                    <div class="kegiatan-info">
-                        <h6>Kajian Islam</h6>
-                    </div>
-                    <div class="text-secondary">
-                        <i class="bi bi-chevron-right"></i>
-                    </div>
-                </div>
+                <?php if(mysqli_num_rows($qKegiatanTerbaru)>0): ?>
+                    <?php while($kegiatan=mysqli_fetch_assoc($qKegiatanTerbaru)): ?>
+                        <div class="kegiatan-item">
+                            <div class="kegiatan-date-box-green">
+                                <div class="clock-icon">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <span class="date-number">
+                                    <?= date('d',strtotime($kegiatan['tanggal'])) ?>
+                                </span>
+                                <span class="date-month-year">
+                                    <?= date('M',strtotime($kegiatan['tanggal'])) ?><br>
+                                    <?= date('Y',strtotime($kegiatan['tanggal'])) ?>
+                                </span>
+                            </div>
 
-                <div class="kegiatan-item">
-                    <div class="kegiatan-date-box-green">
-                        <div class="clock-icon"><i class="bi bi-clock-fill"></i></div>
-                        <span class="date-number">10</span>
-                        <span class="date-month-year">Mar<br>2026</span>
-                    </div>
-                    <div class="kegiatan-info">
-                        <h6>Pesantren Ramadhan</h6>
-                    </div>
-                    <div class="text-secondary">
-                        <i class="bi bi-chevron-right"></i>
-                    </div>
+                            <div class="kegiatan-info">
+                                <h6><?= htmlspecialchars($kegiatan['nama_kegiatan']) ?></h6>
+                            </div>
+
+                            <div class="text-secondary">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-event fs-1"></i>
+                    <p class="mt-3 mb-0">Belum ada kegiatan.</p>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
 </div>
 
 <?php require_once __DIR__ . '/template/footer.php'; ?>
