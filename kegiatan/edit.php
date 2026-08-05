@@ -4,9 +4,9 @@ require_once __DIR__ . '/../template/header.php';
 
 $id = $_GET['id'] ?? 0;
 
-$data = mysqli_query($connect,"SELECT * FROM kegiatan WHERE id_kegiatan='$id'");
+$data = mysqli_query($connect, "SELECT * FROM kegiatan WHERE id_kegiatan='$id'");
 
-if(mysqli_num_rows($data)==0){
+if (mysqli_num_rows($data) == 0) {
     echo "<script>
             alert('Data kegiatan tidak ditemukan!');
             window.location='index.php';
@@ -21,22 +21,6 @@ $row = mysqli_fetch_assoc($data);
 
 <div class="container-fluid">
 
-    <div class="breadcrumb-wrapper">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="<?= url() ?>">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="index.php">Kegiatan</a>
-                </li>
-                <li class="breadcrumb-item active">
-                    Edit Kegiatan
-                </li>
-            </ol>
-        </nav>
-    </div>
-
     <a href="index.php" class="btn-back">
         <i class="bi bi-arrow-left"></i>
         Kembali
@@ -44,89 +28,65 @@ $row = mysqli_fetch_assoc($data);
 
     <div class="form-card">
 
-        <div class="form-title">
-            Edit Kegiatan
-        </div>
-
-        <div class="form-subtitle">
-            Ubah data kegiatan musholla.
-        </div>
+        <h3 class="form-title">Edit Kegiatan</h3>
+        <p class="form-subtitle">
+            Perbarui data kegiatan musholla pada form di bawah ini.
+        </p>
 
         <form action="update.php" method="POST">
 
             <input type="hidden" name="id_kegiatan" value="<?= $row['id_kegiatan']; ?>">
 
-            <div class="row">
+            <div class="form-group">
+                <label>Nama Kegiatan <span class="required">*</span></label>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Nama Kegiatan
-                            <span class="required">*</span>
-                        </label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-event"></i>
+                    </span>
 
-                        <input
-                            type="text"
-                            name="nama_kegiatan"
-                            class="form-control"
-                            value="<?= htmlspecialchars($row['nama_kegiatan']); ?>"
-                            required>
-                    </div>
+                    <input type="text" name="nama_kegiatan" class="form-control" value="<?= htmlspecialchars($row['nama_kegiatan']); ?>" required>
                 </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Pengeluaran
-                            <span class="required">*</span>
-                        </label>
+            <div class="form-group">
+                <label>Pengeluaran <span class="required">*</span></label>
 
-                        <div class="input-group">
-                            <span class="input-group-text">Rp</span>
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
 
-                            <input
-                                type="number"
-                                name="pengeluaran"
-                                class="form-control"
-                                value="<?= $row['pengeluaran']; ?>"
-                                min="0"
-                                required>
-                        </div>
-                    </div>
+                    <input type="number" name="pengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" required>
                 </div>
-                                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Tanggal
-                            <span class="required">*</span>
-                        </label>
+            </div>
 
-                        <input
-                            type="date"
-                            name="tanggal"
-                            class="form-control"
-                            value="<?= $row['tanggal']; ?>"
-                            required>
-                    </div>
+            <div class="form-group">
+                <label>Tanggal <span class="required">*</span></label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-date"></i>
+                    </span>
+
+                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required>
                 </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Deskripsi</label>
+            <div class="form-group">
+                <label>Deskripsi</label>
 
-                        <textarea
-                            name="deskripsi"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Masukkan deskripsi kegiatan"><?= htmlspecialchars($row['deskripsi']); ?></textarea>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-card-text"></i>
+                    </span>
+
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)"><?= htmlspecialchars($row['deskripsi']); ?></textarea>
                 </div>
-
             </div>
 
             <div class="form-footer">
 
                 <a href="index.php" class="btn-cancel">
+                    <i class="bi bi-arrow-left-circle"></i>
                     Batal
                 </a>
 

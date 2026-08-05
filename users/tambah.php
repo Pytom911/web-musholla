@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Tambah Data User';
-require_once '../template/header.php';
+$pageTitle = 'Tambah Kegiatan';
+require_once __DIR__ . '/../template/header.php';
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -14,49 +14,60 @@ require_once '../template/header.php';
 
     <div class="form-card">
 
-        <h3 class="form-title">Tambah Data Pengguna</h3>
-        <p class="form-subtitle">Tambahkan data pengguna baru ke dalam sistem.</p>
+        <h3 class="form-title">Tambah Kegiatan</h3>
+        <p class="form-subtitle">
+            Silakan lengkapi data kegiatan musholla pada form di bawah ini.
+        </p>
 
         <form action="simpan.php" method="POST">
 
             <div class="form-group">
-                <label>Username <span class="required">*</span></label>
-                <input type="text" name="username" class="form-control" placeholder="Masukkan Username" required>
-            </div>
-
-            <div class="form-group">
-                <label>Nama <span class="required">*</span></label>
-                <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama" required>
-            </div>
-
-            <div class="form-group">
-                <label>Role <span class="required">*</span></label>
+                <label>Nama Kegiatan <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-person-badge"></i>
+                        <i class="bi bi-calendar-event"></i>
                     </span>
-                    <select name="role" class="form-select" required>
-                        <option value="">Pilih Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="petugas">Petugas</option>
-                        <option value="siswa">Siswa</option>
-                    </select>
+
+                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan" required>
                 </div>
             </div>
+
             <div class="form-group">
-                <label>Password <span class="required">*</span></label>
+                <label>Pengeluaran <span class="required">*</span></label>
+
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" name="pengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tanggal <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-lock"></i>
+                        <i class="bi bi-calendar-date"></i>
                     </span>
 
-                    <input type="password" name="password" class="form-control" placeholder="Masukan Password" required>
+                    <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Deskripsi</label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-card-text"></i>
+                    </span>
+
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)"></textarea>
                 </div>
             </div>
 
             <div class="form-footer">
+
                 <a href="index.php" class="btn-cancel">
                     <i class="bi bi-arrow-left-circle"></i>
                     Batal
@@ -66,6 +77,7 @@ require_once '../template/header.php';
                     <i class="bi bi-check-circle-fill"></i>
                     Simpan Data
                 </button>
+
             </div>
 
         </form>
@@ -74,4 +86,4 @@ require_once '../template/header.php';
 
 </div>
 
-<?php require_once '../template/footer.php'; ?>
+<?php require_once __DIR__ . '/../template/footer.php'; ?>

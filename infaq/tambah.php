@@ -21,7 +21,12 @@ require_once '../template/header.php';
 
             <div class="form-group">
                 <label>Nama Donatur <span class="required">*</span></label>
-                <input type="text" name="nama_donatur" class="form-control" placeholder="Masukkan nama donatur" required>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" name="nama_donatur" class="form-control" placeholder="Masukkan nama donatur" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -38,17 +43,17 @@ require_once '../template/header.php';
                 </div>
 
             </div>
-                        <div class="form-group">
-                <label>Tanggal <span class="required">*</span></label>
+            <div class="form-group">
+            <label>Tanggal <span class="required">*</span></label>
 
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-calendar-event"></i>
-                    </span>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
 
-                    <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
-                </div>
+                <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
             </div>
+        </div>
 
             <div class="form-footer">
                 <a href="index.php" class="btn-cancel">

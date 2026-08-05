@@ -87,7 +87,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
         <div class="stat-card">
             <div>
                 <div class="stat-header">
-                    <div class="stat-icon cyan"><i class="bi bi-backpack3"></i></div>
+                    <div class="stat-icon cyan"><i class="bi bi-wallet2"></i></div>
                     <h3 class="stat-title">Total Infaq dan Shodaqoh</h3>
                 </div>
                 <div class="stat-value">Rp -</div>

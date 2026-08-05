@@ -32,7 +32,12 @@ if(!$row){
 
             <div class="form-group">
                 <label>Nama Donatur <span class="required">*</span></label>
-                <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                </div>
             </div>
 
             <div class="form-group">

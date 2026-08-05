@@ -9,7 +9,8 @@
 
 :root {
     /* Brand Colors (Login) */
-    --brand-green: #145A2E;
+    --green-muda: #118848;
+    --brand-green: #118848;
     --brand-green-dark: #0E3E20;
     --brand-green-darker: #0B2E18;
     --brand-green-light: #EAF9F1;
@@ -594,7 +595,7 @@ img, svg {
 }
 
 .btn-login-hero {
-    background-color: var(--primary-green);
+    background-color: var(--green-muda);
     color: #ffffff;
     padding: 10px 24px;
     border-radius: 8px;

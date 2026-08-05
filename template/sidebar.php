@@ -99,6 +99,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                 <span>Data Shodaqoh</span>
             </div>
         </a>
+        <?php if ($isPetugas OR $isAdmin): ?>
         <div class="brand-divider">
             <span></span>
             <i class="fst-normal fw-semibold fs-7">Laporan</i>
@@ -142,6 +143,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                 class="sidebar-link py-2 <?= $currentFile === 'laporan-Imam.php' ? 'active' : '' ?>">
                 <span style="font-size:0.85rem;">Laporan Imam</span>
             </a>
+                    <?php endif; ?>
 
         </div>
     </div>
