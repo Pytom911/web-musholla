@@ -15,7 +15,6 @@ if (isset($_POST['nama_donatur'])) {
     } else {
         header('Location: tambah.php?pesan=gagal');
     }
-
 } else {
     header('Location: index.php');
 }

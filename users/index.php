@@ -61,7 +61,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
-                <div class="icon icon-yellow">
+                <div class="icon icon-green">
                     <i class="bi bi-person-badge"></i>
                 </div>
 
@@ -117,12 +117,12 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
-                                <td><?= htmlspecialchars($row['nama']); ?></td>
+                                <td><strong><?=($row['username']); ?></strong></td>
+                                <td><?=($row['nama']); ?></td>
                                 <td><span
-                                        class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span>
+                                        class="role-badge role-<?=($row['role']); ?>"><?=(ucfirst($row['role'])); ?></span>
                                 </td>
-                                <td><?= htmlspecialchars($row['password']); ?></td>
+                                <td><?=($row['password']); ?></td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_user']; ?>" class="btn-edit">

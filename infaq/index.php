@@ -2,11 +2,10 @@
 $pageTitle = 'Data Infaq';
 require_once '../template/header.php';
 
-$totalDonatur = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT nama_donatur) AS total FROM infaq"));
+$totalDonatur = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM infaq"));
 $totalInfaq = mysqli_fetch_assoc(mysqli_query($connect, "SELECT SUM(nominal) AS total FROM infaq"));
-$totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "SELECT SUM(nominal) AS total FROM infaq WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())"));
 $totalTransaksi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM infaq"));
-$data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_infaq DESC");
+$data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY id_infaq DESC");
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -33,7 +32,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             <h3>Data Infaq</h3>
             <p>Kelola seluruh data infaq musholla.</p>
         </div>
-        <?php if ($isPetugas OR $isAdmin): ?>
+        <?php if ($isPetugas or $isAdmin): ?>
             <a href="tambah.php" class="btn-add">
                 <i class="fas fa-plus-circle"></i>
                 Tambah Infaq
@@ -43,10 +42,10 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
-                <div class="icon icon-red">
+                <div class="icon icon-green">
                     <i class="fas fa-users"></i>
                 </div>
 
@@ -59,10 +58,10 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
-                <div class="icon icon-green">
+                <div class="icon icon-red">
                     <i class="bi bi-box2-heart"></i>
                 </div>
 
@@ -75,23 +74,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="stats-card">
-
-                <div class="icon icon-yellow">
-                    <i class="bi bi-calendar-event-fill"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Bulan Ini</small>
-                    <h2>Rp<?= number_format($totalBulan['total'] ?? 0, 0, ',', '.') ?></h2>
-                    <span><?= date('F Y') ?></span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-blue">
@@ -115,7 +98,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                 <input type="text" id="searchInput" placeholder="Cari nama donatur...">
             </div>
 
-            <div class="filter-box">
+            <!-- <div class="filter-box">
                 <select id="filterBulan">
                     <option value="">All Months</option>
                     <option value="01">January</option>
@@ -131,7 +114,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-            </div>
+            </div> -->
 
         </div>
 
@@ -143,7 +126,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                         <th>Nama Donatur</th>
                         <th width="220">Nominal</th>
                         <th width="180">Tanggal</th>
-                        <?php if ($isPetugas OR $isAdmin): ?>
+                        <?php if ($isPetugas or $isAdmin): ?>
                             <th width="220">Aksi</th>
                         <?php endif; ?>
                     </tr>
@@ -154,10 +137,10 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr data-tanggal="<?= $row['tanggal']; ?>">
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= htmlspecialchars($row['nama_donatur']); ?></strong></td>
+                                <td><strong><?= ($row['nama_donatur']); ?></strong></td>
                                 <td><span class="nominal">Rp <?= number_format($row['nominal'], 0, ',', '.'); ?></span></td>
                                 <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
-                                <?php if ($isPetugas OR $isAdmin): ?>
+                                <?php if ($isPetugas or $isAdmin): ?>
                                     <td>
                                         <div class="action-group">
                                             <a href="edit.php?id=<?= $row['id_infaq']; ?>" class="btn-edit">
@@ -174,7 +157,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                     <?php else: ?>
                         <tr>
                             <td colspan="5">
-                                <div class="empty-data">
+                                <div class="data-kosong">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Data Infaq</h4>
                                     <p>Silakan klik tombol <b>Tambah Infaq</b> untuk menambahkan data.</p>

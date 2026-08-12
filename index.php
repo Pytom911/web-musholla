@@ -128,7 +128,6 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     Rp<?= number_format($saldoKeuangan,0,',','.') ?>
                 </div>
             </div>
-            <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
 
@@ -144,7 +143,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     Rp<?= number_format($totalPengeluaran,0,',','.') ?>
                 </div>
             </div>
-            <a href="<?= url('laporan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
+            <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
 </div>

@@ -17,9 +17,8 @@ if (isset($_POST['id_infaq'])) {
     if ($query) {
         header('Location: index.php?pesan=update');
     } else {
-        header('Location: edit.php?id='.$id.'&pesan=gagal');
+        header('Location: edit.php?id=' . $id . '&pesan=gagal');
     }
-
 } else {
     header('Location: index.php');
 }
