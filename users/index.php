@@ -117,12 +117,12 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?=($row['username']); ?></strong></td>
-                                <td><?=($row['nama']); ?></td>
+                                <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
+                                <td><?= htmlspecialchars($row['nama']); ?></td>
                                 <td><span
-                                        class="role-badge role-<?=($row['role']); ?>"><?=(ucfirst($row['role'])); ?></span>
+                                        class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span>
                                 </td>
-                                <td><?=($row['password']); ?></td>
+                                <td><?= htmlspecialchars($row['password']); ?></td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_user']; ?>" class="btn-edit">

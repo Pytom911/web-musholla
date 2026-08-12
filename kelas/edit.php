@@ -32,12 +32,7 @@ if (!$row) {
 
             <div class="form-group">
                 <label>Nama Kelas <span class="required">*</span></label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-mortarboard"></i>
-                    </span>
-                    <input type="text" name="nama_kelas" class="form-control" value="<?= htmlspecialchars($row['nama_kelas']); ?>" required>
-                </div>  
+                <input type="text" name="nama_kelas" class="form-control" value="<?= htmlspecialchars($row['nama_kelas']); ?>" required>
             </div>
 
             <div class="form-group">
@@ -60,7 +55,7 @@ if (!$row) {
                         Batal
                     </a>
 
-                    <button type="submit" class="btn-update">
+                    <button type="submit" class="btn-add">
                         <i class="bi bi-pencil-square"></i>
                         Update Data
                     </button>

@@ -81,8 +81,8 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?=($row['nama_kelas']); ?></strong></td>
-                                <td><strong><?=($row['tingkat']); ?></strong></td>
+                                <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
+                                <td><strong><?= htmlspecialchars($row['tingkat']); ?></strong></td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_kelas']; ?>" class="btn-edit">

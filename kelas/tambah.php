@@ -23,7 +23,7 @@ require_once '../template/header.php';
                 <label>Nama Kelas <span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-mortarboard"></i>
+                        <i class="bi bi-card-checklist"></i>
                     </span>
                     <input type="text" name="nama_kelas" class="form-control" placeholder="Masukkan nama kelas" required>
                 </div>

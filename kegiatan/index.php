@@ -89,16 +89,16 @@ $data = mysqli_query($connect, "SELECT * FROM kegiatan ORDER BY id_kegiatan DESC
                     <?php if (mysqli_num_rows($data) > 0): ?>
                         <?php $no = 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
-                            <tr data-tanggal="<?= ($row['tanggal']); ?>">
+                            <tr data-tanggal="<?= htmlspecialchars($row['tanggal']); ?>">
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= ($row['nama_kegiatan']); ?></strong></td>
+                                <td><strong><?= htmlspecialchars($row['nama_kegiatan']); ?></strong></td>
                                 <td>
                                     <span class="nominal-red">
                                         Rp <?= number_format($row['pengeluaran'], 0, ',', '.'); ?>
                                     </span>
                                 </td>
                                 <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
-                                <td><?= nl2br(($row['deskripsi'])); ?></td>
+                                <td><?= nl2br(htmlspecialchars($row['deskripsi'])); ?></td>
                                 <?php if ($isPetugas || $isAdmin): ?>
                                     <td>
                                         <div class="action-group">

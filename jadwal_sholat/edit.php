@@ -59,7 +59,7 @@ if (!$row) {
                     Batal
                 </a>
 
-                <button type="submit" class="btn-update">
+                <button type="submit" class="btn-add">
                     <i class="bi bi-pencil-square"></i>
                     Update Data
                 </button>

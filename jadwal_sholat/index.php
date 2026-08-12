@@ -15,7 +15,7 @@ $data = mysqli_query($connect, "
 
 <link rel="stylesheet" href="../assets/css/data.css">
 
-<div class="container-fluid">   
+<div class="container-fluid">
 
     <?php if (isset($_GET['pesan'])): ?>
 
@@ -125,7 +125,9 @@ $data = mysqli_query($connect, "
                                             <i class="fas fa-pen"></i> Edit
                                         </a>
 
-                                        <a href="hapus.php?id=<?= $row['id_jadwal']; ?>" class="btn-delete">
+                                        <a href="hapus.php?id=<?= $row['id_jadwal']; ?>"
+                                            class="btn-delete"
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')">
                                             <i class="fas fa-trash"></i> Hapus
                                         </a>
 
