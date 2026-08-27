@@ -7,6 +7,8 @@ $pageTitle = 'Tambah Guru';
 require_once "../template/header.php";
 ?>
 
+<link rel="stylesheet" href="../assets/css/data.css">
+
 <div class="container-fluid px-4">
 
     <!-- Tombol Kembali -->
@@ -115,22 +117,17 @@ require_once "../template/header.php";
                 </div>
 
                 <!-- Tombol -->
-                <div class="d-flex justify-content-end gap-2 mt-5">
+                <div class="form-footer">
+                <a href="index.php" class="btn-cancel">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    Batal
+                </a>
 
-                    <a href="index.php" class="btn btn-light px-4 py-3">
-                        <i class="bi bi-x-circle"></i>
-                        Batal
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="btn btn-success px-4 py-3"
-                    >
-                        <i class="bi bi-check-circle"></i>
-                        Simpan Data
-                    </button>
-
-                </div>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Simpan Data
+                </button>
+            </div>
 
             </form>
 

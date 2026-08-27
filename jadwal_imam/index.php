@@ -1,4 +1,3 @@
-```php
 <?php
 $pageTitle = 'Data Jadwal Imam';
 session_start();

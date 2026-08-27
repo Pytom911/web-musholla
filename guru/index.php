@@ -1,4 +1,3 @@
-```php
 <?php
 $pageTitle = 'Data Guru';
 require_once '../template/header.php';
