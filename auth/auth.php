@@ -12,6 +12,6 @@ function requireRole(array $allowedRoles)
 
     if (!in_array($role, $allowedRoles, true)) {
         http_response_code(403);
-        exit('Forbidden');
+        exit('Anda tidak memiliki akses untuk mengunjungi halaman ini');
     }
 }

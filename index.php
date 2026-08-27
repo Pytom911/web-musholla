@@ -12,6 +12,16 @@ $qTotalInfaq = mysqli_query($connect, "
 $dataTotalInfaq = mysqli_fetch_assoc($qTotalInfaq);
 $totalInfaq = $dataTotalInfaq['total'];
 
+$qTotalshodaqoh = mysqli_query($connect, "
+    SELECT COALESCE(SUM(nominal),0) AS total
+    FROM shodaqoh_jumat
+    WHERE MONTH(tanggal)=MONTH(CURDATE())
+    AND YEAR(tanggal)=YEAR(CURDATE())
+");
+
+$dataTotalshodaqoh = mysqli_fetch_assoc($qTotalshodaqoh);
+$totalshodaqoh = $dataTotalshodaqoh['total'];
+
 $qTotalKegiatan = mysqli_query($connect,"
     SELECT COUNT(*) AS total
     FROM kegiatan
@@ -29,7 +39,7 @@ $dataTotalPengeluaran = mysqli_fetch_assoc($qTotalPengeluaran);
 $totalPengeluaran = $dataTotalPengeluaran['total'];
 
 // Saldo Keuangan (sementara Infaq - Pengeluaran)
-$saldoKeuangan = $totalInfaq - $totalPengeluaran;
+$saldoKeuangan = $totalInfaq + $totalshodaqoh - $totalPengeluaran;
 
 $qKegiatanTerbaru = mysqli_query($connect,"
     SELECT *
@@ -53,7 +63,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
 <!-- Baris Pertama: Total Infaq, Total Shodaqoh, Total Kegiatan, Total Kelas -->
 <div class="row g-3">
     <!-- Card 1: Total Infaq -->
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-12 col-sm-6 col-xl-4">
         <div class="stat-card">
             <div>
                 <div class="stat-header">
@@ -69,20 +79,22 @@ $qKegiatanTerbaru = mysqli_query($connect,"
     </div>
 
     <!-- Card 2: Total Shodaqoh -->
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-12 col-sm-6 col-xl-4">
         <div class="stat-card">
             <div>
                 <div class="stat-header">
                     <div class="stat-icon blue"><i class="bi bi-coin"></i></div>
                     <h3 class="stat-title">Total Shodaqoh <span class="fw-normal"></span></h3>
                 </div>
-                <div class="stat-value">Rp -</div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalshodaqoh,0,',','.') ?>
+                </div>
             </div>
             <a href="<?= url('shodaqoh/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
 
-    <!-- Card 4: Total Kelas -->
+    <!-- Card 4: Total Kelas
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="stat-card">
             <div>
@@ -93,10 +105,10 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                 <div class="stat-value">Rp -</div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Card 3: Total Kegiatan -->
-    <div class="col-12 col-sm-6 col-xl-3">
+    <div class="col-12 col-sm-6 col-xl-4">
         <div class="stat-card">
             <div>
                 <div class="stat-header">
@@ -127,8 +139,8 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                 <div class="stat-value">
                     Rp<?= number_format($saldoKeuangan,0,',','.') ?>
                 </div>
+                <span class="jadwal-kelas">Total Dari Infaq Dan Shodaqoh</span>
             </div>
-            <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
 
@@ -144,7 +156,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     Rp<?= number_format($totalPengeluaran,0,',','.') ?>
                 </div>
             </div>
-            <a href="<?= url('laporan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
+            <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
         </div>
     </div>
 </div>

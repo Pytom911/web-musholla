@@ -1,4 +1,6 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin']);
 $pageTitle = 'Tambah Data User';
 require_once '../template/header.php';
 ?>

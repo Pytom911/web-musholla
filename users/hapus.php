@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin']);
 
 if (isset($_GET['id'])) {
 
