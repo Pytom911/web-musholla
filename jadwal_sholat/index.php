@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Data Jadwal Sholat';
-require_once '../template/header.php';
+require_once __DIR__ . '/../template/header.php';
 
 $totalJadwal = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM jadwal_sholat"));
 $totalkelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM kelas"));
@@ -170,3 +170,5 @@ $data = mysqli_query($connect, "
 </div>
 
 <script src="../assets/js/data.js"></script>
+
+<?php require_once __DIR__ . '../template/footer.php'; ?>

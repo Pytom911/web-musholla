@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Data Jadwal Imam';
 session_start();
-require_once '../template/header.php';
+require_once __DIR__ . '/../template/header.php';
 
 $totalImam = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(DISTINCT id_guru) AS total
@@ -181,5 +181,4 @@ $data = mysqli_query($connect, "
 
 <script src="../assets/js/data.js"></script>
 
-<?php require_once '../template/footer.php'; ?>
-```
+<?php require_once __DIR__ . '/../template/footer.php'; ?>
