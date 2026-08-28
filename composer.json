@@ -5,6 +5,6 @@
     "license": "proprietary",
     "require": {
         "php": ">=7.4",
-        "dompdf/dompdf": "3.1.4"
+        "dompdf/dompdf": "^3.1.5"
     }
 }
