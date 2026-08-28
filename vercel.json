@@ -7,7 +7,11 @@
   "routes": [
     {
       "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "continue": true
+    },
+    {
+      "src": "/(.*\\.php)",
+      "dest": "/api/index.php"
     },
     {
       "src": "/(.*)",
