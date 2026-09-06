@@ -13,7 +13,6 @@ $akses = $_SESSION['role'] ?? '';
 $photos = [
     'admin' => 'admin_profile.jpg',
     'petugas' => 'petugas_profile.jpg',
-    'siswa' => 'siswa_profile.jpg',
 ];
 
 $defaultPhoto = $photos[$akses] ?? 'default_profile.jpg';

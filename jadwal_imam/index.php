@@ -61,7 +61,7 @@ $data = mysqli_query($connect, "
             <p>Kelola seluruh data jadwal imam musholla.</p>
         </div>
 
-        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
+        <?php if ($isPetugas OR $isAdmin): ?>
             <a href="tambah.php" class="btn-add">
                 <i class="fas fa-plus-circle"></i>
                 Tambah Jadwal Imam
@@ -112,12 +112,12 @@ $data = mysqli_query($connect, "
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Imam</th>
-                        <th width="180">Tanggal</th>
-                        <th width="220">Waktu Sholat</th>
+                        <th>Tanggal</th>
+                        <th>Waktu Sholat</th>
                         <?php if ($isPetugas OR $isAdmin): ?>
-                            <th width="180" class="text-center">Aksi</th>
+                            <th>Aksi</th>
                         <?php endif; ?>
                     </tr>
                 </thead>
@@ -129,13 +129,9 @@ $data = mysqli_query($connect, "
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td>
-                                    <strong>
-                                        <?= htmlspecialchars($row['nama_guru'] ?? 'Nama guru tidak ditemukan'); ?>
-                                    </strong>
-                                </td>
+                                <td><strong><?= htmlspecialchars($row['nama_guru'] ?? 'Nama guru tidak ditemukan'); ?></strong></td>
                                 <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
-                                <td><?= htmlspecialchars($row['waktu_sholat']); ?></td>
+                                <td><strong><?= htmlspecialchars($row['waktu_sholat']); ?></strong></td>
                                 <?php if ($isPetugas OR $isAdmin): ?>
                                     <td>
                                         <div class="action-group">

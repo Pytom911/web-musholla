@@ -67,10 +67,10 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama kelas</th>
-                        <th width="220">Tingkat</th>
-                        <th width="220">Aksi</th>
+                        <th>Tingkat</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,7 +80,7 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
-                                <td><strong><?= htmlspecialchars($row['tingkat']); ?></strong></td>
+                                <td><?= htmlspecialchars($row['tingkat']); ?></td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_kelas']; ?>" class="btn-edit">

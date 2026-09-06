@@ -71,10 +71,6 @@ $bulan = [
 
     <div class="table-card">
         <div class="table-header">
-            <div>
-                <h4>Data Laporan Shodaqoh Jumat</h4>
-                <p class="text-muted mb-0">Seluruh transaksi shodaqoh Jumat yang telah tercatat.</p>
-            </div>
             <div class="table-tools">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -87,10 +83,10 @@ $bulan = [
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th width="200">Tanggal</th>
+                        <th>No</th>
+                        <th>Tanggal</th>
                         <th>Nama Kelas</th>
-                        <th width="220">Nominal</th>
+                        <th>Nominal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +101,7 @@ $bulan = [
                                 <td><?= $tanggal; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
                                 <td>
-                                    <span class="nominal-red">
+                                    <span class="nominal">
                                         Rp <?= number_format($row['nominal'], 0, ',', '.'); ?>
                                     </span>
                                 </td>

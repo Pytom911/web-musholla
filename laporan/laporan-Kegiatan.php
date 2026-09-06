@@ -20,7 +20,7 @@ $bulan = [
     <div class="laporan-header">
         <div>
             <h3>Laporan Kegiatan</h3>
-            <p>Rekapitulasi seluruh data kegiatan dan pengeluaran musholla.</p>
+            <p>seluruh data kegiatan pengeluaran musholla.</p>
         </div>
         <a href="export/export-Kegiatan.php" target="_blank" class="btn-export">
             <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
@@ -57,10 +57,6 @@ $bulan = [
 
     <div class="table-card">
         <div class="table-header">
-            <div>
-                <h4>Data Laporan Kegiatan</h4>
-                <p class="text-muted mb-0">Seluruh kegiatan dan pengeluaran yang telah tercatat.</p>
-            </div>
             <div class="table-tools">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -73,10 +69,10 @@ $bulan = [
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Kegiatan</th>
-                        <th width="220">Pengeluaran</th>
-                        <th width="200">Tanggal</th>
+                        <th>Pengeluaran</th>
+                        <th>Tanggal</th>
                         <th>Deskripsi</th>
                     </tr>
                 </thead>

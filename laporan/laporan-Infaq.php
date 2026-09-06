@@ -22,7 +22,7 @@ $bulan = [
     <div class="laporan-header">
         <div>
             <h3>Laporan Infaq</h3>
-            <p>Rekapitulasi seluruh data penerimaan infaq musholla.</p>
+            <p>seluruh data penerimaan infaq musholla.</p>
         </div>
         <a href="export/export-Infaq.php" target="_blank" class="btn-export">
             <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
@@ -72,10 +72,6 @@ $bulan = [
 
     <div class="table-card">
         <div class="table-header">
-            <div>
-                <h4>Data Laporan Infaq</h4>
-                <p class="text-muted mb-0">Seluruh transaksi infaq yang telah tercatat.</p>
-            </div>
             <div class="table-tools">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
@@ -88,10 +84,10 @@ $bulan = [
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Donatur</th>
-                        <th width="220">Nominal</th>
-                        <th width="200">Tanggal</th>
+                        <th>Nominal</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,7 +100,7 @@ $bulan = [
                                     <strong><?= htmlspecialchars($row['nama_donatur']); ?></strong>
                                 </td>
                                 <td>
-                                    <span class="nominal-red">
+                                    <span class="nominal">
                                         Rp <?= number_format($row['nominal'], 0, ',', '.'); ?>
                                     </span>
                                 </td>

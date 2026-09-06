@@ -77,7 +77,7 @@ $html = '
 
 <div class="title">
     <h3>LAPORAN SHODAQOH JUMAT</h3>
-    <p>Rekapitulasi seluruh data penerimaan shodaqoh Jumat dari setiap kelas</p>
+    <p>seluruh data penerimaan shodaqoh Jumat dari setiap kelas</p>
 </div>
 
 <table class="summary">

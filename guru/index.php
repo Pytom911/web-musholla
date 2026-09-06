@@ -1,6 +1,4 @@
 <?php
-require_once "../auth/auth.php";
-requireRole(['admin']);
 $pageTitle = 'Data Guru';
 require_once '../template/header.php';
 
@@ -35,10 +33,12 @@ $data = mysqli_query($connect, "
             <h3>Data Guru</h3>
             <p>Kelola seluruh data guru.</p>
         </div>
-        <a href="tambah.php" class="btn-add">
-            <i class="fas fa-plus-circle"></i>
-            Tambah Guru
-        </a>
+        <?php if ($isPetugas OR $isAdmin): ?>
+            <a href="tambah.php" class="btn-add">
+                <i class="fas fa-plus-circle"></i>
+                Tambah Guru
+            </a>
+        <?php endif; ?>
     </div>
 
     <div class="row g-4 mb-4">
@@ -72,7 +72,9 @@ $data = mysqli_query($connect, "
                         <th>Nama Guru</th>
                         <th>NIP</th>
                         <th>No HP</th>
-                        <th width="220">Aksi</th>
+                        <?php if ($isPetugas OR $isAdmin): ?>
+                            <th width="220">Aksi</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -82,23 +84,24 @@ $data = mysqli_query($connect, "
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><?= htmlspecialchars($row['nama_guru']); ?></td>
+                                <td><strong><?= htmlspecialchars($row['nama_guru']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['nip']); ?></td>
                                 <td><?= htmlspecialchars($row['no_hp']); ?></td>
-                                <td>
-                                    <div class="action-group">
-                                        <a href="edit.php?id=<?= $row['id_guru']; ?>" class="btn-edit">
-                                            <i class="fas fa-pen"></i>
-                                            Edit
-                                        </a>
-                                        <a href="hapus.php?id=<?= $row['id_guru']; ?>"
-                                           class="btn-delete"
-                                           onclick="return confirm('Yakin ingin menghapus data?')">
-                                            <i class="fas fa-trash"></i>
-                                            Hapus
-                                        </a>
-                                    </div>
-                                </td>
+                                <?php if ($isPetugas OR $isAdmin): ?>
+                                    <td>
+                                        <div class="action-group">
+                                            <a href="edit.php?id=<?= $row['id_guru']; ?>" class="btn-edit">
+                                                <i class="fas fa-pen"></i>
+                                                Edit
+                                            </a>
+                                            <a href="hapus.php?id=<?= $row['id_guru']; ?>" class="btn-delete"
+                                                onclick="return confirm('Yakin ingin menghapus data?')">
+                                                <i class="fas fa-trash"></i>
+                                                Hapus
+                                            </a>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>

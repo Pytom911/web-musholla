@@ -39,81 +39,43 @@ require_once __DIR__ . '/../template/header.php';
         </div>
 
         <form action="simpan.php" method="POST">
-
             <div class="form-group">
-                <label>
-                    Nama Kegiatan
-                    <span class="required">*</span>
-                </label>
-
+                <label>Nama Kegiatan<span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-
-                    <input
-                        type="text"
-                        name="nama_kegiatan"
-                        class="form-control"
-                        placeholder="Masukkan nama kegiatan"
-                        required>
+                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>
-                    Pengeluaran
-                    <span class="required">*</span>
-                </label>
-
+                <label>Pengeluaran<span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         Rp
                     </span>
-
-                    <input
-                        type="number"
-                        name="pengeluaran"
-                        class="form-control"
-                        placeholder="Masukkan nominal pengeluaran"
-                        min="0"
-                        required>
+                    <input type="number" name="pengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>
-                    Tanggal
-                    <span class="required">*</span>
-                </label>
-
+                <label>Tanggal<span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-calendar-date"></i>
                     </span>
-
-                    <input
-                        type="date"
-                        name="tanggal"
-                        class="form-control"
-                        value="<?= date('Y-m-d'); ?>"
-                        required>
+                    <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Deskripsi</label>
-
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-card-text"></i>
                     </span>
-
-                    <textarea
-                        name="deskripsi"
-                        class="form-control"
-                        rows="4"
-                        placeholder="Masukkan deskripsi kegiatan (opsional)"></textarea>
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)" required></textarea>
                 </div>
             </div>
 

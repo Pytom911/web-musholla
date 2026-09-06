@@ -61,7 +61,7 @@ $kelas = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas ASC");
                 <label>Nominal <span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-cash-stack"></i>
+                        Rp
                     </span>
                     <input type="number" name="nominal" class="form-control" value="<?= $row['nominal']; ?>" min="1000" required>
                 </div>

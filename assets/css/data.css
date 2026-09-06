@@ -267,6 +267,61 @@
     background:#fff;
 }
 
+.table-modern thead th {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-modern tbody td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-modern .action-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.table-modern .btn-edit,
+.table-modern .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 85px;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.table-modern .btn-edit {
+    background: #fbbf00;
+    color: #fff;
+}
+
+.table-modern .btn-delete {
+    background: #ef4444;
+    color: #fff;
+}
+
+.table-modern .btn-edit:hover {
+    background: #e0a800;
+    color: #fff;
+}
+
+.table-modern .btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
 .table-modern thead th{
     background:#f8fafc;
     color:var(--text);

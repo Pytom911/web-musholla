@@ -134,13 +134,13 @@ $data = mysqli_query($connect, $sql);
 
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Kegiatan</th>
-                        <th width="180">Pengeluaran</th>
-                        <th width="170">Tanggal</th>
+                        <th>Pengeluaran</th>
+                        <th>Tanggal</th>
                         <th>Deskripsi</th>
                         <?php if ($isPetugas OR $isAdmin): ?>
-                            <th width="180" class="text-center">Aksi</th>
+                            <th>Aksi</th>
                         <?php endif; ?>
                     </tr>
                 </thead>
@@ -168,8 +168,7 @@ $data = mysqli_query($connect, $sql);
                                                 Edit
                                             </a>
 
-                                            <a href="hapus.php?id=<?= $row['id_kegiatan']; ?>" class="btn-delete"
-                                                onclick="return confirm('Yakin ingin menghapus data kegiatan ini?')">
+                                            <a href="hapus.php?id=<?= $row['id_kegiatan']; ?>" class="btn-delete">
                                                 <i class="bi bi-trash-fill"></i>
                                                 Hapus
                                             </a>

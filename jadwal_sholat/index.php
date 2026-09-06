@@ -37,10 +37,10 @@ $data = mysqli_query($connect, "
             <h3>Data Jadwal Sholat</h3>
             <p>Kelola seluruh data jadwal sholat musholla.</p>
         </div>
-        <?php if ($isPetugas || $isAdmin): ?>
+        <?php if ($isPetugas || $isAdmin):?>
             <a href="tambah.php" class="btn-add">
                 <i class="fas fa-plus-circle"></i>
-                Tambah Jadwal
+                Tambah Jadwal Sholat
             </a>
         <?php endif; ?>
 
@@ -94,11 +94,13 @@ $data = mysqli_query($connect, "
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Tanggal</th>
                         <th>Waktu Sholat</th>
                         <th>Kelas</th>
-                        <th width="220">Aksi</th>
+                        <?php if ($isPetugas || $isAdmin):?>
+                        <th>Aksi</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -115,10 +117,10 @@ $data = mysqli_query($connect, "
 
                                 <td><?= htmlspecialchars($row['tanggal']); ?></td>
 
-                                <td><?= htmlspecialchars($row['waktu_sholat']); ?></td>
+                                <td><strong><?= htmlspecialchars($row['waktu_sholat']); ?></strong></td>
 
                                 <td><?= htmlspecialchars($row['nama_kelas']); ?></td>
-
+                                <?php if ($isPetugas || $isAdmin):?>
                                 <td>
                                     <div class="action-group">
 
@@ -134,6 +136,7 @@ $data = mysqli_query($connect, "
 
                                     </div>
                                 </td>
+                                <?php endif; ?>
 
                             </tr>
 

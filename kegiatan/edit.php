@@ -79,7 +79,7 @@ $row = mysqli_fetch_assoc($data);
                         <i class="bi bi-card-text"></i>
                     </span>
 
-                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)"><?= htmlspecialchars($row['deskripsi']); ?></textarea>
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)" required><?= htmlspecialchars($row['deskripsi']); ?></textarea>
                 </div>
             </div>
 

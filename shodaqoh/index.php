@@ -97,12 +97,12 @@ $data = mysqli_query (
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Tanggal</th>
                         <th>Nama Kelas</th>
-                        <th width="220">Nominal</th>
+                        <th>Nominal</th>
                         <?php if($isPetugas || $isAdmin): ?>
-                            <th width="180" class="text-center">Aksi</th>
+                            <th>Aksi</th>
                         <?php endif; ?>
                     </tr>
                 </thead>

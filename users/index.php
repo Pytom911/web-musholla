@@ -105,12 +105,12 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Username</th>
                         <th>Nama</th>
-                        <th width="180">Role</th>
-                        <th width="180">Password</th>
-                        <th width="220">Aksi</th>
+                        <th>Role</th>
+                        <th>Password</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -88,7 +88,7 @@ $html = '
 
 <div class="title">
     <h3>LAPORAN KEGIATAN</h3>
-    <p>Rekapitulasi seluruh data kegiatan dan pengeluaran musholla</p>
+    <p>seluruh data kegiatan dan pengeluaran musholla</p>
 </div>
 
 <table class="summary">

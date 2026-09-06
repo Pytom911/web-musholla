@@ -105,12 +105,12 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Donatur</th>
-                        <th width="220">Nominal</th>
-                        <th width="180">Tanggal</th>
+                        <th>Nominal</th>
+                        <th>Tanggal</th>
                         <?php if ($isPetugas OR $isAdmin): ?>
-                            <th width="220">Aksi</th>
+                            <th>Aksi</th>
                         <?php endif; ?>
                     </tr>
                 </thead>

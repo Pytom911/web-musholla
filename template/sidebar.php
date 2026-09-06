@@ -26,12 +26,12 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                 <span>Beranda</span>
             </div>
         </a>
+        <div class="brand-divider">
+            <span></span>
+            <i class="fst-normal fw-semibold fs-7">Master Data</i>
+            <span></span>
+        </div>
         <?php if ($isAdmin): ?>
-            <div class="brand-divider">
-                <span></span>
-                <i class="fst-normal fw-semibold fs-7">Master Data</i>
-                <span></span>
-            </div>
             <a href="<?= url('users/index.php') ?>"
                 class="sidebar-link <?= (strpos($currentPage, '/users/') !== false) ? 'active' : '' ?>">
                 <div class="sidebar-link-left">
@@ -39,21 +39,21 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                     <span>Data User</span>
                 </div>
             </a>
-            <a href="<?= url('guru/index.php') ?>"
-                class="sidebar-link <?= (strpos($currentPage, '/guru/') !== false) ? 'active' : '' ?>">
-                <div class="sidebar-link-left">
-                    <i class="bi bi-people"></i>
-                    <span>Data Guru</span>
-                </div>
-            </a>
-            <a href="<?= url('kelas/index.php') ?>"
-                class="sidebar-link <?= (strpos($currentPage, '/kelas/') !== false) ? 'active' : '' ?>">
-                <div class="sidebar-link-left">
-                    <i class="bi bi-book"></i>
-                    <span>Data Kelas</span>
-                </div>
-            </a>
         <?php endif; ?>
+        <a href="<?= url('guru/index.php') ?>"
+            class="sidebar-link <?= (strpos($currentPage, '/guru/') !== false) ? 'active' : '' ?>">
+            <div class="sidebar-link-left">
+                <i class="bi bi-people"></i>
+                <span>Data Guru</span>
+            </div>
+        </a>
+        <a href="<?= url('kelas/index.php') ?>"
+            class="sidebar-link <?= (strpos($currentPage, '/kelas/') !== false) ? 'active' : '' ?>">
+            <div class="sidebar-link-left">
+                <i class="bi bi-book"></i>
+                <span>Data Kelas</span>
+            </div>
+        </a>
         <div class="brand-divider">
             <span></span>
             <i class="fst-normal fw-semibold fs-7">Jadwal</i>
@@ -100,50 +100,50 @@ $currentFile = basename($_SERVER['PHP_SELF']);
             </div>
         </a>
         <?php if ($isPetugas OR $isAdmin): ?>
-        <div class="brand-divider">
-            <span></span>
-            <i class="fst-normal fw-semibold fs-7">Laporan</i>
-            <span></span>
-        </div>
-
-        <!-- Dropdown Laporan -->
-        <a href="#" class="sidebar-link <?= (strpos($currentPage, '/laporan/') !== false) ? 'active' : '' ?>"
-            data-bs-toggle="collapse" data-bs-target="#menuLaporan"
-            aria-expanded="<?= (strpos($currentPage, '/laporan/') !== false) ? 'true' : 'false' ?>">
-            <div class="sidebar-link-left">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Laporan</span>
+            <div class="brand-divider">
+                <span></span>
+                <i class="fst-normal fw-semibold fs-7">Laporan</i>
+                <span></span>
             </div>
-            <i class="bi bi-chevron-down" style="font-size: 0.75rem;"></i>
-        </a>
 
-        <div class="collapse <?= (strpos($currentPage, '/laporan/') !== false) ? 'show' : '' ?> ps-3" id="menuLaporan">
-
-            <a href="<?= url('laporan/laporan-Infaq.php') ?>"
-                class="sidebar-link py-2 <?= $currentFile === 'laporan-Infaq.php' ? 'active' : '' ?>">
-                <span style="font-size:0.85rem;">Laporan Infaq</span>
+            <!-- Dropdown Laporan -->
+            <a href="#" class="sidebar-link <?= (strpos($currentPage, '/laporan/') !== false) ? 'active' : '' ?>"
+                data-bs-toggle="collapse" data-bs-target="#menuLaporan"
+                aria-expanded="<?= (strpos($currentPage, '/laporan/') !== false) ? 'true' : 'false' ?>">
+                <div class="sidebar-link-left">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Laporan</span>
+                </div>
+                <i class="bi bi-chevron-down" style="font-size: 0.75rem;"></i>
             </a>
 
-            <a href="<?= url('laporan/laporan-Shodaqoh.php') ?>"
-                class="sidebar-link py-2 <?= $currentFile === 'laporan-Shodaqoh.php' ? 'active' : '' ?>">
-                <span style="font-size:0.85rem;">Laporan Shodaqoh</span>
-            </a>
+            <div class="collapse <?= (strpos($currentPage, '/laporan/') !== false) ? 'show' : '' ?> ps-3" id="menuLaporan">
 
-            <a href="<?= url('laporan/laporan-Kegiatan.php') ?>"
-                class="sidebar-link py-2 <?= $currentFile === 'laporan-Kegiatan.php' ? 'active' : '' ?>">
-                <span style="font-size:0.85rem;">Laporan Kegiatan</span>
-            </a>
+                <a href="<?= url('laporan/laporan-Infaq.php') ?>"
+                    class="sidebar-link py-2 <?= $currentFile === 'laporan-Infaq.php' ? 'active' : '' ?>">
+                    <span style="font-size:0.85rem;">Laporan Infaq</span>
+                </a>
 
-            <a href="<?= url('laporan/laporan-Jadwal.php') ?>"
-                class="sidebar-link py-2 <?= $currentFile === 'laporan-Jadwal.php' ? 'active' : '' ?>">
-                <span style="font-size:0.85rem;">Laporan Jadwal</span>
-            </a>
+                <a href="<?= url('laporan/laporan-Shodaqoh.php') ?>"
+                    class="sidebar-link py-2 <?= $currentFile === 'laporan-Shodaqoh.php' ? 'active' : '' ?>">
+                    <span style="font-size:0.85rem;">Laporan Shodaqoh</span>
+                </a>
 
-            <a href="<?= url('laporan/laporan-Imam.php') ?>"
-                class="sidebar-link py-2 <?= $currentFile === 'laporan-Imam.php' ? 'active' : '' ?>">
-                <span style="font-size:0.85rem;">Laporan Imam</span>
-            </a>
-                    <?php endif; ?>
+                <a href="<?= url('laporan/laporan-Kegiatan.php') ?>"
+                    class="sidebar-link py-2 <?= $currentFile === 'laporan-Kegiatan.php' ? 'active' : '' ?>">
+                    <span style="font-size:0.85rem;">Laporan Kegiatan</span>
+                </a>
+
+                <a href="<?= url('laporan/laporan-Jadwal.php') ?>"
+                    class="sidebar-link py-2 <?= $currentFile === 'laporan-Jadwal.php' ? 'active' : '' ?>">
+                    <span style="font-size:0.85rem;">Laporan Jadwal</span>
+                </a>
+
+                <a href="<?= url('laporan/laporan-Imam.php') ?>"
+                    class="sidebar-link py-2 <?= $currentFile === 'laporan-Imam.php' ? 'active' : '' ?>">
+                    <span style="font-size:0.85rem;">Laporan Imam</span>
+                </a>
+            <?php endif; ?>
 
         </div>
     </div>

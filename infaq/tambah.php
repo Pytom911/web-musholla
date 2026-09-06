@@ -35,13 +35,11 @@ require_once '../template/header.php';
                 <div class="input-group">
 
                     <span class="input-group-text">
-                        <i class="bi bi-cash-stack"></i>
+                        Rp
                     </span>
 
                     <input type="number" name="nominal" class="form-control" placeholder="Masukkan nominal infaq" min="1000" required>
-
                 </div>
-
             </div>
             <div class="form-group">
                 <label>Tanggal <span class="required">*</span></label>
