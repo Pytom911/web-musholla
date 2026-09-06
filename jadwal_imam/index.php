@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Data Jadwal Imam';
 session_start();
-require_once '../template/header.php';
+require_once __DIR__ . '/../template/header.php';
 
 $totalImam = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(DISTINCT id_guru) AS total
@@ -116,7 +116,9 @@ $data = mysqli_query($connect, "
                         <th>Nama Imam</th>
                         <th width="180">Tanggal</th>
                         <th width="220">Waktu Sholat</th>
-                        <th width="220">Aksi</th>
+                        <?php if ($isPetugas OR $isAdmin): ?>
+                            <th width="180" class="text-center">Aksi</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -134,24 +136,24 @@ $data = mysqli_query($connect, "
                                 </td>
                                 <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
                                 <td><?= htmlspecialchars($row['waktu_sholat']); ?></td>
-                                <td>
-                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
+                                <?php if ($isPetugas OR $isAdmin): ?>
+                                    <td>
                                         <div class="action-group">
+
                                             <a href="edit.php?id=<?= $row['id_imam']; ?>" class="btn-edit">
-                                                <i class="fas fa-pen"></i>
+                                                <i class="bi bi-pencil-fill"></i>
                                                 Edit
                                             </a>
-                                            <a href="hapus.php?id=<?= $row['id_imam']; ?>"
-                                               class="btn-delete"
-                                               onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                <i class="fas fa-trash"></i>
+
+                                            <a href="hapus.php?id=<?= $row['id_imam']; ?>" class="btn-delete"
+                                                onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                <i class="bi bi-trash-fill"></i>
                                                 Hapus
                                             </a>
                                         </div>
-                                    <?php else: ?>
-                                        <span>-</span>
-                                    <?php endif; ?>
-                                </td>
+
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -181,5 +183,4 @@ $data = mysqli_query($connect, "
 
 <script src="../assets/js/data.js"></script>
 
-<?php require_once '../template/footer.php'; ?>
-```
+<?php require_once __DIR__ . '/../template/footer.php'; ?>

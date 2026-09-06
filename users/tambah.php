@@ -42,7 +42,6 @@ require_once '../template/header.php';
                         <option value="">Pilih Role</option>
                         <option value="admin">Admin</option>
                         <option value="petugas">Petugas</option>
-                        <option value="siswa">Siswa</option>
                     </select>
                 </div>
             </div>

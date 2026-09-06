@@ -78,7 +78,7 @@ $data = mysqli_query($connect, $sql);
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-event-fill"></i>
@@ -92,7 +92,7 @@ $data = mysqli_query($connect, $sql);
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-cash-stack"></i>
@@ -102,20 +102,6 @@ $data = mysqli_query($connect, $sql);
                     <small>Total Pengeluaran</small>
                     <h2>Rp<?= number_format($totalPengeluaran, 0, ',', '.'); ?></h2>
                     <span>Semua Kegiatan</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="stats-card">
-                <div class="icon icon-yellow">
-                    <i class="bi bi-calendar2-week-fill"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Pengeluaran Bulan Ini</small>
-                    <h2>Rp<?= number_format($pengeluaranBulan, 0, ',', '.'); ?></h2>
-                    <span><?= date('F Y'); ?></span>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-red">
@@ -59,7 +59,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-green">
@@ -75,23 +75,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
-            <div class="stats-card">
-
-                <div class="icon icon-yellow">
-                    <i class="bi bi-calendar-event-fill"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Bulan Ini</small>
-                    <h2>Rp<?= number_format($totalBulan['total'] ?? 0, 0, ',', '.') ?></h2>
-                    <span><?= date('F Y') ?></span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
                 <div class="icon icon-blue">
@@ -113,25 +97,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Cari nama donatur...">
-            </div>
-
-            <div class="filter-box">
-                <select id="filterBulan">
-                    <option value="">All Months</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-            </div>
+            </div>  
 
         </div>
 

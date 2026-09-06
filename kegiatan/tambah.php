@@ -40,72 +40,87 @@ require_once __DIR__ . '/../template/header.php';
 
         <form action="simpan.php" method="POST">
 
-            <div class="row">
+            <div class="form-group">
+                <label>
+                    Nama Kegiatan
+                    <span class="required">*</span>
+                </label>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Nama Kegiatan
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="nama_kegiatan"
-                            class="form-control"
-                            placeholder="Masukkan nama kegiatan"
-                            required>
-                    </div>
-                </div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-event"></i>
+                    </span>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Pengeluaran
-                            <span class="required">*</span>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text">Rp</span>
-                            <input
-                                type="number"
-                                name="pengeluaran"
-                                class="form-control"
-                                placeholder="Masukkan nominal pengeluaran"
-                                min="0"
-                                required>
-                        </div>
-                    </div>
+                    <input
+                        type="text"
+                        name="nama_kegiatan"
+                        class="form-control"
+                        placeholder="Masukkan nama kegiatan"
+                        required>
                 </div>
-                                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>
-                            Tanggal
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="date"
-                            name="tanggal"
-                            class="form-control"
-                            value="<?= date('Y-m-d'); ?>"
-                            required>
-                    </div>
-                </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea
-                            name="deskripsi"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Masukkan deskripsi kegiatan (opsional)"></textarea>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>
+                    Pengeluaran
+                    <span class="required">*</span>
+                </label>
 
+                <div class="input-group">
+                    <span class="input-group-text">
+                        Rp
+                    </span>
+
+                    <input
+                        type="number"
+                        name="pengeluaran"
+                        class="form-control"
+                        placeholder="Masukkan nominal pengeluaran"
+                        min="0"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Tanggal
+                    <span class="required">*</span>
+                </label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-date"></i>
+                    </span>
+
+                    <input
+                        type="date"
+                        name="tanggal"
+                        class="form-control"
+                        value="<?= date('Y-m-d'); ?>"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Deskripsi</label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-card-text"></i>
+                    </span>
+
+                    <textarea
+                        name="deskripsi"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Masukkan deskripsi kegiatan (opsional)"></textarea>
+                </div>
             </div>
 
             <div class="form-footer">
 
                 <a href="<?= url('kegiatan/index.php') ?>" class="btn-cancel">
+                    <i class="bi bi-arrow-counterclockwise"></i>
                     Batal
                 </a>
 
@@ -117,8 +132,8 @@ require_once __DIR__ . '/../template/header.php';
             </div>
 
         </form>
-
     </div>
 
 </div>
+
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

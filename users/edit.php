@@ -67,7 +67,6 @@ if (!$row) {
                         <option value="">Pilih Role</option>
                         <option value="admin" <?= $row['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
                         <option value="petugas" <?= $row['role'] == 'petugas' ? 'selected' : ''; ?>>Petugas</option>
-                        <option value="siswa" <?= $row['role'] == 'siswa' ? 'selected' : ''; ?>>Siswa</option>
                     </select>
                 </div>
             </div>

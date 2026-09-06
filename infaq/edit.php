@@ -1,12 +1,12 @@
 <?php
-$pageTitle='Edit Data Infaq';
+$pageTitle = 'Edit Data Infaq';
 require_once '../template/header.php';
 
-$id=mysqli_real_escape_string($connect,$_GET['id']);
-$data=mysqli_query($connect,"SELECT * FROM infaq WHERE id_infaq='$id'");
-$row=mysqli_fetch_assoc($data);
+$id = mysqli_real_escape_string($connect, $_GET['id']);
+$data = mysqli_query($connect, "SELECT * FROM infaq WHERE id_infaq='$id'");
+$row = mysqli_fetch_assoc($data);
 
-if(!$row){
+if (!$row) {
     echo "<script>alert('Data tidak ditemukan!');window.location='index.php';</script>";
     exit;
 }
@@ -32,7 +32,12 @@ if(!$row){
 
             <div class="form-group">
                 <label>Nama Donatur <span class="required">*</span></label>
-                <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -46,7 +51,7 @@ if(!$row){
                     <input type="number" name="nominal" class="form-control" value="<?= $row['nominal']; ?>" min="1000" required>
                 </div>
             </div>
-                        <div class="form-group">
+            <div class="form-group">
                 <label>Tanggal <span class="required">*</span></label>
 
                 <div class="input-group">

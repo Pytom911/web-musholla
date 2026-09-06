@@ -82,7 +82,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
             class="sidebar-link <?= (strpos($currentPage, '/kegiatan/') !== false) ? 'active' : '' ?>">
             <div class="sidebar-link-left">
                 <i class="bi bi-card-checklist"></i>
-                <span>Kegiatan</span>
+                <span>Data Kegiatan</span>
             </div>
         </a>
         <a href="<?= url('infaq/index.php') ?>"
