@@ -1,6 +1,11 @@
 FROM php:8.4-cli
 
-# Install extension PHP yang dibutuhkan
+# Install dependency untuk PHP extensions
+RUN apt-get update \
+    && apt-get install -y libonig-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
 RUN docker-php-ext-install mysqli mbstring
 
 # Install Composer
@@ -8,17 +13,17 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy composer files terlebih dahulu
+# Copy Composer files
 COPY composer.json composer.lock ./
 
-# Install dependency
+# Install dependencies
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction
 
-# Copy seluruh project
+# Copy project
 COPY . .
 
-# Railway menggunakan PORT environment variable
-CMD sh -c 'php -S 0.0.0.0:${PORT:-8080} -t /app'
+# Start PHP server
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app"]
