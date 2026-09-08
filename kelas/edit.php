@@ -1,4 +1,6 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 $pageTitle = 'Edit Data kelas';
 require_once '../template/header.php';
 
@@ -31,8 +33,9 @@ if (!$row) {
             <input type="hidden" name="id_kelas" value="<?= $row['id_kelas']; ?>">
 
             <div class="form-group">
-                <label>Nama Kelas <span class="required">*</span></label>
-                <input type="text" name="nama_kelas" class="form-control" value="<?= htmlspecialchars($row['nama_kelas']); ?>" required>
+                <label>Nama jurusan <span class="required">*</span></label>
+                <input type="text" name="nama_kelas" class="form-control"
+                    value="<?= htmlspecialchars($row['nama_kelas']); ?>" required>
             </div>
 
             <div class="form-group">
@@ -40,7 +43,7 @@ if (!$row) {
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-cash-stack"></i>
+                        <i class="bi bi-mortarboard-fill"></i>
                     </span>
                     <select id="tingkat" name="tingkat" class="form-select">
                         <option value="X" <?= ($row['tingkat'] == "X") ? "selected" : ""; ?>>X</option>
@@ -55,10 +58,10 @@ if (!$row) {
                         Batal
                     </a>
 
-                    <button type="submit" class="btn-add">
-                        <i class="bi bi-pencil-square"></i>
-                        Update Data
-                    </button>
+                <button type="submit" class="btn-update">
+                    <i class="bi bi-pencil-square"></i>
+                    Update Data
+                </button>
                 </div>
 
         </form>

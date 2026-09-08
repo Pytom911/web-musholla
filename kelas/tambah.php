@@ -1,4 +1,6 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 $pageTitle = 'Tambah Data kelas';
 require_once '../template/header.php';
 ?>
@@ -20,12 +22,10 @@ require_once '../template/header.php';
         <form action="simpan.php" method="POST">
 
             <div class="form-group">
-                <label>Nama Kelas <span class="required">*</span></label>
+                <label>Nama jurusan <span class="required">*</span></label>
                 <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-card-checklist"></i>
-                    </span>
-                    <input type="text" name="nama_kelas" class="form-control" placeholder="Masukkan nama kelas" required>
+                    <input type="text" name="nama_kelas" class="form-control" placeholder="Masukkan nama jurusan"
+                        required>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@ require_once '../template/header.php';
                 <div class="input-group">
 
                     <span class="input-group-text">
-                        <i class="bi bi-backpack3"></i>
+                        <i class="bi bi-mortarboard-fill"></i>
                     </span>
                     <select id="tingkat" name="tingkat" class="form-select">
                         <option value="X">X</option>

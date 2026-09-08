@@ -3,6 +3,7 @@ $pageTitle = 'Data kelas';
 require_once '../template/header.php';
 
 $totalkelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT nama_kelas) AS total FROM kelas"));
+$totaldatakelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM kelas"));
 $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_kelas DESC");
 ?>
 
@@ -30,27 +31,40 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
             <h3>Data kelas</h3>
             <p>Kelola seluruh data kelas musholla.</p>
         </div>
-
-        <a href="tambah.php" class="btn-add">
-            <i class="fas fa-plus-circle"></i>
-            Tambah kelas
-        </a>
+        <?php if ($isPetugas || $isAdmin): ?>
+            <a href="tambah.php" class="btn-add">
+                <i class="fas fa-plus-circle"></i>
+                Tambah kelas
+            </a>
+        <?php endif; ?>
 
     </div>
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-12 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-mortarboard-fill"></i>
                 </div>
                 <div class="stats-info">
-                    <small>Total kelas</small>
-                    <h2><?= $totalkelas['total'] ?? 0 ?></h2>
-                    <span>Kelas</span>
+                    <small>Total Data Kelas</small>
+                    <h2><?= $totaldatakelas['total'] ?? 0 ?></h2>
+                    <span>Data</span>
                 </div>
+            </div>
+        </div>
 
+        <div class="col-xl-6 col-md-6">
+            <div class="stats-card">
+                <div class="icon icon-red">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <div class="stats-info">
+                    <small>Total seluruh jurusan SMKN 1 Kraksaan</small>
+                    <h2><?= $totalkelas['total'] ?? 0 ?></h2>
+                    <span>Jurusan</span>
+                </div>
             </div>
         </div>
 
@@ -68,12 +82,15 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama kelas</th>
+                        <th>Nama jurusan</th>
                         <th>Tingkat</th>
-                        <th>Aksi</th>
+                        <?php if ($isPetugas || $isAdmin): ?>
+                            <th>Aksi</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
+
                     <?php if (mysqli_num_rows($data) > 0): ?>
                         <?php $no = 1;
                         while ($row = mysqli_fetch_assoc($data)): ?>
@@ -81,16 +98,18 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['tingkat']); ?></td>
-                                <td>
-                                    <div class="action-group">
-                                        <a href="edit.php?id=<?= $row['id_kelas']; ?>" class="btn-edit">
-                                            <i class="fas fa-pen"></i> Edit
-                                        </a>
-                                        <a href="hapus.php?id=<?= $row['id_kelas']; ?>" class="btn-delete">
-                                            <i class="fas fa-trash"></i> Hapus
-                                        </a>
-                                    </div>
-                                </td>
+                                <?php if ($isPetugas || $isAdmin): ?>
+                                    <td>
+                                        <div class="action-group">
+                                            <a href="edit.php?id=<?= $row['id_kelas']; ?>" class="btn-edit">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a>
+                                            <a href="hapus.php?id=<?= $row['id_kelas']; ?>" class="btn-delete">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </a>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -118,3 +137,4 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
 </div>
 
 <script src="../assets/js/data.js"></script>
+<?php require_once '../template/footer.php'; ?>

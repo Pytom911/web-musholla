@@ -1,9 +1,10 @@
 <?php
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 if (isset($_GET['id'])) {
-
-    $id = (int)$_GET['id'];
+    $id = (int) $_GET['id'];
 
     $query = mysqli_query($connect, "DELETE FROM kelas WHERE id_kelas='$id'");
 

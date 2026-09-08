@@ -1,9 +1,11 @@
 <?php
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 if (isset($_POST['id_kelas'])) {
 
-    $id = (int)$_POST['id_kelas'];
+    $id = (int) $_POST['id_kelas'];
     $nama = mysqli_real_escape_string($connect, $_POST['nama_kelas']);
     $tingkat = $_POST['tingkat'];
 
