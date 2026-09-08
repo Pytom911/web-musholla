@@ -14,7 +14,7 @@ $totalInfaq = $dataTotalInfaq['total'];
 
 $qTotalshodaqoh = mysqli_query($connect, "
     SELECT COALESCE(SUM(nominal),0) AS total
-    FROM shodaqoh_jumat
+    FROM shodaqoh
     WHERE MONTH(tanggal)=MONTH(CURDATE())
     AND YEAR(tanggal)=YEAR(CURDATE())
 ");
