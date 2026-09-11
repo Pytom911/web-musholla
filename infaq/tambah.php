@@ -1,6 +1,8 @@
 <?php
 $pageTitle = 'Tambah Data Infaq';
 require_once '../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">

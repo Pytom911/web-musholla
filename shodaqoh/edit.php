@@ -1,10 +1,12 @@
 <?php
-$pageTitle = 'Edit Data Shodaqoh Jumat';
+$pageTitle = 'Edit Data Shodaqoh';
 require_once '../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 $id = mysqli_real_escape_string($connect, $_GET['id']);
 
-$data = mysqli_query($connect, "SELECT * FROM shodaqoh_jumat WHERE id_shodaqoh='$id'");
+$data = mysqli_query($connect, "SELECT * FROM shodaqoh WHERE id_shodaqoh='$id'");
 $row = mysqli_fetch_assoc($data);
 
 if (!$row) {

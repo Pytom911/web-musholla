@@ -22,7 +22,7 @@ $qTotalshodaqoh = mysqli_query($connect, "
 $dataTotalshodaqoh = mysqli_fetch_assoc($qTotalshodaqoh);
 $totalshodaqoh = $dataTotalshodaqoh['total'];
 
-$qTotalKegiatan = mysqli_query($connect,"
+$qTotalKegiatan = mysqli_query($connect, "
     SELECT COUNT(*) AS total
     FROM kegiatan
 ");
@@ -30,7 +30,7 @@ $qTotalKegiatan = mysqli_query($connect,"
 $dataTotalKegiatan = mysqli_fetch_assoc($qTotalKegiatan);
 $totalKegiatan = $dataTotalKegiatan['total'];
 
-$qTotalPengeluaran = mysqli_query($connect,"
+$qTotalPengeluaran = mysqli_query($connect, "
     SELECT COALESCE(SUM(pengeluaran),0) AS total
     FROM kegiatan
 ");
@@ -41,12 +41,31 @@ $totalPengeluaran = $dataTotalPengeluaran['total'];
 // Saldo Keuangan (sementara Infaq - Pengeluaran)
 $saldoKeuangan = $totalInfaq + $totalshodaqoh - $totalPengeluaran;
 
-$qKegiatanTerbaru = mysqli_query($connect,"
+$qKegiatanTerbaru = mysqli_query($connect, "
     SELECT *
     FROM kegiatan
     ORDER BY tanggal DESC,id_kegiatan DESC
     LIMIT 2
 ");
+
+//jadwal sholat
+
+$qJadwalSholat = mysqli_query($connect, "
+    SELECT 
+    jadwal_sholat.*,
+    kelas.nama_kelas,
+    kelas.tingkat
+    FROM jadwal_sholat
+    JOIN kelas 
+        ON jadwal_sholat.id_kelas = kelas.id_kelas
+    WHERE tanggal = CURDATE()
+");
+
+$jadwal = [];
+
+while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
+    $jadwal[strtolower($row['waktu_sholat'])] = $row;
+}
 ?>
 
 <!-- Hero Section (Ringkas) -->
@@ -54,8 +73,10 @@ $qKegiatanTerbaru = mysqli_query($connect,"
     <div class="hero-content">
         <p class="hero-subtitle">Selamat Datang di</p>
         <h1 class="hero-title">Sistem Informasi Musholla SMK Negeri 1 Kraksaan</h1>
-        <p class="hero-desc">Informasi kegiatan, jadwal, dan laporan musholla sekolah dalam satu sistem yang mudah
-            diakses.</p>
+        <p class="hero-desc">mengelola seluruh informasi data guru agama dan data seluruh kelas <u>SMKN 1 Kraksaan</u>
+        </p>
+        <p class="hero-desc">Jadwal Sholat dan imam, Kegiatan Keagamaan, keuangan infaq dan shodaqoh, dan laporan
+            musholla dalam satu sistem yang mudah di akses.</p>
     </div>
     <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="hero-logo-large">
 </section>
@@ -71,7 +92,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     <h3 class="stat-title">Total Infaq <span class="fw-normal"></span></h3>
                 </div>
                 <div class="stat-value">
-                    Rp<?= number_format($totalInfaq,0,',','.') ?>
+                    Rp<?= number_format($totalInfaq, 0, ',', '.') ?>
                 </div>
             </div>
             <a href="<?= url('infaq/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
@@ -87,7 +108,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     <h3 class="stat-title">Total Shodaqoh <span class="fw-normal"></span></h3>
                 </div>
                 <div class="stat-value">
-                    Rp<?= number_format($totalshodaqoh,0,',','.') ?>
+                    Rp<?= number_format($totalshodaqoh, 0, ',', '.') ?>
                 </div>
             </div>
             <a href="<?= url('shodaqoh/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
@@ -137,7 +158,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     <h3 class="stat-title">Saldo Keuangan</h3>
                 </div>
                 <div class="stat-value">
-                    Rp<?= number_format($saldoKeuangan,0,',','.') ?>
+                    Rp<?= number_format($saldoKeuangan, 0, ',', '.') ?>
                 </div>
                 <span class="jadwal-kelas">Total Dari Infaq Dan Shodaqoh</span>
             </div>
@@ -153,7 +174,7 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                     <h3 class="stat-title">Total Pengeluaran</h3>
                 </div>
                 <div class="stat-value">
-                    Rp<?= number_format($totalPengeluaran,0,',','.') ?>
+                    Rp<?= number_format($totalPengeluaran, 0, ',', '.') ?>
                 </div>
             </div>
             <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">Lihat detail &rarr;</a>
@@ -164,35 +185,82 @@ $qKegiatanTerbaru = mysqli_query($connect,"
 <!-- Baris Bawah: Jadwal Hari Ini & Kegiatan Terbaru (satu baris) -->
 <div class="row g-4 mt-1 mb-4">
     <!-- Kolom Kiri: Jadwal Hari Ini -->
+
     <div class="col-12 col-lg-6">
         <div class="section-header">
             <h4 class="section-title">Jadwal Hari Ini</h4>
         </div>
+
         <div class="row g-3">
+
+            <!-- DZUHUR -->
             <div class="col-12 col-sm-6">
                 <div class="info-card">
-                    <div class="jadwal-icon bg-light-green">
-                        <i class="bi bi-clock"></i>
-                    </div>
-                    <div class="jadwal-name">Dhuzur</div>
-                    <div class="jadwal-time">12:00 - 12:45</div>
-                    <p class="jadwal-kelas">Kelas: XI RPL 1</p>
+
+                    <?php if (isset($jadwal['dzuhur'])): ?>
+
+                        <div class="jadwal-icon bg-light-green">
+                            <i class="bi bi-clock"></i>
+                        </div>
+
+                        <div class="jadwal-name">Dzuhur</div>
+
+                        <div class="jadwal-time">
+                            12:00 - 12:45
+                        </div>
+
+                        <p class="border-kelas">
+                            Kelas:
+                            <?= htmlspecialchars($jadwal['dzuhur']['tingkat']) ?>
+                            <?= htmlspecialchars($jadwal['dzuhur']['nama_kelas']) ?>
+                        </p>
+
+                    <?php else: ?>
+
+                        <div class="jadwal-name">
+                            Tidak ada jadwal sholat hari ini
+                        </div>
+
+                    <?php endif; ?>
+
                 </div>
             </div>
+
+
+            <!-- ASHAR -->
             <div class="col-12 col-sm-6">
                 <div class="info-card">
-                    <div class="jadwal-icon bg-light-blue">
-                        <i class="bi bi-person"></i>
-                    </div>
-                    <div class="jadwal-name">Ashar</div>
-                    <div class="jadwal-time">15:30 - 16:15</div>
-                    <p class="jadwal-kelas">Kelas: XI RPL 1</p>
+
+                    <?php if (isset($jadwal['ashar'])): ?>
+
+                        <div class="jadwal-icon bg-light-blue">
+                            <i class="bi bi-person"></i>
+                        </div>
+
+                        <div class="jadwal-name">Ashar</div>
+
+                        <div class="jadwal-time">
+                            15:30 - 16:15
+                        </div>
+
+                        <p class="jadwal-kelas">
+                            Kelas: <?= htmlspecialchars($jadwal['ashar']['nama_kelas']) ?>
+                        </p>
+
+                    <?php else: ?>
+
+                        <div class="jadwal-name">
+                            Tidak ada jadwal sholat hari ini
+                        </div>
+
+                    <?php endif; ?>
+
                 </div>
             </div>
+
         </div>
     </div>
 
-    <!-- Kolom Kanan: Kegiatan Terbaru (SUDAH DI-REDESAIN) -->
     <div class="col-12 col-lg-6">
         <div class="section-header">
             <h4 class="section-title">Kegiatan Terbaru</h4>
@@ -200,19 +268,19 @@ $qKegiatanTerbaru = mysqli_query($connect,"
         </div>
         <div class="col-12">
             <div class="info-card">
-                <?php if(mysqli_num_rows($qKegiatanTerbaru)>0): ?>
-                    <?php while($kegiatan=mysqli_fetch_assoc($qKegiatanTerbaru)): ?>
+                <?php if (mysqli_num_rows($qKegiatanTerbaru) > 0): ?>
+                    <?php while ($kegiatan = mysqli_fetch_assoc($qKegiatanTerbaru)): ?>
                         <div class="kegiatan-item">
                             <div class="kegiatan-date-box-green">
                                 <div class="clock-icon">
                                     <i class="bi bi-clock-fill"></i>
                                 </div>
                                 <span class="date-number">
-                                    <?= date('d',strtotime($kegiatan['tanggal'])) ?>
+                                    <?= date('d', strtotime($kegiatan['tanggal'])) ?>
                                 </span>
                                 <span class="date-month-year">
-                                    <?= date('M',strtotime($kegiatan['tanggal'])) ?><br>
-                                    <?= date('Y',strtotime($kegiatan['tanggal'])) ?>
+                                    <?= date('M', strtotime($kegiatan['tanggal'])) ?><br>
+                                    <?= date('Y', strtotime($kegiatan['tanggal'])) ?>
                                 </span>
                             </div>
 
@@ -224,16 +292,16 @@ $qKegiatanTerbaru = mysqli_query($connect,"
                                 <i class="bi bi-chevron-right"></i>
                             </div>
                         </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-calendar-event fs-1"></i>
-                    <p class="mt-3 mb-0">Belum ada kegiatan.</p>
-                </div>
-            <?php endif; ?>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-event fs-1"></i>
+                        <p class="mt-3 mb-0">Belum ada kegiatan.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
-</div>
 </div>
 
 <?php require_once __DIR__ . '/template/footer.php'; ?>

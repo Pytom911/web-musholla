@@ -93,11 +93,12 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
         </div>
 
     </div>
+
     <div class="data-card">
         <div class="data-toolbar">
             <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama atau username...">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari usernama ...">
             </div>
         </div>
 
@@ -121,16 +122,15 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['nama']); ?></td>
-                                <td><span
-                                        class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span>
-                                </td>
+                                <td><span class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span></td>
                                 <td><?= htmlspecialchars($row['password']); ?></td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_user']; ?>" class="btn-edit">
                                             <i class="fas fa-pen"></i> Edit
                                         </a>
-                                        <a href="hapus.php?id=<?= $row['id_user']; ?>" class="btn-delete">
+                                        <a href="hapus.php?id=<?= $row['id_user']; ?>" class="btn-delete"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
                                             <i class="fas fa-trash"></i> Hapus
                                         </a>
                                     </div>
@@ -161,6 +161,6 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

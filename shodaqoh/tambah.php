@@ -1,6 +1,8 @@
 <?php
 $pageTitle = 'Tambah Data Shodaqoh Jumat';
 require_once '../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 $kelas = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas ASC");
 ?>

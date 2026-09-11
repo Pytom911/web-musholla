@@ -42,6 +42,21 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
     </div>
 
     <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="stats-card">
+
+                <div class="icon icon-green">
+                    <i class="bi bi-box2-heart"></i>
+                </div>
+
+                <div class="stats-info">
+                    <small>Total Infaq</small>
+                    <h2>Rp<?= number_format($totalInfaq['total'] ?? 0, 0, ',', '.') ?></h2>
+                    <span>Keseluruhan</span>
+                </div>
+
+            </div>
+        </div>
 
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
@@ -54,22 +69,6 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                     <small>Jumlah Donatur</small>
                     <h2><?= $totalDonatur['total'] ?? 0 ?></h2>
                     <span>Orang</span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="stats-card">
-
-                <div class="icon icon-green">
-                    <i class="bi bi-box2-heart"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Total Infaq</small>
-                    <h2>Rp<?= number_format($totalInfaq['total'] ?? 0, 0, ',', '.') ?></h2>
-                    <span>Keseluruhan</span>
                 </div>
 
             </div>
@@ -129,7 +128,8 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                                             <a href="edit.php?id=<?= $row['id_infaq']; ?>" class="btn-edit">
                                                 <i class="fas fa-pen"></i> Edit
                                             </a>
-                                            <a href="hapus.php?id=<?= $row['id_infaq']; ?>" class="btn-delete">
+                                            <a href="hapus.php?id=<?= $row['id_infaq']; ?>" class="btn-delete"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data infaq ini?')">
                                                 <i class="fas fa-trash"></i> Hapus
                                             </a>
                                         </div>
@@ -161,6 +161,6 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

@@ -3,6 +3,8 @@
 session_start();
 
 $pageTitle = 'Tambah Guru';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 require_once "../template/header.php";
 ?>

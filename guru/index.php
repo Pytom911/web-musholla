@@ -8,7 +8,7 @@ $totalGuru = mysqli_fetch_assoc(mysqli_query($connect, "
 
 $data = mysqli_query($connect, "
     SELECT * FROM guru
-    ORDER BY CAST(nip AS UNSIGNED) ASC
+    ORDER BY id_guru DESC
 ");
 ?>
 
@@ -94,7 +94,8 @@ $data = mysqli_query($connect, "
                                                 <i class="fas fa-pen"></i>
                                                 Edit
                                             </a>
-                                            <a href="hapus.php?id=<?= $row['id_guru']; ?>" class="btn-delete">
+                                            <a href="hapus.php?id=<?= $row['id_guru']; ?>" class="btn-delete"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data guru ini?')">
                                                 <i class="fas fa-trash"></i>
                                                 Hapus
                                             </a>
@@ -127,7 +128,7 @@ $data = mysqli_query($connect, "
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>
 ```

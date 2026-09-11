@@ -1,6 +1,8 @@
 <?php
 $pageTitle = 'Tambah Kegiatan';
 require_once __DIR__ . '/../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">

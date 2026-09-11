@@ -1,6 +1,8 @@
 <?php
 $pageTitle = 'Edit Data Guru';
 require_once '../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 $id = mysqli_real_escape_string($connect, $_GET['id']);
 $data = mysqli_query($connect, "SELECT * FROM guru WHERE id_guru='$id'");

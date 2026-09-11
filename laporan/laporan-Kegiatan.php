@@ -125,5 +125,5 @@ $bulan = [
     </div>
 </div>
 
-<script src="../assets/js/laporan.js"></script>
+<script src="../assets/js/script.js"></script>
 <?php require_once '../template/footer.php'; ?>

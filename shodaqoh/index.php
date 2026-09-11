@@ -2,18 +2,18 @@
 $pageTitle = 'Data Shodaqoh Jumat';
 require_once '../template/header.php';
 
-$totalData = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh_jumat"));
-$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh_jumat"));
-$totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh_jumat WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())"));
-$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh_jumat"));
+$totalData = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh"));
+$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh"));
+$totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh WHERE MONTH(tanggal)=MONTH(CURDATE()) AND YEAR(tanggal)=YEAR(CURDATE())"));
+$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh"));
 
 $data = mysqli_query (
     $connect, 
-    "SELECT shodaqoh_jumat.*, kelas.nama_kelas
-    FROM shodaqoh_jumat
+    "SELECT shodaqoh.*, kelas.nama_kelas
+    FROM shodaqoh
     JOIN kelas
-    ON shodaqoh_jumat.id_kelas = kelas.id_kelas
-    ORDER BY shodaqoh_jumat.tanggal DESC, shodaqoh_jumat.id_shodaqoh DESC
+    ON shodaqoh.id_kelas = kelas.id_kelas
+    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
 ")
 ?>
 
@@ -49,7 +49,7 @@ $data = mysqli_query (
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
-                    <i class="bi bi-cash-stack"></i>
+                    <i class="bi bi-coin"></i>
                 </div>
                 <div class="stats-info">
                     <small>Total Shodaqoh</small>
@@ -85,7 +85,8 @@ $data = mysqli_query (
             </div>
         </div>
     </div>
-        <div class="data-card">
+
+    <div class="data-card">
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="bi bi-search"></i>
@@ -98,9 +99,9 @@ $data = mysqli_query (
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Tanggal</th>
                         <th>Nama Kelas</th>
                         <th>Nominal</th>
+                        <th>Tanggal</th>
                         <?php if($isPetugas || $isAdmin): ?>
                             <th>Aksi</th>
                         <?php endif; ?>
@@ -109,22 +110,23 @@ $data = mysqli_query (
                 <tbody>
                     <?php if(mysqli_num_rows($data) > 0): ?>
                         <?php $no=1; while($row=mysqli_fetch_assoc($data)): ?>
-                        <tr data-tanggal="<?= htmlspecialchars($row['tanggal']); ?>">
+                        <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= date('d F Y',strtotime($row['tanggal'])); ?></td>
                             <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
                             <td>
                                 <span class="nominal">
                                     Rp <?= number_format($row['nominal'],0,',','.'); ?>
                                 </span>
                             </td>
+                            <td><?= date('d F Y',strtotime($row['tanggal'])); ?></td>
                             <?php if($isPetugas || $isAdmin): ?>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_shodaqoh']; ?>" class="btn-edit">
                                             <i class="bi bi-pencil-fill"></i> Edit
                                         </a>
-                                        <a href="hapus.php?id=<?= $row['id_shodaqoh']; ?>" class="btn-delete">
+                                        <a href="hapus.php?id=<?= $row['id_shodaqoh']; ?>" class="btn-delete"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus data shodaqoh ini?');">
                                             <i class="bi bi-trash-fill"></i> Hapus
                                         </a>
                                     </div>
@@ -155,5 +157,5 @@ $data = mysqli_query (
     </div>
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 <?php require_once '../template/footer.php'; ?>

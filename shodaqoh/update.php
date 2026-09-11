@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 if (isset($_POST['id_shodaqoh'])) {
     $id = (int)$_POST['id_shodaqoh'];
@@ -7,7 +9,7 @@ if (isset($_POST['id_shodaqoh'])) {
     $nominal = $_POST['nominal'];
     $tanggal = $_POST['tanggal'];
 
-    $query = mysqli_query($connect, "UPDATE shodaqoh_jumat SET
+    $query = mysqli_query($connect, "UPDATE shodaqoh SET
         id_kelas='$id_kelas',
         nominal='$nominal',
         tanggal='$tanggal'

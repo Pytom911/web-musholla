@@ -96,15 +96,16 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
-                                <td><?= htmlspecialchars($row['tingkat']); ?></td>
+                                <td><span class="role-badge JURUSAN-<?= htmlspecialchars($row['nama_kelas']); ?>"><?= htmlspecialchars(ucfirst($row['nama_kelas'])); ?></span></td>
+                                <td><strong><?= htmlspecialchars($row['tingkat']); ?></strong></td>
                                 <?php if ($isPetugas || $isAdmin): ?>
                                     <td>
                                         <div class="action-group">
                                             <a href="edit.php?id=<?= $row['id_kelas']; ?>" class="btn-edit">
                                                 <i class="fas fa-pen"></i> Edit
                                             </a>
-                                            <a href="hapus.php?id=<?= $row['id_kelas']; ?>" class="btn-delete">
+                                            <a href="hapus.php?id=<?= $row['id_kelas']; ?>" class="btn-delete"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus kelas ini?');">
                                                 <i class="fas fa-trash"></i> Hapus
                                             </a>
                                         </div>
@@ -136,5 +137,5 @@ $data = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas DESC,id_
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 <?php require_once '../template/footer.php'; ?>

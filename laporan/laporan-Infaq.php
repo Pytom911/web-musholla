@@ -32,19 +32,6 @@ $bulan = [
     <div class="row g-4 mb-4">
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
-                <div class="icon icon-red">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stats-info">
-                    <small>Jumlah Donatur</small>
-                    <h2><?= $totalDonatur['total'] ?? 0; ?></h2>
-                    <span>Orang</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-box2-heart"></i>
                 </div>
@@ -56,6 +43,19 @@ $bulan = [
             </div>
         </div>
 
+        <div class="col-xl-4 col-md-6">
+            <div class="stats-card">
+                <div class="icon icon-red">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-info">
+                    <small>Jumlah Donatur</small>
+                    <h2><?= $totalDonatur['total'] ?? 0; ?></h2>
+                    <span>Orang</span>
+                </div>
+            </div>
+        </div>
+        
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-blue">
@@ -139,5 +139,5 @@ $bulan = [
 
 </div>
 
-<script src="../assets/js/laporan.js"></script>
+<script src="../assets/js/script.js"></script>
 <?php require_once '../template/footer.php'; ?>

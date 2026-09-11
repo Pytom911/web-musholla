@@ -773,6 +773,16 @@ img, svg {
     font-weight: 500;
 }
 
+.border-kelas {
+    display:inline-block;
+    color:#16a34a;
+    font-weight:700;
+    font-size:15px;
+    background:#ecfdf3;
+    padding:6px 14px;
+    border-radius:30px;
+}
+
 /* -- List Kegiatan (Redesain Kalender Hijau) -- */
 .kegiatan-list {
     display: flex;

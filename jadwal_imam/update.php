@@ -1,6 +1,8 @@
 <?php
 
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 $id = $_POST['id_imam'];
 $tanggal = $_POST['tanggal'];

@@ -65,7 +65,7 @@ $bulan = [
 
     <div class="row g-4 mb-4">
 
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="fas fa-users"></i>
@@ -79,7 +79,7 @@ $bulan = [
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-calendar-check"></i>
@@ -89,20 +89,6 @@ $bulan = [
                     <small>Total Jadwal</small>
                     <h2><?= $totalJadwal['total'] ?? 0; ?></h2>
                     <span>Data Jadwal</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="stats-card">
-                <div class="icon icon-blue">
-                    <i class="bi bi-calendar-day"></i>
-                </div>
-
-                <div class="stats-info">
-                    <small>Jadwal Hari Ini</small>
-                    <h2><?= $totalJadwalHariIni['total'] ?? 0; ?></h2>
-                    <span>Jadwal Imam</span>
                 </div>
             </div>
         </div>
@@ -136,8 +122,9 @@ $bulan = [
                     <tr>
                         <th>No</th>
                         <th>Nama Imam</th>
-                        <th>Waktu Sholat</th>
                         <th>Tanggal</th>
+                        <th>Waktu Sholat</th>
+                        
                     </tr>
                 </thead>
 
@@ -164,12 +151,6 @@ $bulan = [
                                 </td>
 
                                 <td>
-                                    <span class="nominal">
-                                        <?= htmlspecialchars($row['waktu_sholat']); ?>
-                                    </span>
-                                </td>
-
-                                <td>
 
                                     <?php
                                     $tanggal = strtotime($row['tanggal']);
@@ -179,6 +160,12 @@ $bulan = [
                                         date('Y', $tanggal);
                                     ?>
 
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        <?= htmlspecialchars($row['waktu_sholat']); ?>
+                                    </strong>
                                 </td>
 
                             </tr>
@@ -231,6 +218,6 @@ $bulan = [
 
 </div>
 
-<script src="../assets/js/laporan.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

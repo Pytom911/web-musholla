@@ -1,5 +1,7 @@
 <?php
 $pageTitle = 'Edit Jadwal Imam';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 session_start();
 

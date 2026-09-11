@@ -114,8 +114,8 @@ $data = mysqli_query($connect, "
                     <tr>
                         <th>No</th>
                         <th>Nama Imam</th>
-                        <th>Tanggal</th>
                         <th>Waktu Sholat</th>
+                        <th>Tanggal</th>
                         <?php if ($isPetugas OR $isAdmin): ?>
                             <th>Aksi</th>
                         <?php endif; ?>
@@ -129,9 +129,9 @@ $data = mysqli_query($connect, "
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= htmlspecialchars($row['nama_guru'] ?? 'Nama guru tidak ditemukan'); ?></strong></td>
-                                <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
+                                <td><strong><?= htmlspecialchars($row['nama_guru']); ?></strong></td>
                                 <td><strong><?= htmlspecialchars($row['waktu_sholat']); ?></strong></td>
+                                <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
                                 <?php if ($isPetugas OR $isAdmin): ?>
                                     <td>
                                         <div class="action-group">
@@ -141,8 +141,8 @@ $data = mysqli_query($connect, "
                                                 Edit
                                             </a>
 
-                                            <a href="hapus.php?id=<?= $row['id_imam']; ?>" class="btn-delete"
-                                                onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                            <a href="hapus.php?id=<?= $row['id_imam']; ?>" class="btn-delete" 
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal imam ini?');">
                                                 <i class="bi bi-trash-fill"></i>
                                                 Hapus
                                             </a>
@@ -177,6 +177,6 @@ $data = mysqli_query($connect, "
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

@@ -11,10 +11,17 @@ $options->set('defaultFont', 'DejaVu Sans');
 
 $dompdf = new Dompdf($options);
 
-$data = mysqli_query($connect, "SELECT shodaqoh_jumat.*, kelas.nama_kelas FROM shodaqoh_jumat INNER JOIN kelas ON shodaqoh_jumat.id_kelas = kelas.id_kelas ORDER BY shodaqoh_jumat.tanggal ASC, shodaqoh_jumat.id_shodaqoh ASC");
-$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh_jumat"));
-$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh_jumat"));
-$totalTransaksi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh_jumat"));
+$data = mysqli_query (
+    $connect, 
+    "SELECT shodaqoh.*, kelas.nama_kelas
+    FROM shodaqoh
+    JOIN kelas
+    ON shodaqoh.id_kelas = kelas.id_kelas
+    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
+");
+$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh"));
+$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh"));
+$totalTransaksi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh"));
 
 $jumlahKelas = $totalKelas['total'] ?? 0;
 $jumlahTransaksi = $totalTransaksi['total'] ?? 0;

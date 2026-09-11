@@ -2,15 +2,15 @@
 $pageTitle = 'Laporan Shodaqoh Jumat';
 require_once '../template/header.php';
 
-$totalData = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh_jumat"));
-$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh_jumat"));
-$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh_jumat"));
+$totalData = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh"));
+$totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh"));
+$totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh"));
 
 $data = mysqli_query($connect, "
-    SELECT shodaqoh_jumat.*, kelas.nama_kelas 
-    FROM shodaqoh_jumat 
-    INNER JOIN kelas ON shodaqoh_jumat.id_kelas = kelas.id_kelas 
-    ORDER BY shodaqoh_jumat.tanggal DESC, shodaqoh_jumat.id_shodaqoh DESC
+    SELECT shodaqoh.*, kelas.nama_kelas 
+    FROM shodaqoh 
+    INNER JOIN kelas ON shodaqoh.id_kelas = kelas.id_kelas 
+    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
 ");
 
 $bulan = [
@@ -27,7 +27,7 @@ $bulan = [
     <div class="laporan-header">
         <div>
             <h3>Laporan Shodaqoh Jumat</h3>
-            <p>Rekapitulasi seluruh data shodaqoh Jumat dari setiap kelas.</p>
+            <p>seluruh data shodaqoh Jumat dari setiap kelas.</p>
         </div>
         <a href="export/export-Shodaqoh.php" target="_blank" class="btn-export">
             <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
@@ -37,7 +37,7 @@ $bulan = [
     <div class="row g-4 mb-4">
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
-                <div class="icon icon-green"><i class="bi bi-cash-stack"></i></div>
+                <div class="icon icon-green"><i class="bi bi-coin"></i></div>
                 <div class="stats-info">
                     <small>Total Shodaqoh</small>
                     <h2>Rp<?= number_format($totalShodaqoh['total'] ?? 0, 0, ',', '.'); ?></h2>
@@ -130,6 +130,6 @@ $bulan = [
     </div>
 </div>
 
-<script src="../assets/js/laporan.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

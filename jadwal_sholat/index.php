@@ -145,13 +145,13 @@ $data = mysqli_query(
 
                         <th>No</th>
 
-                        <th>Tanggal</th>
-
                         <th>Waktu Sholat</th>
 
                         <th>Jurusan</th>
 
                         <th>Tingkat</th>
+
+                        <th>Tanggal</th>
 
                         <?php if ($isPetugas || $isAdmin): ?>
 
@@ -182,14 +182,6 @@ $data = mysqli_query(
                                     <?= $no++; ?>
                                 </td>
 
-
-                                <td>
-                                    <?= htmlspecialchars(
-                                        $row['tanggal']
-                                    ); ?>
-                                </td>
-
-
                                 <td>
                                     <strong>
                                         <?= htmlspecialchars(
@@ -214,7 +206,10 @@ $data = mysqli_query(
                                         ); ?>
                                     </strong>
                                 </td>
-
+                                
+                                <td>
+                                    <?= date('d F Y', strtotime($row['tanggal'])); ?>
+                                </td>
 
                                 <?php if ($isPetugas || $isAdmin): ?>
 
@@ -297,6 +292,6 @@ $data = mysqli_query(
 </div>
 
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

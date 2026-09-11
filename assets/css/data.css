@@ -224,34 +224,6 @@
     border-color:var(--primary);
     box-shadow:0 0 0 4px rgba(17,136,72,.10);
 }
-
-/*==========================
-  FILTER BULAN
-==========================*/
-
-.filter-box{
-    width:240px;
-}
-
-.filter-box select{
-    width:100%;
-    height:50px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:0 16px;
-    background:#fff;
-    color:var(--text);
-    font-size:15px;
-    outline:none;
-    cursor:pointer;
-    transition:var(--transition);
-}
-
-.filter-box select:focus{
-    border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(17,136,72,.10);
-}
-
 /*==========================
   TABLE WRAPPER
 ==========================*/
@@ -391,9 +363,34 @@
     color:#d97706;
 }
 
-.role-siswa{
+.JURUSAN-PPLG{
+    background:#e7f8ec;
+    color:#d16e0a;
+}
+
+.JURUSAN-TJKT{
     background:#e7f8ec;
     color:#16a34a;
+}
+
+.JURUSAN-DKV{
+    background:#e7f8ec;
+    color:#1b7ece;
+}
+
+.JURUSAN-AKL{
+    background:#e7f8ec;
+    color:#c6e117;
+}
+
+.JURUSAN-MPLB{
+    background:#e7f8ec;
+    color:#ff3bfc;
+}
+
+.JURUSAN-Pemasaran{
+    background:#e7f8ec;
+    color:#e91a1a;
 }
 
 /*==========================

@@ -1,6 +1,8 @@
 <?php
 
 require_once "../config/config.php";
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 
 $guru = mysqli_query(
