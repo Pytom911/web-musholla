@@ -26,6 +26,14 @@ $bulan = [
     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 
+$logoPath = __DIR__ . '/../../assets/img/musholla_logo.png';
+$logo = '';
+
+if (file_exists($logoPath)) {
+    $logoData = base64_encode(file_get_contents($logoPath));
+    $logo = 'data:image/png;base64,' . $logoData;
+}
+
 $html = '
 <!DOCTYPE html>
 <html>
@@ -35,10 +43,12 @@ $html = '
     @page { margin: 35px 45px; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1f2937; margin: 0; }
     
-    .header { text-align: center; padding-bottom: 14px; border-bottom: 3px solid #118848; margin-bottom: 22px; }
+    .header { position: relative; text-align: center; padding-bottom: 14px; border-bottom: 3px solid #118848; margin-bottom: 22px; }
     .header h1 { margin: 0; font-size: 20px; color: #118848; font-weight: bold; }
     .header h2 { margin: 5px 0; font-size: 16px; color: #1f2937; }
     .header p { margin: 3px 0 0; color: #6b7280; font-size: 11px; }
+
+    .logo { position: absolute; top: -55px; left: 0; width: 170px; height: 170px; }
     
     .title { text-align: center; margin-bottom: 20px; }
     .title h3 { margin: 0; font-size: 18px; color: #1f2937; }
@@ -70,6 +80,7 @@ $html = '
 <body>
 
 <div class="header">
+    ' . ($logo ? '<img src="' . $logo . '" class="logo">' : '') . '
     <h1>SISTEM INFORMASI MUSHOLLA</h1>
     <h2>SMK NEGERI 1 KRAKSAAN</h2>
     <p>Laporan Keuangan Musholla</p>

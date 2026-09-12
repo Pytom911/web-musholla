@@ -86,6 +86,14 @@ $bulan = [
 |--------------------------------------------------------------------------
 */
 
+$logoPath = __DIR__ . '/../../assets/img/musholla_logo.png';
+$logo = '';
+
+if (file_exists($logoPath)) {
+    $logoData = base64_encode(file_get_contents($logoPath));
+    $logo = 'data:image/png;base64,' . $logoData;
+}
+
 $html = '
 <!DOCTYPE html>
 <html>
@@ -109,6 +117,7 @@ $html = '
     /* HEADER */
 
     .header {
+        posisition: relative;
         text-align: center;
         padding-bottom: 14px;
         border-bottom: 3px solid #118848;
@@ -133,6 +142,13 @@ $html = '
         color: #6b7280;
         font-size: 11px;
     }
+
+    .logo { 
+    position: absolute; 
+    top: -55px; 
+    left: 0; 
+    width: 170px; 
+    height: 170px; }
 
     /* TITLE */
 
@@ -259,6 +275,7 @@ $html = '
 
 <div class="header">
 
+    ' . ($logo ? '<img src="' . $logo . '" class="logo">' : '') . '
     <h1>SISTEM INFORMASI MUSHOLLA</h1>
 
     <h2>SMK NEGERI 1 KRAKSAAN</h2>
