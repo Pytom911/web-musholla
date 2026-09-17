@@ -70,8 +70,7 @@ $data = mysqli_query(
         jadwal_sholat.hari,
         jadwal_sholat.waktu_sholat,
         jadwal_sholat.id_kelas,
-        kelas.nama_kelas,
-        kelas.tingkat
+        kelas.nama_kelas
     FROM jadwal_sholat
     LEFT JOIN kelas
         ON jadwal_sholat.id_kelas = kelas.id_kelas
@@ -269,10 +268,6 @@ $html = '
                 Jurusan
             </th>
 
-            <th width="20%">
-                Tingkat
-            </th>
-
         </tr>
 
     </thead>
@@ -343,16 +338,6 @@ if (mysqli_num_rows($data) > 0) {
             : 'Kelas Tidak Ditemukan';
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | TINGKAT
-        |--------------------------------------------------------------------------
-        */
-
-        $tingkat = !empty($row['tingkat'])
-            ? $row['tingkat']
-            : 'Tingkat Tidak Ditemukan';
-
 
         /*
         |--------------------------------------------------------------------------
@@ -378,10 +363,6 @@ if (mysqli_num_rows($data) > 0) {
 
             <td class="bold">
                 ' . htmlspecialchars($namaKelas) . '
-            </td>
-
-            <td>
-                ' . htmlspecialchars($tingkat) . '
             </td>
 
         </tr>

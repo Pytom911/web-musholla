@@ -43,8 +43,7 @@ $data = mysqli_query(
         jadwal_sholat.hari,
         jadwal_sholat.waktu_sholat,
         jadwal_sholat.id_kelas,
-        kelas.nama_kelas,
-        kelas.tingkat
+        kelas.nama_kelas
     FROM jadwal_sholat
     LEFT JOIN kelas 
         ON jadwal_sholat.id_kelas = kelas.id_kelas
@@ -137,7 +136,6 @@ $data = mysqli_query(
                         <th>Hari</th>
                         <th>Waktu Sholat</th>
                         <th>Jurusan</th>
-                        <th>Tingkat</th>
                     </tr>
                 </thead>
 
@@ -199,15 +197,6 @@ $data = mysqli_query(
                                     <strong>
                                         <?= htmlspecialchars(
                                             $row['nama_kelas'] ?? 'Kelas Tidak Ditemukan'
-                                        ); ?>
-                                    </strong>
-
-                                </td>
-                                 <td>
-
-                                    <strong>
-                                        <?= htmlspecialchars(
-                                            $row['tingkat'] ?? 'Tingkat Tidak Ditemukan'
                                         ); ?>
                                     </strong>
 
