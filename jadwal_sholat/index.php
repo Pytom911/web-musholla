@@ -18,13 +18,12 @@ $data = mysqli_query(
     "
     SELECT 
         jadwal_sholat.*,
-        kelas.nama_kelas,
-        kelas.tingkat
+        kelas.nama_kelas
     FROM jadwal_sholat
     JOIN kelas 
         ON jadwal_sholat.id_kelas = kelas.id_kelas
     ORDER BY 
-        jadwal_sholat.tanggal DESC,
+        FIELD(jadwal_sholat.hari, 'Senin','Selasa','Rabu','Kamis','Jumat'),
         jadwal_sholat.id_jadwal DESC
     "
 );
@@ -149,9 +148,7 @@ $data = mysqli_query(
 
                         <th>Jurusan</th>
 
-                        <th>Tingkat</th>
-
-                        <th>Tanggal</th>
+                        <th>Hari</th>
 
                         <?php if ($isPetugas || $isAdmin): ?>
 
@@ -198,17 +195,11 @@ $data = mysqli_query(
                                         ); ?>
                                     </strong>
                                 </td>
-
-                                <td>
-                                    <strong>
-                                        <?= htmlspecialchars(
-                                            $row['tingkat']
-                                        ); ?>
-                                    </strong>
-                                </td>
                                 
                                 <td>
-                                    <?= date('d F Y', strtotime($row['tanggal'])); ?>
+                                    <strong>
+                                        <?= htmlspecialchars($row['hari']); ?>
+                                    </strong>
                                 </td>
 
                                 <?php if ($isPetugas || $isAdmin): ?>

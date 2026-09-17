@@ -50,6 +50,18 @@ $qKegiatanTerbaru = mysqli_query($connect, "
 
 //jadwal sholat
 
+$hariMap = [
+    'Monday'    => 'Senin',
+    'Tuesday'   => 'Selasa',
+    'Wednesday' => 'Rabu',
+    'Thursday'  => 'Kamis',
+    'Friday'    => 'Jumat',
+    'Saturday'  => 'Sabtu',
+    'Sunday'    => 'Minggu'
+];
+
+$hariIni = $hariMap[date('l')] ?? '';
+
 $qJadwalSholat = mysqli_query($connect, "
     SELECT 
     jadwal_sholat.*,
@@ -58,13 +70,14 @@ $qJadwalSholat = mysqli_query($connect, "
     FROM jadwal_sholat
     JOIN kelas 
         ON jadwal_sholat.id_kelas = kelas.id_kelas
-    WHERE tanggal = CURDATE()
+    WHERE hari = '$hariIni'
+    ORDER BY jadwal_sholat.id_jadwal DESC
 ");
 
 $jadwal = [];
 
 while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
-    $jadwal[strtolower($row['waktu_sholat'])] = $row;
+    $jadwal[strtolower($row['waktu_sholat'])][] = $row;
 }
 ?>
 
@@ -197,7 +210,7 @@ while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
             <div class="col-12 col-sm-6">
                 <div class="info-card">
 
-                    <?php if (isset($jadwal['dzuhur'])): ?>
+                    <?php if (!empty($jadwal['dzuhur'])): ?>
 
                         <div class="jadwal-icon bg-light-green">
                             <i class="bi bi-clock"></i>
@@ -209,11 +222,15 @@ while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
                             12:00 - 12:45
                         </div>
 
-                        <p class="border-kelas">
-                            Kelas:
-                            <?= htmlspecialchars($jadwal['dzuhur']['tingkat']) ?>
-                            <?= htmlspecialchars($jadwal['dzuhur']['nama_kelas']) ?>
-                        </p>
+                        <?php foreach ($jadwal['dzuhur'] as $jdz): ?>
+
+                            <p class="border-kelas">
+                                Kelas:
+                                <?= htmlspecialchars($jdz['tingkat']) ?>
+                                <?= htmlspecialchars($jdz['nama_kelas']) ?>
+                            </p>
+
+                        <?php endforeach; ?>
 
                     <?php else: ?>
 
@@ -231,7 +248,7 @@ while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
             <div class="col-12 col-sm-6">
                 <div class="info-card">
 
-                    <?php if (isset($jadwal['ashar'])): ?>
+                    <?php if (!empty($jadwal['ashar'])): ?>
 
                         <div class="jadwal-icon bg-light-blue">
                             <i class="bi bi-person"></i>
@@ -243,9 +260,13 @@ while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
                             15:30 - 16:15
                         </div>
 
-                        <p class="jadwal-kelas">
-                            Kelas: <?= htmlspecialchars($jadwal['ashar']['nama_kelas']) ?>
-                        </p>
+                        <?php foreach ($jadwal['ashar'] as $jas): ?>
+
+                            <p class="jadwal-kelas">
+                                Kelas: <?= htmlspecialchars($jas['nama_kelas']) ?>
+                            </p>
+
+                        <?php endforeach; ?>
 
                     <?php else: ?>
 

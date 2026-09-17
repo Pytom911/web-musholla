@@ -39,11 +39,11 @@ $kelas = mysqli_query(
         <form action="simpan.php" method="POST">
 
 
-            <!-- Tanggal -->
+            <!-- Hari -->
             <div class="form-group">
 
                 <label>
-                    Tanggal
+                    Hari
                     <span class="required">*</span>
                 </label>
 
@@ -51,12 +51,38 @@ $kelas = mysqli_query(
 
                     <span class="input-group-text">
 
-                        <i class="bi bi-calendar-event"></i>
+                        <i class="bi bi-calendar-week"></i>
 
                     </span>
 
 
-                    <input type="date" name="tanggal" class="form-control" required>
+                    <select name="hari" class="form-select" required>
+
+                        <option value="">
+                            -- Pilih Hari --
+                        </option>
+
+                        <option value="Senin">
+                            Senin
+                        </option>
+
+                        <option value="Selasa">
+                            Selasa
+                        </option>
+
+                        <option value="Rabu">
+                            Rabu
+                        </option>
+
+                        <option value="Kamis">
+                            Kamis
+                        </option>
+
+                        <option value="Jumat">
+                            Jumat
+                        </option>
+
+                    </select>
 
                 </div>
 

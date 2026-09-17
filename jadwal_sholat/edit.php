@@ -108,12 +108,12 @@ $kelas = mysqli_query(
             <input type="hidden" name="id_jadwal" value="<?= $row['id_jadwal']; ?>">
 
 
-            <!-- Tanggal -->
+            <!-- Hari -->
             <div class="form-group">
 
                 <label>
 
-                    Tanggal
+                    Hari
 
                     <span class="required">*</span>
 
@@ -124,14 +124,38 @@ $kelas = mysqli_query(
 
                     <span class="input-group-text">
 
-                        <i class="bi bi-calendar-event"></i>
+                        <i class="bi bi-calendar-week"></i>
 
                     </span>
 
 
-                    <input type="date" name="tanggal" class="form-control" value="<?= htmlspecialchars(
-                        $row['tanggal']
-                    ); ?>" required>
+                    <select name="hari" class="form-select" required>
+
+                        <option value="">
+                            -- Pilih Hari --
+                        </option>
+
+                        <?php
+                        $hariOptions = [
+                            'Senin',
+                            'Selasa',
+                            'Rabu',
+                            'Kamis',
+                            'Jumat'
+                        ];
+
+                        foreach ($hariOptions as $hariOption):
+                            ?>
+
+                            <option value="<?= $hariOption; ?>" <?= $row['hari'] === $hariOption
+                                  ? 'selected'
+                                  : ''; ?>>
+                                <?= $hariOption; ?>
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
 
                 </div>
 

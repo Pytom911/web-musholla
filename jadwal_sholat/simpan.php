@@ -5,15 +5,15 @@ require_once "../auth/auth.php";
 requireRole(['admin','petugas']);
 if (
     isset(
-    $_POST['tanggal'],
+    $_POST['hari'],
     $_POST['waktu_sholat'],
     $_POST['id_kelas']
 )
 ) {
 
-    $tanggal = mysqli_real_escape_string(
+    $hari = mysqli_real_escape_string(
         $connect,
-        $_POST['tanggal']
+        $_POST['hari']
     );
 
 
@@ -47,6 +47,31 @@ if (
     }
 
 
+    /*
+     * Sesuai ENUM database:
+     *
+     * ENUM('Senin','Selasa','Rabu','Kamis','Jumat')
+     */
+
+    $hariValid = [
+        'Senin',
+        'Selasa',
+        'Rabu',
+        'Kamis',
+        'Jumat'
+    ];
+
+    if (!in_array($hari, $hariValid, true)) {
+
+        header(
+            'Location: tambah.php?pesan=gagal'
+        );
+
+        exit;
+
+    }
+
+
     if ($id_kelas <= 0) {
 
         header(
@@ -63,13 +88,13 @@ if (
         "
         INSERT INTO jadwal_sholat
         (
-            tanggal,
+            hari,
             waktu_sholat,
             id_kelas
         )
         VALUES
         (
-            '$tanggal',
+            '$hari',
             '$waktu_sholat',
             $id_kelas
         )

@@ -80,8 +80,8 @@ $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
                             </li>
                             <li><a class="dropdown-item py-2 text-danger" href="<?= url('auth/logout.php') ?>"><i
                                         class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
-                            <li><a class="dropdown-item py-2" href="<?= url('auth/sign_in.php') ?>"><i
-                                        class="bi bi-person-fill me-2"></i> Switch Account</a></li>
+                            <!-- <li><a class="dropdown-item py-2" href="<?= url('auth/change_pass.php') ?>"><i
+                             class="bi bi-key-fill"></i> Change Password</a></li> -->
                         </ul>
                     </div>
                 <?php else: ?>

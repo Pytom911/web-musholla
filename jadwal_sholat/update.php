@@ -8,7 +8,7 @@ requireRole(['admin','petugas']);
 if (
     isset(
     $_POST['id_jadwal'],
-    $_POST['tanggal'],
+    $_POST['hari'],
     $_POST['waktu_sholat'],
     $_POST['id_kelas']
 )
@@ -18,9 +18,9 @@ if (
     $id = (int) $_POST['id_jadwal'];
 
 
-    $tanggal = mysqli_real_escape_string(
+    $hari = mysqli_real_escape_string(
         $connect,
-        $_POST['tanggal']
+        $_POST['hari']
     );
 
 
@@ -59,6 +59,35 @@ if (
 
 
     /*
+     * Validasi hari
+     *
+     * ENUM('Senin','Selasa','Rabu','Kamis','Jumat')
+     */
+
+    $hariValid = [
+        'Senin',
+        'Selasa',
+        'Rabu',
+        'Kamis',
+        'Jumat'
+    ];
+
+    if (!in_array($hari, $hariValid, true)) {
+
+        echo "<script>
+
+            alert('Hari tidak valid!');
+
+            window.history.back();
+
+        </script>";
+
+        exit;
+
+    }
+
+
+    /*
      * Validasi kelas
      */
 
@@ -86,7 +115,7 @@ if (
         "
         UPDATE jadwal_sholat
         SET
-            tanggal = '$tanggal',
+            hari = '$hari',
             waktu_sholat = '$waktu_sholat',
             id_kelas = $id_kelas
         WHERE
