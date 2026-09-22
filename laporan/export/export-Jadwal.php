@@ -70,7 +70,8 @@ $data = mysqli_query(
         jadwal_sholat.hari,
         jadwal_sholat.waktu_sholat,
         jadwal_sholat.id_kelas,
-        kelas.nama_kelas
+        kelas.nama_kelas,
+        kelas.tingkat
     FROM jadwal_sholat
     LEFT JOIN kelas
         ON jadwal_sholat.id_kelas = kelas.id_kelas
@@ -264,8 +265,12 @@ $html = '
                 Waktu Sholat
             </th>
 
-            <th width="25%">
+            <th width="20%">
                 Jurusan
+            </th>
+
+            <th width="12%">
+                Tingkat
             </th>
 
         </tr>
@@ -365,6 +370,10 @@ if (mysqli_num_rows($data) > 0) {
                 ' . htmlspecialchars($namaKelas) . '
             </td>
 
+            <td class="center">
+                ' . htmlspecialchars($row['tingkat'] ?? '-') . '
+            </td>
+
         </tr>
 
         ';
@@ -376,7 +385,7 @@ if (mysqli_num_rows($data) > 0) {
 
         <tr>
 
-            <td colspan="5" class="empty">
+            <td colspan="6" class="empty">
 
                 Belum ada data jadwal sholat.
 

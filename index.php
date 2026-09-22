@@ -262,8 +262,10 @@ while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
 
                         <?php foreach ($jadwal['ashar'] as $jas): ?>
 
-                            <p class="jadwal-kelas">
-                                Kelas: <?= htmlspecialchars($jas['nama_kelas']) ?>
+                            <p class="border-kelas">
+                                Kelas:
+                                <?= htmlspecialchars($jas['tingkat']) ?>
+                                <?= htmlspecialchars($jas['nama_kelas']) ?>
                             </p>
 
                         <?php endforeach; ?>

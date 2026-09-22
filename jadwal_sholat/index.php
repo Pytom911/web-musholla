@@ -18,7 +18,8 @@ $data = mysqli_query(
     "
     SELECT 
         jadwal_sholat.*,
-        kelas.nama_kelas
+        kelas.nama_kelas,
+        kelas.tingkat
     FROM jadwal_sholat
     JOIN kelas 
         ON jadwal_sholat.id_kelas = kelas.id_kelas
@@ -148,6 +149,8 @@ $data = mysqli_query(
 
                         <th>Jurusan</th>
 
+                        <th>Tingkat</th>
+
                         <th>Hari</th>
 
                         <?php if ($isPetugas || $isAdmin): ?>
@@ -195,6 +198,14 @@ $data = mysqli_query(
                                         ); ?>
                                     </strong>
                                 </td>
+
+                                <td>
+                                    <strong>
+                                        <?= htmlspecialchars(
+                                            $row['tingkat']
+                                        ); ?>
+                                    </strong>
+                                </td>
                                 
                                 <td>
                                     <strong>
@@ -234,7 +245,7 @@ $data = mysqli_query(
 
                         <tr>
 
-                            <td colspan="<?= ($isPetugas || $isAdmin) ? 5 : 4; ?>">
+                            <td colspan="<?= ($isPetugas || $isAdmin) ? 6 : 5; ?>">
 
                                 <div class="empty-data">
 
