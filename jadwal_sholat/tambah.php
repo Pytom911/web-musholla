@@ -48,7 +48,6 @@ require_once __DIR__ . '/../template/header.php';
                     </span>
                     <select id="waktu_sholat" name="waktu_sholat" class="form-select" required>
                         <option value="">-- Pilih Waktu Sholat --</option>
-                        <option value="Dzuhur">Dzuhur</option>
                         <option value="Ashar">Ashar</option>
                     </select>
                 </div>

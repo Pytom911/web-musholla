@@ -248,6 +248,36 @@ function post(string $key, $default = '')
     return $_POST[$key] ?? $default;
 }
 
+function hari_indonesia(?string $tanggal): string
+{
+    $tanggal = trim($tanggal ?? '');
+
+    if ($tanggal === '') {
+        return '-';
+    }
+
+    $date = DateTime::createFromFormat('!Y-m-d', $tanggal);
+
+    if (
+        $date === false
+        || $date->format('Y-m-d') !== $tanggal
+    ) {
+        return '-';
+    }
+
+    $days = [
+        'Monday' => 'Senin',
+        'Tuesday' => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday' => 'Kamis',
+        'Friday' => 'Jumat',
+        'Saturday' => 'Sabtu',
+        'Sunday' => 'Minggu',
+    ];
+
+    return $days[$date->format('l')] ?? '-';
+}
+
 
 /* ---------- 7. SESSION ---------- */
 

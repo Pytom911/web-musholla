@@ -17,7 +17,22 @@ $data = mysqli_query(
         kelas.bagian
      FROM jadwal_sholat
      JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
-     ORDER BY jadwal_sholat.tanggal DESC, jadwal_sholat.id_jadwal DESC"
+     ORDER BY
+         CASE
+             WHEN jadwal_sholat.tanggal IS NULL THEN 3
+             WHEN jadwal_sholat.tanggal = CURDATE() THEN 0
+             WHEN jadwal_sholat.tanggal > CURDATE() THEN 1
+             ELSE 2
+         END ASC,
+         CASE
+             WHEN jadwal_sholat.tanggal > CURDATE() THEN jadwal_sholat.tanggal
+             ELSE NULL
+         END ASC,
+         CASE
+             WHEN jadwal_sholat.tanggal < CURDATE() THEN jadwal_sholat.tanggal
+             ELSE NULL
+         END DESC,
+         jadwal_sholat.id_jadwal DESC"
 );
 $dataCount = mysqli_num_rows($data);
 $canManage = $isPetugas || $isAdmin;
@@ -69,7 +84,7 @@ $canManage = $isPetugas || $isAdmin;
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari tanggal, waktu, kelas, atau bagian...">
+                <input type="text" id="searchInput" placeholder="Cari hari, tanggal, waktu, kelas, atau bagian...">
             </div>
         </div>
 
@@ -78,6 +93,7 @@ $canManage = $isPetugas || $isAdmin;
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Hari</th>
                         <th>Tanggal</th>
                         <th>Waktu Sholat</th>
                         <th>Nama Kelas</th>
@@ -96,9 +112,11 @@ $canManage = $isPetugas || $isAdmin;
                             $tanggal = !empty($row['tanggal'])
                                 ? date('d/m/Y', strtotime($row['tanggal']))
                                 : '-';
+                            $hari = hari_indonesia($row['tanggal'] ?? null);
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
+                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?></strong></td>
@@ -125,7 +143,7 @@ $canManage = $isPetugas || $isAdmin;
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="<?= $canManage ? 7 : 6 ?>">
+                            <td colspan="<?= $canManage ? 8 : 7 ?>">
                                 <div class="empty-data">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Data Jadwal Sholat</h4>

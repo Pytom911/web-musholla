@@ -48,7 +48,76 @@ $qKegiatanTerbaru = mysqli_query($connect, "
     LIMIT 2
 ");
 
-//jadwal sholat
+$tanggalHariIni = date('Y-m-d');
+
+$stmtJadwalHariIni = $connect->prepare(
+    "SELECT
+        jadwal_sholat.id_jadwal,
+        jadwal_sholat.tanggal,
+        kelas.nama_kelas,
+        kelas.tingkat,
+        kelas.bagian
+     FROM jadwal_sholat
+     JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
+     WHERE jadwal_sholat.tanggal = ?
+       AND jadwal_sholat.waktu_sholat = 'Ashar'
+     ORDER BY FIELD(kelas.tingkat, 'X', 'XI', 'XII'),
+              kelas.nama_kelas ASC,
+              kelas.id_kelas ASC"
+);
+$stmtJadwalHariIni->bind_param('s', $tanggalHariIni);
+$stmtJadwalHariIni->execute();
+$jadwalHariIni = $stmtJadwalHariIni->get_result();
+
+$stmtTanggalBerikutnya = $connect->prepare(
+    "SELECT MIN(tanggal) AS tanggal
+     FROM jadwal_sholat
+     WHERE tanggal > ?
+       AND waktu_sholat = 'Ashar'"
+);
+$stmtTanggalBerikutnya->bind_param('s', $tanggalHariIni);
+$stmtTanggalBerikutnya->execute();
+$resultTanggalBerikutnya = $stmtTanggalBerikutnya->get_result();
+$rowTanggalBerikutnya = $resultTanggalBerikutnya
+    ? $resultTanggalBerikutnya->fetch_assoc()
+    : null;
+$tanggalBerikutnya = $rowTanggalBerikutnya['tanggal'] ?? null;
+$jadwalBerikutnya = null;
+
+if ($tanggalBerikutnya !== null) {
+    $stmtJadwalBerikutnya = $connect->prepare(
+        "SELECT
+            jadwal_sholat.id_jadwal,
+            jadwal_sholat.tanggal,
+            kelas.nama_kelas,
+            kelas.tingkat,
+            kelas.bagian
+         FROM jadwal_sholat
+         JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
+         WHERE jadwal_sholat.tanggal = ?
+           AND jadwal_sholat.waktu_sholat = 'Ashar'
+         ORDER BY FIELD(kelas.tingkat, 'X', 'XI', 'XII'),
+                  kelas.nama_kelas ASC,
+                  kelas.id_kelas ASC"
+    );
+    $stmtJadwalBerikutnya->bind_param('s', $tanggalBerikutnya);
+    $stmtJadwalBerikutnya->execute();
+    $jadwalBerikutnya = $stmtJadwalBerikutnya->get_result();
+}
+
+$waktuAshar = '14:50 - 15:10';
+$jadwalDashboard = [
+    [
+        'judul' => 'Jadwal Hari Ini',
+        'tanggal' => $tanggalHariIni,
+        'data' => $jadwalHariIni,
+    ],
+    [
+        'judul' => 'Jadwal Berikutnya',
+        'tanggal' => $tanggalBerikutnya,
+        'data' => $jadwalBerikutnya,
+    ],
+];
 ?>
 
 <!-- Hero Section (Ringkas) -->
@@ -165,92 +234,49 @@ $qKegiatanTerbaru = mysqli_query($connect, "
     </div>
 </div>
 
-<!-- Baris Bawah: Jadwal Hari Ini & Kegiatan Terbaru (satu baris) -->
+<!-- Baris Bawah: Jadwal Sholat & Kegiatan Terbaru (satu baris) -->
 <div class="row g-4 mt-1 mb-4">
-    <!-- Kolom Kiri: Jadwal Hari Ini -->
-
     <div class="col-12 col-lg-6">
         <div class="section-header">
-            <h4 class="section-title">Jadwal Hari Ini</h4>
+            <h4 class="section-title">Jadwal Sholat</h4>
         </div>
 
         <div class="row g-3">
+            <?php foreach ($jadwalDashboard as $panel): ?>
+                <div class="col-12 col-sm-6">
+                    <div class="info-card">
 
-            <!-- DZUHUR -->
-            <div class="col-12 col-sm-6">
-                <div class="info-card">
+                        <div class="jadwal-name"><?= htmlspecialchars($panel['judul']) ?></div>
 
-                    <?php if (!empty($jadwal['dzuhur'])): ?>
+                        <?php if ($panel['tanggal'] !== null): ?>
+                            <div class="jadwal-kelas mb-2">
+                                <?= htmlspecialchars(hari_indonesia($panel['tanggal'])) ?>,
+                                <?= htmlspecialchars(date('d/m/Y', strtotime($panel['tanggal']))) ?>
+                            </div>
+                        <?php endif; ?>
 
-                        <div class="jadwal-icon bg-light-green">
-                            <i class="bi bi-clock"></i>
-                        </div>
+                        <?php if ($panel['tanggal'] !== null && $panel['data'] !== null && mysqli_num_rows($panel['data']) > 0): ?>
+                            <div class="jadwal-name">Ashar</div>
+                            <div class="jadwal-time"><?= htmlspecialchars($waktuAshar) ?></div>
 
-                        <div class="jadwal-name">Dzuhur</div>
-
-                        <div class="jadwal-time">
-                            12:00 - 12:45
-                        </div>
-
-                        <?php foreach ($jadwal['dzuhur'] as $jdz): ?>
-
-                            <p class="border-kelas">
-                                Kelas:
-                                <?= htmlspecialchars($jdz['tingkat']) ?>
-                                <?= htmlspecialchars($jdz['nama_kelas']) ?>
-                            </p>
-
-                        <?php endforeach; ?>
-
-                    <?php else: ?>
-
-                        <div class="jadwal-name">
-                            Tidak ada jadwal sholat hari ini
-                        </div>
-
-                    <?php endif; ?>
-
+                            <?php while ($barisJadwal = mysqli_fetch_assoc($panel['data'])): ?>
+                                <p class="border-kelas">
+                                    Kelas:
+                                    <?= htmlspecialchars($barisJadwal['tingkat']) ?>
+                                    <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
+                                    <?= htmlspecialchars($barisJadwal['bagian']) ?>
+                                </p>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="jadwal-name">
+                                <?= $panel['judul'] === 'Jadwal Hari Ini'
+                                    ? 'Belum ada jadwal hari ini'
+                                    : 'Belum ada jadwal terjadwal berikutnya' ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
-
-
-            <!-- ASHAR -->
-            <div class="col-12 col-sm-6">
-                <div class="info-card">
-
-                    <?php if (!empty($jadwal['ashar'])): ?>
-
-                        <div class="jadwal-icon bg-light-blue">
-                            <i class="bi bi-person"></i>
-                        </div>
-
-                        <div class="jadwal-name">Ashar</div>
-
-                        <div class="jadwal-time">
-                            15:30 - 16:15
-                        </div>
-
-                        <?php foreach ($jadwal['ashar'] as $jas): ?>
-
-                            <p class="border-kelas">
-                                Kelas:
-                                <?= htmlspecialchars($jas['tingkat']) ?>
-                                <?= htmlspecialchars($jas['nama_kelas']) ?>
-                            </p>
-
-                        <?php endforeach; ?>
-
-                    <?php else: ?>
-
-                        <div class="jadwal-name">
-                            Tidak ada jadwal sholat hari ini
-                        </div>
-
-                    <?php endif; ?>
-
-                </div>
-            </div>
-
+            <?php endforeach; ?>
         </div>
     </div>
 

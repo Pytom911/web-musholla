@@ -19,7 +19,7 @@ if ($tanggal !== '') {
 
 if (
     !$tanggalValid
-    || !in_array($waktu, ['Dzuhur', 'Ashar'], true)
+    || !in_array($waktu, ['Ashar'], true)
     || $idKelas <= 0
 ) {
     redirect('jadwal_sholat/tambah.php?pesan=gagal');

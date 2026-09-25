@@ -33,14 +33,6 @@ $totalJadwal = mysqli_fetch_assoc(
     )
 );
 
-// Total tanggal
-$totalTanggal = mysqli_fetch_assoc(
-    mysqli_query(
-        $connect,
-        "SELECT COUNT(DISTINCT tanggal) AS total FROM jadwal_sholat"
-    )
-);
-
 // Total kelas
 $totalKelas = mysqli_fetch_assoc(
     mysqli_query(
@@ -50,7 +42,6 @@ $totalKelas = mysqli_fetch_assoc(
 );
 
 $jumlahJadwal = $totalJadwal['total'] ?? 0;
-$jumlahTanggal = $totalTanggal['total'] ?? 0;
 $jumlahKelas = $totalKelas['total'] ?? 0;
 
 
@@ -77,7 +68,20 @@ $data = mysqli_query(
     LEFT JOIN kelas
         ON jadwal_sholat.id_kelas = kelas.id_kelas
     ORDER BY
-        jadwal_sholat.tanggal DESC,
+        CASE
+            WHEN jadwal_sholat.tanggal IS NULL THEN 3
+            WHEN jadwal_sholat.tanggal = CURDATE() THEN 0
+            WHEN jadwal_sholat.tanggal > CURDATE() THEN 1
+            ELSE 2
+        END ASC,
+        CASE
+            WHEN jadwal_sholat.tanggal > CURDATE() THEN jadwal_sholat.tanggal
+            ELSE NULL
+        END ASC,
+        CASE
+            WHEN jadwal_sholat.tanggal < CURDATE() THEN jadwal_sholat.tanggal
+            ELSE NULL
+        END DESC,
         jadwal_sholat.id_jadwal DESC"
 );
 
@@ -140,7 +144,7 @@ $html = '
     .title p { margin: 6px 0 0; font-size: 11px; color: #6b7280; }
     
     .summary { width: 100%; border-collapse: collapse; margin-bottom: 22px; }
-    .summary td { width: 33.33%; text-align: center; padding: 12px 8px; background: #f0fdf4; border: 1px solid #d1fae5; }
+    .summary td { width: 50%; text-align: center; padding: 12px 8px; background: #f0fdf4; border: 1px solid #d1fae5; }
     .summary-label { display: block; font-size: 9px; color: #6b7280; margin-bottom: 5px; }
     .summary-value { display: block; font-size: 14px; font-weight: bold; color: #118848; }
     
@@ -219,19 +223,6 @@ $html = '
         <td>
 
             <span class="summary-label">
-                TOTAL TANGGAL
-            </span>
-
-            <span class="summary-value">
-                ' . $jumlahTanggal . ' Tanggal
-            </span>
-
-        </td>
-
-
-        <td>
-
-            <span class="summary-label">
                 TOTAL KELAS
             </span>
 
@@ -254,15 +245,19 @@ $html = '
 
         <tr>
 
-            <th width="8%" class="center">
+            <th width="6%" class="center">
                 No
             </th>
 
-            <th width="22%">
+            <th width="14%">
+                Hari
+            </th>
+
+            <th width="20%">
                 Tanggal
             </th>
 
-            <th width="18%">
+            <th width="16%">
                 Waktu Sholat
             </th>
 
@@ -270,11 +265,11 @@ $html = '
                 Nama Kelas
             </th>
 
-            <th width="12%">
+            <th width="11%">
                 Tingkat
             </th>
 
-            <th width="12%">
+            <th width="11%">
                 Bagian
             </th>
 
@@ -302,6 +297,7 @@ if (mysqli_num_rows($data) > 0) {
         $tanggal = !empty($row['tanggal'])
             ? date('d/m/Y', strtotime($row['tanggal']))
             : '-';
+        $hari = hari_indonesia($row['tanggal'] ?? null);
         $bagian = !empty($row['bagian'])
             ? $row['bagian']
             : '-';
@@ -361,6 +357,10 @@ if (mysqli_num_rows($data) > 0) {
                 ' . $no++ . '
             </td>
 
+            <td class="center">
+                ' . htmlspecialchars($hari) . '
+            </td>
+
             <td class="bold">
                 ' . htmlspecialchars($tanggal) . '
             </td>
@@ -392,7 +392,7 @@ if (mysqli_num_rows($data) > 0) {
 
         <tr>
 
-            <td colspan="6" class="empty">
+            <td colspan="7" class="empty">
 
                 Belum ada data jadwal sholat.
 

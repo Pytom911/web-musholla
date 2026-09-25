@@ -6,10 +6,6 @@ $totalJadwal = mysqli_fetch_assoc(mysqli_query(
     $connect,
     "SELECT COUNT(*) AS total FROM jadwal_sholat"
 ));
-$totalTanggal = mysqli_fetch_assoc(mysqli_query(
-    $connect,
-    "SELECT COUNT(DISTINCT tanggal) AS total FROM jadwal_sholat"
-));
 $totalKelas = mysqli_fetch_assoc(mysqli_query(
     $connect,
     "SELECT COUNT(DISTINCT id_kelas) AS total FROM jadwal_sholat"
@@ -26,7 +22,22 @@ $data = mysqli_query(
         kelas.bagian
      FROM jadwal_sholat
      LEFT JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
-     ORDER BY jadwal_sholat.tanggal DESC, jadwal_sholat.id_jadwal DESC"
+     ORDER BY
+         CASE
+             WHEN jadwal_sholat.tanggal IS NULL THEN 3
+             WHEN jadwal_sholat.tanggal = CURDATE() THEN 0
+             WHEN jadwal_sholat.tanggal > CURDATE() THEN 1
+             ELSE 2
+         END ASC,
+         CASE
+             WHEN jadwal_sholat.tanggal > CURDATE() THEN jadwal_sholat.tanggal
+             ELSE NULL
+         END ASC,
+         CASE
+             WHEN jadwal_sholat.tanggal < CURDATE() THEN jadwal_sholat.tanggal
+             ELSE NULL
+         END DESC,
+         jadwal_sholat.id_jadwal DESC"
 );
 ?>
 
@@ -46,7 +57,7 @@ $data = mysqli_query(
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-xl-4 col-md-4">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-check"></i>
@@ -58,19 +69,7 @@ $data = mysqli_query(
                 </div>
             </div>
         </div>
-        <div class="col-xl-4 col-md-4">
-            <div class="stats-card">
-                <div class="icon icon-blue">
-                    <i class="bi bi-calendar3"></i>
-                </div>
-                <div class="stats-info">
-                    <small>Total Tanggal</small>
-                    <h2><?= (int) ($totalTanggal['total'] ?? 0) ?></h2>
-                    <span>Tanggal</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-md-4">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-mortarboard"></i>
@@ -90,7 +89,7 @@ $data = mysqli_query(
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" class="form-control"
-                        placeholder="Cari jadwal, tanggal, kelas, atau bagian...">
+                        placeholder="Cari hari, jadwal, tanggal, kelas, atau bagian...">
                 </div>
             </div>
         </div>
@@ -100,6 +99,7 @@ $data = mysqli_query(
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Hari</th>
                         <th>Tanggal</th>
                         <th>Waktu Sholat</th>
                         <th>Nama Kelas</th>
@@ -115,9 +115,11 @@ $data = mysqli_query(
                             $tanggal = !empty($row['tanggal'])
                                 ? date('d/m/Y', strtotime($row['tanggal']))
                                 : '-';
+                            $hari = hari_indonesia($row['tanggal'] ?? null);
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
+                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) ($row['nama_kelas'] ?? 'Kelas Tidak Ditemukan'), ENT_QUOTES, 'UTF-8') ?></strong></td>
@@ -131,7 +133,7 @@ $data = mysqli_query(
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-report">
                                     <i class="bi bi-calendar-x"></i>
                                     <h5>Belum Ada Jadwal Sholat</h5>
