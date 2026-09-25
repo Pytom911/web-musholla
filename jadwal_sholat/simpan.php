@@ -1,129 +1,58 @@
 <?php
+require_once __DIR__ . '/../auth/auth.php';
+requireRole(['admin', 'petugas']);
 
-require_once '../config/connect.php';
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
-if (
-    isset(
-    $_POST['hari'],
-    $_POST['waktu_sholat'],
-    $_POST['id_kelas']
-)
-) {
+$rawTanggal = $_POST['tanggal'] ?? null;
+$rawWaktu = $_POST['waktu_sholat'] ?? null;
+$rawIdKelas = $_POST['id_kelas'] ?? null;
 
-    $hari = mysqli_real_escape_string(
-        $connect,
-        $_POST['hari']
-    );
+$tanggal = is_string($rawTanggal) ? trim($rawTanggal) : '';
+$waktu = is_string($rawWaktu) ? trim($rawWaktu) : '';
+$idKelas = is_scalar($rawIdKelas) ? (int) $rawIdKelas : 0;
 
-
-    $waktu_sholat = mysqli_real_escape_string(
-        $connect,
-        $_POST['waktu_sholat']
-    );
-
-
-    $id_kelas = (int) $_POST['id_kelas'];
-
-
-    /*
-     * Sesuai ENUM database:
-     *
-     * ENUM('Dzuhur','Ashar')
-     */
-
-    if (
-        $waktu_sholat !== 'Dzuhur'
-        &&
-        $waktu_sholat !== 'Ashar'
-    ) {
-
-        header(
-            'Location: tambah.php?pesan=gagal'
-        );
-
-        exit;
-
-    }
-
-
-    /*
-     * Sesuai ENUM database:
-     *
-     * ENUM('Senin','Selasa','Rabu','Kamis','Jumat')
-     */
-
-    $hariValid = [
-        'Senin',
-        'Selasa',
-        'Rabu',
-        'Kamis',
-        'Jumat'
-    ];
-
-    if (!in_array($hari, $hariValid, true)) {
-
-        header(
-            'Location: tambah.php?pesan=gagal'
-        );
-
-        exit;
-
-    }
-
-
-    if ($id_kelas <= 0) {
-
-        header(
-            'Location: tambah.php?pesan=gagal'
-        );
-
-        exit;
-
-    }
-
-
-    $query = mysqli_query(
-        $connect,
-        "
-        INSERT INTO jadwal_sholat
-        (
-            hari,
-            waktu_sholat,
-            id_kelas
-        )
-        VALUES
-        (
-            '$hari',
-            '$waktu_sholat',
-            $id_kelas
-        )
-        "
-    );
-
-
-    if ($query) {
-
-        header(
-            'Location: index.php?pesan=simpan'
-        );
-
-        exit;
-
-    }
-
-
-    header(
-        'Location: tambah.php?pesan=gagal'
-    );
-
-    exit;
-
+$tanggalValid = $tanggal === '';
+if ($tanggal !== '') {
+    $parsedTanggal = DateTime::createFromFormat('!Y-m-d', $tanggal);
+    $tanggalValid = $parsedTanggal !== false
+        && $parsedTanggal->format('Y-m-d') === $tanggal;
 }
 
+if (
+    !$tanggalValid
+    || !in_array($waktu, ['Dzuhur', 'Ashar'], true)
+    || $idKelas <= 0
+) {
+    redirect('jadwal_sholat/tambah.php?pesan=gagal');
+}
 
-header('Location: index.php');
+try {
+    $classStmt = $connect->prepare("SELECT id_kelas FROM kelas WHERE id_kelas = ?");
+    $classStmt->bind_param('i', $idKelas);
+    $classStmt->execute();
+    $classStmt->store_result();
 
-exit;
+    if ($classStmt->num_rows !== 1) {
+        redirect('jadwal_sholat/tambah.php?pesan=gagal');
+    }
 
-?>
+    if ($tanggal === '') {
+        $stmt = $connect->prepare(
+            "INSERT INTO jadwal_sholat (tanggal, waktu_sholat, id_kelas)
+             VALUES (NULL, ?, ?)"
+        );
+        $stmt->bind_param('si', $waktu, $idKelas);
+    } else {
+        $stmt = $connect->prepare(
+            "INSERT INTO jadwal_sholat (tanggal, waktu_sholat, id_kelas)
+             VALUES (?, ?, ?)"
+        );
+        $stmt->bind_param('ssi', $tanggal, $waktu, $idKelas);
+    }
+
+    $stmt->execute();
+} catch (Throwable $e) {
+    error_log('Prayer schedule create failed: ' . $e->getMessage());
+    redirect('jadwal_sholat/tambah.php?pesan=gagal');
+}
+
+redirect('jadwal_sholat/index.php?pesan=simpan');

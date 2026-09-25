@@ -49,36 +49,6 @@ $qKegiatanTerbaru = mysqli_query($connect, "
 ");
 
 //jadwal sholat
-
-$hariMap = [
-    'Monday'    => 'Senin',
-    'Tuesday'   => 'Selasa',
-    'Wednesday' => 'Rabu',
-    'Thursday'  => 'Kamis',
-    'Friday'    => 'Jumat',
-    'Saturday'  => 'Sabtu',
-    'Sunday'    => 'Minggu'
-];
-
-$hariIni = $hariMap[date('l')] ?? '';
-
-$qJadwalSholat = mysqli_query($connect, "
-    SELECT 
-    jadwal_sholat.*,
-    kelas.nama_kelas,
-    kelas.tingkat
-    FROM jadwal_sholat
-    JOIN kelas 
-        ON jadwal_sholat.id_kelas = kelas.id_kelas
-    WHERE hari = '$hariIni'
-    ORDER BY jadwal_sholat.id_jadwal DESC
-");
-
-$jadwal = [];
-
-while ($row = mysqli_fetch_assoc($qJadwalSholat)) {
-    $jadwal[strtolower($row['waktu_sholat'])][] = $row;
-}
 ?>
 
 <!-- Hero Section (Ringkas) -->

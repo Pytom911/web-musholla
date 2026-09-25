@@ -1,152 +1,66 @@
 <?php
+require_once __DIR__ . '/../auth/auth.php';
+requireRole(['admin', 'petugas']);
 
-require_once '../config/connect.php';
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
+$rawId = $_POST['id_jadwal'] ?? null;
+$rawTanggal = $_POST['tanggal'] ?? null;
+$rawWaktu = $_POST['waktu_sholat'] ?? null;
+$rawIdKelas = $_POST['id_kelas'] ?? null;
 
+$id = is_scalar($rawId) ? (int) $rawId : 0;
+$tanggal = is_string($rawTanggal) ? trim($rawTanggal) : '';
+$waktu = is_string($rawWaktu) ? trim($rawWaktu) : '';
+$idKelas = is_scalar($rawIdKelas) ? (int) $rawIdKelas : 0;
 
-if (
-    isset(
-    $_POST['id_jadwal'],
-    $_POST['hari'],
-    $_POST['waktu_sholat'],
-    $_POST['id_kelas']
-)
-) {
-
-
-    $id = (int) $_POST['id_jadwal'];
-
-
-    $hari = mysqli_real_escape_string(
-        $connect,
-        $_POST['hari']
-    );
-
-
-    $waktu_sholat = mysqli_real_escape_string(
-        $connect,
-        $_POST['waktu_sholat']
-    );
-
-
-    $id_kelas = (int) $_POST['id_kelas'];
-
-
-    /*
-     * VALIDASI SESUAI DATABASE
-     *
-     * ENUM('Dzuhur','Ashar')
-     */
-
-    if (
-        $waktu_sholat !== 'Dzuhur'
-        &&
-        $waktu_sholat !== 'Ashar'
-    ) {
-
-        echo "<script>
-
-            alert('Waktu sholat tidak valid!');
-
-            window.history.back();
-
-        </script>";
-
-        exit;
-
-    }
-
-
-    /*
-     * Validasi hari
-     *
-     * ENUM('Senin','Selasa','Rabu','Kamis','Jumat')
-     */
-
-    $hariValid = [
-        'Senin',
-        'Selasa',
-        'Rabu',
-        'Kamis',
-        'Jumat'
-    ];
-
-    if (!in_array($hari, $hariValid, true)) {
-
-        echo "<script>
-
-            alert('Hari tidak valid!');
-
-            window.history.back();
-
-        </script>";
-
-        exit;
-
-    }
-
-
-    /*
-     * Validasi kelas
-     */
-
-    if ($id_kelas <= 0) {
-
-        echo "<script>
-
-            alert('Kelas harus dipilih!');
-
-            window.history.back();
-
-        </script>";
-
-        exit;
-
-    }
-
-
-    /*
-     * Update data
-     */
-
-    $query = mysqli_query(
-        $connect,
-        "
-        UPDATE jadwal_sholat
-        SET
-            hari = '$hari',
-            waktu_sholat = '$waktu_sholat',
-            id_kelas = $id_kelas
-        WHERE
-            id_jadwal = $id
-        "
-    );
-
-
-    if ($query) {
-
-        header(
-            'Location: index.php?pesan=update'
-        );
-
-        exit;
-
-    }
-
-
-    echo "Gagal update: " .
-        mysqli_error($connect);
-
-
-} else {
-
-    header(
-        'Location: index.php'
-    );
-
-    exit;
-
+$tanggalValid = $tanggal === '';
+if ($tanggal !== '') {
+    $parsedTanggal = DateTime::createFromFormat('!Y-m-d', $tanggal);
+    $tanggalValid = $parsedTanggal !== false
+        && $parsedTanggal->format('Y-m-d') === $tanggal;
 }
 
-?>
+if ($id <= 0) {
+    redirect('jadwal_sholat/index.php');
+}
+
+if (
+    !$tanggalValid
+    || !in_array($waktu, ['Dzuhur', 'Ashar'], true)
+    || $idKelas <= 0
+) {
+    redirect('jadwal_sholat/edit.php?id=' . $id . '&pesan=gagal');
+}
+
+try {
+    $classStmt = $connect->prepare("SELECT id_kelas FROM kelas WHERE id_kelas = ?");
+    $classStmt->bind_param('i', $idKelas);
+    $classStmt->execute();
+    $classStmt->store_result();
+
+    if ($classStmt->num_rows !== 1) {
+        redirect('jadwal_sholat/edit.php?id=' . $id . '&pesan=gagal');
+    }
+
+    if ($tanggal === '') {
+        $stmt = $connect->prepare(
+            "UPDATE jadwal_sholat
+             SET tanggal = NULL, waktu_sholat = ?, id_kelas = ?
+             WHERE id_jadwal = ?"
+        );
+        $stmt->bind_param('sii', $waktu, $idKelas, $id);
+    } else {
+        $stmt = $connect->prepare(
+            "UPDATE jadwal_sholat
+             SET tanggal = ?, waktu_sholat = ?, id_kelas = ?
+             WHERE id_jadwal = ?"
+        );
+        $stmt->bind_param('ssii', $tanggal, $waktu, $idKelas, $id);
+    }
+
+    $stmt->execute();
+} catch (Throwable $e) {
+    error_log('Prayer schedule update failed: ' . $e->getMessage());
+    redirect('jadwal_sholat/edit.php?id=' . $id . '&pesan=gagal');
+}
+
+redirect('jadwal_sholat/index.php?pesan=update');

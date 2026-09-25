@@ -1,49 +1,21 @@
 <?php
-require_once '../config/connect.php';
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
+require_once __DIR__ . '/../auth/auth.php';
+requireRole(['admin', 'petugas']);
 
+$rawId = $_GET['id'] ?? null;
+$id = is_scalar($rawId) ? (int) $rawId : 0;
 
-
-if (isset($_GET['id'])) {
-
-
-    $id = (int) $_GET['id'];
-
-
-    $query = mysqli_query(
-        $connect,
-        "
-        DELETE FROM jadwal_sholat
-        WHERE id_jadwal = $id
-        "
-    );
-
-
-    if ($query) {
-
-        header(
-            'Location: index.php?pesan=hapus'
-        );
-
-        exit;
-
-    }
-
-
-    header(
-        'Location: index.php?pesan=gagal'
-    );
-
-    exit;
-
+if ($id <= 0) {
+    redirect('jadwal_sholat/index.php');
 }
 
+try {
+    $stmt = $connect->prepare("DELETE FROM jadwal_sholat WHERE id_jadwal = ?");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+} catch (Throwable $e) {
+    error_log('Prayer schedule delete failed: ' . $e->getMessage());
+    redirect('jadwal_sholat/index.php?pesan=gagal');
+}
 
-header(
-    'Location: index.php'
-);
-
-exit;
-
-?>
+redirect('jadwal_sholat/index.php?pesan=hapus');

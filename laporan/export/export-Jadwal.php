@@ -33,11 +33,11 @@ $totalJadwal = mysqli_fetch_assoc(
     )
 );
 
-// Total hari
-$totalHari = mysqli_fetch_assoc(
+// Total tanggal
+$totalTanggal = mysqli_fetch_assoc(
     mysqli_query(
         $connect,
-        "SELECT COUNT(DISTINCT hari) AS total FROM jadwal_sholat"
+        "SELECT COUNT(DISTINCT tanggal) AS total FROM jadwal_sholat"
     )
 );
 
@@ -50,7 +50,7 @@ $totalKelas = mysqli_fetch_assoc(
 );
 
 $jumlahJadwal = $totalJadwal['total'] ?? 0;
-$jumlahHari = $totalHari['total'] ?? 0;
+$jumlahTanggal = $totalTanggal['total'] ?? 0;
 $jumlahKelas = $totalKelas['total'] ?? 0;
 
 
@@ -67,16 +67,17 @@ $data = mysqli_query(
     $connect,
     "SELECT
         jadwal_sholat.id_jadwal,
-        jadwal_sholat.hari,
+        jadwal_sholat.tanggal,
         jadwal_sholat.waktu_sholat,
         jadwal_sholat.id_kelas,
         kelas.nama_kelas,
-        kelas.tingkat
+        kelas.tingkat,
+        kelas.bagian
     FROM jadwal_sholat
     LEFT JOIN kelas
         ON jadwal_sholat.id_kelas = kelas.id_kelas
     ORDER BY
-        FIELD(jadwal_sholat.hari, 'Senin','Selasa','Rabu','Kamis','Jumat'),
+        jadwal_sholat.tanggal DESC,
         jadwal_sholat.id_jadwal DESC"
 );
 
@@ -190,7 +191,7 @@ $html = '
     <h3>LAPORAN JADWAL SHOLAT</h3>
 
     <p>
-        Seluruh data jadwal sholat berdasarkan hari dan kelas
+        Seluruh data jadwal sholat berdasarkan tanggal dan kelas
     </p>
 
 </div>
@@ -218,11 +219,11 @@ $html = '
         <td>
 
             <span class="summary-label">
-                TOTAL HARI
+                TOTAL TANGGAL
             </span>
 
             <span class="summary-value">
-                ' . $jumlahHari . ' Hari
+                ' . $jumlahTanggal . ' Tanggal
             </span>
 
         </td>
@@ -257,20 +258,24 @@ $html = '
                 No
             </th>
 
-            <th width="25%">
-                Hari
+            <th width="22%">
+                Tanggal
             </th>
 
-            <th width="22%">
+            <th width="18%">
                 Waktu Sholat
             </th>
 
-            <th width="20%">
-                Jurusan
+            <th width="22%">
+                Nama Kelas
             </th>
 
             <th width="12%">
                 Tingkat
+            </th>
+
+            <th width="12%">
+                Bagian
             </th>
 
         </tr>
@@ -294,14 +299,12 @@ if (mysqli_num_rows($data) > 0) {
 
     while ($row = mysqli_fetch_assoc($data)) {
 
-        /*
-        |--------------------------------------------------------------------------
-        | HARI
-        |--------------------------------------------------------------------------
-        */
-
-        $hari = $row['hari'];
-
+        $tanggal = !empty($row['tanggal'])
+            ? date('d/m/Y', strtotime($row['tanggal']))
+            : '-';
+        $bagian = !empty($row['bagian'])
+            ? $row['bagian']
+            : '-';
 
         /*
         |--------------------------------------------------------------------------
@@ -359,7 +362,7 @@ if (mysqli_num_rows($data) > 0) {
             </td>
 
             <td class="bold">
-                ' . htmlspecialchars($hari) . '
+                ' . htmlspecialchars($tanggal) . '
             </td>
 
             <td class="sholat">
@@ -372,6 +375,10 @@ if (mysqli_num_rows($data) > 0) {
 
             <td class="center">
                 ' . htmlspecialchars($row['tingkat'] ?? '-') . '
+            </td>
+
+            <td class="center">
+                ' . htmlspecialchars($bagian) . '
             </td>
 
         </tr>

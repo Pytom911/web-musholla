@@ -1,278 +1,157 @@
 <?php
 $pageTitle = 'Laporan Jadwal Sholat';
-require_once '../template/header.php';
+require_once __DIR__ . '/../template/header.php';
 
-/*
-|--------------------------------------------------------------------------
-| DATA STATISTIK
-|--------------------------------------------------------------------------
-*/
-
-// Total jadwal
 $totalJadwal = mysqli_fetch_assoc(mysqli_query(
     $connect,
     "SELECT COUNT(*) AS total FROM jadwal_sholat"
 ));
-
-// Total hari
-$totalHari = mysqli_fetch_assoc(mysqli_query(
+$totalTanggal = mysqli_fetch_assoc(mysqli_query(
     $connect,
-    "SELECT COUNT(DISTINCT hari) AS total FROM jadwal_sholat"
+    "SELECT COUNT(DISTINCT tanggal) AS total FROM jadwal_sholat"
 ));
-
-// Total kelas yang memiliki jadwal
 $totalKelas = mysqli_fetch_assoc(mysqli_query(
     $connect,
     "SELECT COUNT(DISTINCT id_kelas) AS total FROM jadwal_sholat"
 ));
-
-
-/*
-|--------------------------------------------------------------------------
-| DATA JADWAL SHOLAT
-|--------------------------------------------------------------------------
-|
-| JOIN dengan tabel kelas agar id_kelas ditampilkan sebagai nama kelas.
-|
-*/
-
 $data = mysqli_query(
     $connect,
-    "SELECT 
+    "SELECT
         jadwal_sholat.id_jadwal,
-        jadwal_sholat.hari,
+        jadwal_sholat.tanggal,
         jadwal_sholat.waktu_sholat,
         jadwal_sholat.id_kelas,
         kelas.nama_kelas,
-        kelas.tingkat
-    FROM jadwal_sholat
-    LEFT JOIN kelas 
-        ON jadwal_sholat.id_kelas = kelas.id_kelas
-    ORDER BY FIELD(jadwal_sholat.hari, 'Senin','Selasa','Rabu','Kamis','Jumat'), jadwal_sholat.id_jadwal DESC"
+        kelas.tingkat,
+        kelas.bagian
+     FROM jadwal_sholat
+     LEFT JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
+     ORDER BY jadwal_sholat.tanggal DESC, jadwal_sholat.id_jadwal DESC"
 );
-
-
 ?>
 
-<link rel="stylesheet" href="../assets/css/laporan.css">
-<link rel="stylesheet" href="../assets/css/data.css">
+<link rel="stylesheet" href="<?= asset('css/laporan.css') ?>">
+<link rel="stylesheet" href="<?= asset('css/data.css') ?>">
 
 <div class="container-fluid">
-
-    <!-- HEADER -->
     <div class="laporan-header">
         <div>
             <h3>Laporan Jadwal Sholat</h3>
-            <p>Seluruh data jadwal sholat berdasarkan hari dan kelas.</p>
+            <p>Seluruh data jadwal sholat berdasarkan tanggal dan kelas.</p>
         </div>
-
-        <a href="export/export-Jadwal.php"
-           target="_blank"
-           class="btn-export">
+        <a href="<?= url('laporan/export/export-Jadwal.php') ?>" target="_blank" class="btn-export">
             <i class="bi bi-file-earmark-pdf-fill"></i>
             Export PDF
         </a>
     </div>
 
-
-    <!-- STATISTIK -->
     <div class="row g-4 mb-4">
-
-        <!-- TOTAL JADWAL -->
-        <div class="col-xl-12 col-md-6">
+        <div class="col-xl-4 col-md-4">
             <div class="stats-card">
-
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-check"></i>
                 </div>
-
                 <div class="stats-info">
                     <small>Total Jadwal</small>
-
-                    <h2>
-                        <?= $totalJadwal['total'] ?? 0; ?>
-                    </h2>
-
+                    <h2><?= (int) ($totalJadwal['total'] ?? 0) ?></h2>
                     <span>Jadwal Sholat</span>
                 </div>
-
             </div>
         </div>
-
+        <div class="col-xl-4 col-md-4">
+            <div class="stats-card">
+                <div class="icon icon-blue">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div class="stats-info">
+                    <small>Total Tanggal</small>
+                    <h2><?= (int) ($totalTanggal['total'] ?? 0) ?></h2>
+                    <span>Tanggal</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-4">
+            <div class="stats-card">
+                <div class="icon icon-red">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+                <div class="stats-info">
+                    <small>Total Kelas</small>
+                    <h2><?= (int) ($totalKelas['total'] ?? 0) ?></h2>
+                    <span>Kelas</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-
-    <!-- TABLE -->
     <div class="table-card">
-
         <div class="table-header">
-
             <div class="table-tools">
-
                 <div class="search-box">
-
                     <i class="fas fa-search"></i>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control"
-                        placeholder="Cari jadwal, kelas, atau hari..."
-                    >
-
+                    <input type="text" id="searchInput" class="form-control"
+                        placeholder="Cari jadwal, tanggal, kelas, atau bagian...">
                 </div>
-
             </div>
-
         </div>
 
-
         <div class="table-responsive">
-
             <table class="table-modern" id="dataTable">
-
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Hari</th>
+                        <th>Tanggal</th>
                         <th>Waktu Sholat</th>
-                        <th>Jurusan</th>
+                        <th>Nama Kelas</th>
                         <th>Tingkat</th>
+                        <th>Bagian</th>
                     </tr>
                 </thead>
-
-
                 <tbody>
-
                     <?php if (mysqli_num_rows($data) > 0): ?>
-
                         <?php $no = 1; ?>
-
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
-
+                            <?php
+                            $tanggal = !empty($row['tanggal'])
+                                ? date('d/m/Y', strtotime($row['tanggal']))
+                                : '-';
+                            ?>
                             <tr>
-
-                                <!-- NO -->
+                                <td><?= $no++ ?></td>
+                                <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars((string) ($row['nama_kelas'] ?? 'Kelas Tidak Ditemukan'), ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><?= htmlspecialchars((string) ($row['tingkat'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
-                                    <?= $no++; ?>
+                                    <?= !empty($row['bagian'])
+                                        ? htmlspecialchars((string) $row['bagian'], ENT_QUOTES, 'UTF-8')
+                                        : '-' ?>
                                 </td>
-
-
-                                <!-- HARI -->
-                                <td>
-                                    <strong>
-                                        <?= htmlspecialchars(
-                                            $row['hari']
-                                        ); ?>
-                                    </strong>
-
-                                </td>
-
-
-                                <!-- WAKTU SHOLAT -->
-                                <td>
-                                    <strong>
-                                    <?php
-                                    $waktu = strtolower($row['waktu_sholat']);
-
-                                    $namaSholat = [
-                                        'dzhuhur' => 'Dzuhur',
-                                        'dzuhur'  => 'Dzuhur',
-                                        'ashar'   => 'Ashar',
-                                        'maghrib' => 'Maghrib',
-                                        'isya'    => 'Isya',
-                                        'subuh'   => 'Subuh'
-                                    ];
-
-                                    echo htmlspecialchars(
-                                        $namaSholat[$waktu] ?? ucfirst($row['waktu_sholat'])
-                                    );
-                                    ?>
-                                    </strong>
-
-                                </td>
-
-
-                                <!-- KELAS -->
-                                <td>
-
-                                    <strong>
-                                        <?= htmlspecialchars(
-                                            $row['nama_kelas'] ?? 'Kelas Tidak Ditemukan'
-                                        ); ?>
-                                    </strong>
-
-                                </td>
-
-
-                                <!-- TINGKAT -->
-                                <td>
-
-                                    <strong>
-                                        <?= htmlspecialchars(
-                                            $row['tingkat'] ?? '-'
-                                        ); ?>
-                                    </strong>
-
-                                </td>
-
-
                             </tr>
-
                         <?php endwhile; ?>
-
-
                     <?php else: ?>
-
                         <tr>
-
                             <td colspan="6">
-
                                 <div class="empty-report">
-
                                     <i class="bi bi-calendar-x"></i>
-
                                     <h5>Belum Ada Jadwal Sholat</h5>
-
-                                    <p>
-                                        Belum terdapat data jadwal sholat
-                                        yang tersimpan dalam sistem.
-                                    </p>
-
+                                    <p>Belum terdapat data jadwal sholat yang tersimpan dalam sistem.</p>
                                 </div>
-
                             </td>
-
                         </tr>
-
                     <?php endif; ?>
-
                 </tbody>
-
             </table>
-
         </div>
 
-
-        <!-- FOOTER TABLE -->
         <div class="table-footer">
-
             <div class="table-info">
-
-                Total Data :
-                <strong>
-                    <?= $totalJadwal['total'] ?? 0; ?>
-                </strong>
-
+                Total Data:
+                <strong><?= (int) ($totalJadwal['total'] ?? 0) ?></strong>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-
-<script src="../assets/js/laporan.js"></script>
-
-<?php require_once '../template/footer.php'; ?>
+<script src="<?= asset('js/laporan.js') ?>"></script>
+<?php require_once __DIR__ . '/../template/footer.php'; ?>

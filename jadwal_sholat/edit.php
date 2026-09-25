@@ -1,300 +1,119 @@
 <?php
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
-$pageTitle = 'Edit Jadwal Sholat';
+require_once __DIR__ . '/../auth/auth.php';
+requireRole(['admin', 'petugas']);
 
-require_once '../template/header.php';
+$rawId = $_GET['id'] ?? null;
+$id = is_scalar($rawId) ? (int) $rawId : 0;
 
-
-/*
- * Cek ID
- */
-
-if (!isset($_GET['id'])) {
-
-    echo "<script>
-        alert('ID jadwal tidak ditemukan!');
-        window.location='index.php';
-    </script>";
-
-    exit;
-
+if ($id <= 0) {
+    redirect('jadwal_sholat/index.php');
 }
 
-
-$id = (int) $_GET['id'];
-
-
-/*
- * Ambil data jadwal
- */
-
-$query = mysqli_query(
-    $connect,
-    "
-    SELECT *
-    FROM jadwal_sholat
-    WHERE id_jadwal = $id
-    "
+$stmt = $connect->prepare(
+    "SELECT id_jadwal, tanggal, waktu_sholat, id_kelas
+     FROM jadwal_sholat
+     WHERE id_jadwal = ?"
 );
-
-
-$row = mysqli_fetch_assoc($query);
-
-
-/*
- * Jika data tidak ditemukan
- */
+$stmt->bind_param('i', $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result ? $result->fetch_assoc() : null;
 
 if (!$row) {
-
-    echo "<script>
-        alert('Data jadwal tidak ditemukan!');
-        window.location='index.php';
-    </script>";
-
-    exit;
-
+    redirect('jadwal_sholat/index.php');
 }
-
-
-/*
- * Ambil data kelas
- */
 
 $kelas = mysqli_query(
     $connect,
-    "
-    SELECT *
-    FROM kelas
-    ORDER BY nama_kelas ASC
-    "
+    "SELECT id_kelas, nama_kelas, tingkat, bagian
+     FROM kelas
+     ORDER BY FIELD(tingkat, 'X', 'XI', 'XII'), nama_kelas ASC, id_kelas ASC"
 );
 
+$pageTitle = 'Edit Jadwal Sholat';
+require_once __DIR__ . '/../template/header.php';
 ?>
 
-<link rel="stylesheet" href="../assets/css/data.css">
-
+<link rel="stylesheet" href="<?= asset('css/data.css') ?>">
 
 <div class="container-fluid">
-
-
-    <a href="index.php" class="btn-back">
-
+    <a href="<?= url('jadwal_sholat/index.php') ?>" class="btn-back">
         <i class="bi bi-arrow-left"></i>
-
         Kembali
-
     </a>
 
-
     <div class="form-card">
+        <h3 class="form-title">Edit Jadwal Sholat</h3>
+        <p class="form-subtitle">Ubah data jadwal sholat.</p>
 
+        <?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
+            <div class="alert alert-danger">Jadwal sholat tidak dapat diperbarui. Periksa kembali isian data.</div>
+        <?php endif; ?>
 
-        <h3 class="form-title">
-            Edit Jadwal Sholat
-        </h3>
+        <form action="<?= url('jadwal_sholat/update.php') ?>" method="POST">
+            <input type="hidden" name="id_jadwal" value="<?= (int) $row['id_jadwal'] ?>">
 
-
-        <p class="form-subtitle">
-            Ubah data jadwal sholat.
-        </p>
-
-
-        <form action="update.php" method="POST">
-
-
-            <!-- ID -->
-            <input type="hidden" name="id_jadwal" value="<?= $row['id_jadwal']; ?>">
-
-
-            <!-- Hari -->
             <div class="form-group">
-
-                <label>
-
-                    Hari
-
-                    <span class="required">*</span>
-
-                </label>
-
-
+                <label for="tanggal">Tanggal</label>
                 <div class="input-group">
-
                     <span class="input-group-text">
-
-                        <i class="bi bi-calendar-week"></i>
-
+                        <i class="bi bi-calendar-event"></i>
                     </span>
-
-
-                    <select name="hari" class="form-select" required>
-
-                        <option value="">
-                            -- Pilih Hari --
-                        </option>
-
-                        <?php
-                        $hariOptions = [
-                            'Senin',
-                            'Selasa',
-                            'Rabu',
-                            'Kamis',
-                            'Jumat'
-                        ];
-
-                        foreach ($hariOptions as $hariOption):
-                            ?>
-
-                            <option value="<?= $hariOption; ?>" <?= $row['hari'] === $hariOption
-                                  ? 'selected'
-                                  : ''; ?>>
-                                <?= $hariOption; ?>
-                            </option>
-
-                        <?php endforeach; ?>
-
-                    </select>
-
+                    <input type="date" id="tanggal" name="tanggal" class="form-control"
+                        value="<?= htmlspecialchars((string) ($row['tanggal'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
-
             </div>
 
-
-            <!-- Waktu Sholat -->
             <div class="form-group">
-
-                <label>
-
-                    Waktu Sholat
-
-                    <span class="required">*</span>
-
-                </label>
-
-
+                <label for="waktu_sholat">Waktu Sholat <span class="required">*</span></label>
                 <div class="input-group">
-
                     <span class="input-group-text">
-
                         <i class="bi bi-clock"></i>
-
                     </span>
-
-
-                    <select name="waktu_sholat" class="form-select" required>
-
-                        <option value="">
-                            -- Pilih Waktu Sholat --
-                        </option>
-
-
-                        <option value="Dzuhur" <?= $row['waktu_sholat'] === 'Dzuhur'
-                            ? 'selected'
-                            : ''; ?>>
-                            Dzuhur
-                        </option>
-
-
-                        <option value="Ashar" <?= $row['waktu_sholat'] === 'Ashar'
-                            ? 'selected'
-                            : ''; ?>>
-                            Ashar
-                        </option>
-
+                    <select id="waktu_sholat" name="waktu_sholat" class="form-select" required>
+                        <option value="">-- Pilih Waktu Sholat --</option>
+                        <option value="Dzuhur" <?= $row['waktu_sholat'] === 'Dzuhur' ? 'selected' : ''; ?>>Dzuhur</option>
+                        <option value="Ashar" <?= $row['waktu_sholat'] === 'Ashar' ? 'selected' : ''; ?>>Ashar</option>
                     </select>
-
                 </div>
-
             </div>
 
-
-            <!-- Kelas -->
             <div class="form-group">
-
-                <label>
-
-                    Kelas
-
-                    <span class="required">*</span>
-
-                </label>
-
-
+                <label for="id_kelas">Kelas <span class="required">*</span></label>
                 <div class="input-group">
-
                     <span class="input-group-text">
-
                         <i class="bi bi-mortarboard"></i>
-
                     </span>
-
-
-                    <select name="id_kelas" class="form-select" required>
-
-                        <option value="">
-                            -- Pilih Kelas --
-                        </option>
-
-
-                        <?php while (
-                            $kelasRow =
-                            mysqli_fetch_assoc($kelas)
-                        ): ?>
-
-                            <option value="<?= $kelasRow['id_kelas']; ?>" <?= $row['id_kelas'] == $kelasRow['id_kelas']
-                                  ? 'selected'
-                                  : ''; ?>>
-
-                                <?= htmlspecialchars(
-                                    $kelasRow['nama_kelas']
-                                ); ?>
-
-                                -
-
-                                <?= htmlspecialchars(
-                                    $kelasRow['tingkat']
-                                ); ?>
-
+                    <select id="id_kelas" name="id_kelas" class="form-select" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        <?php while ($kelasRow = mysqli_fetch_assoc($kelas)): ?>
+                            <?php
+                            $labelKelas = $kelasRow['nama_kelas'] . ' - ' . $kelasRow['tingkat'];
+                            if ($kelasRow['bagian'] !== null && $kelasRow['bagian'] !== '') {
+                                $labelKelas .= ' (Bagian ' . $kelasRow['bagian'] . ')';
+                            }
+                            ?>
+                            <option value="<?= (int) $kelasRow['id_kelas'] ?>"
+                                <?= (int) $row['id_kelas'] === (int) $kelasRow['id_kelas'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($labelKelas, ENT_QUOTES, 'UTF-8') ?>
                             </option>
-
                         <?php endwhile; ?>
-
                     </select>
-
                 </div>
-
             </div>
 
-
-            <!-- Tombol -->
             <div class="form-footer">
-
-
-                <a href="index.php" class="btn-cancel">
-
+                <a href="<?= url('jadwal_sholat/index.php') ?>" class="btn-cancel">
                     <i class="bi bi-arrow-left-circle"></i>
-
                     Batal
-
                 </a>
-
-
                 <button type="submit" class="btn-update">
                     <i class="bi bi-pencil-square"></i>
                     Update Data
                 </button>
-
-
             </div>
-
-
         </form>
-
     </div>
-
 </div>
 
-
-<?php require_once '../template/footer.php'; ?>
+<?php require_once __DIR__ . '/../template/footer.php'; ?>
