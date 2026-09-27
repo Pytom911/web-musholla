@@ -93,12 +93,12 @@ $canManage = $isPetugas || $isAdmin;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Hari</th>
-                        <th>Tanggal</th>
-                        <th>Waktu Sholat</th>
                         <th>Nama Kelas</th>
                         <th>Tingkat</th>
                         <th>Bagian</th>
+                        <th>Hari</th>
+                        <th>Waktu Sholat</th>
+                        <th>Tanggal</th>
                         <?php if ($canManage): ?>
                             <th>Aksi</th>
                         <?php endif; ?>
@@ -110,15 +110,11 @@ $canManage = $isPetugas || $isAdmin;
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <?php
                             $tanggal = !empty($row['tanggal'])
-                                ? date('d/m/Y', strtotime($row['tanggal']))
+                                ? date('F d Y',strtotime($row['tanggal']))
                                 : '-';
                             $hari = hari_indonesia($row['tanggal'] ?? null);
                             ?>
-                            <tr>
                                 <td><?= $no++ ?></td>
-                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
-                                <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
-                                <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><?= htmlspecialchars((string) $row['tingkat'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
@@ -126,6 +122,9 @@ $canManage = $isPetugas || $isAdmin;
                                         ? htmlspecialchars((string) $row['bagian'], ENT_QUOTES, 'UTF-8')
                                         : '-' ?>
                                 </td>
+                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <?php if ($canManage): ?>
                                     <td>
                                         <div class="action-group">

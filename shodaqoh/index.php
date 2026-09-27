@@ -9,12 +9,25 @@ $totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT i
 
 $data = mysqli_query (
     $connect, 
-    "SELECT shodaqoh.*, kelas.nama_kelas
+    "SELECT shodaqoh.*, kelas.nama_kelas, kelas.tingkat, kelas.bagian
     FROM shodaqoh
     JOIN kelas
     ON shodaqoh.id_kelas = kelas.id_kelas
-    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
-")
+    ORDER BY 
+    CASE WHEN shodaqoh.tanggal IS NULL THEN 3
+        WHEN shodaqoh.tanggal = CURDATE() THEN 0
+        WHEN shodaqoh.tanggal > CURDATE() THEN 1
+        ELSE 2
+    END ASC,
+    CASE WHEN shodaqoh.tanggal > CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END ASC,
+    CASE WHEN shodaqoh.tanggal < CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END DESC,
+    shodaqoh.id_shodaqoh DESC
+");
+$dataCount = mysqli_num_rows($data);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -100,6 +113,8 @@ $data = mysqli_query (
                     <tr>
                         <th>No</th>
                         <th>Nama Kelas</th>
+                        <th>Tingkat</th>
+                        <th>Bagian</th>
                         <th>Nominal</th>
                         <th>Tanggal</th>
                         <?php if($isPetugas || $isAdmin): ?>
@@ -113,12 +128,14 @@ $data = mysqli_query (
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
+                            <td><?= htmlspecialchars($row['tingkat']); ?></td>
+                            <td><?= htmlspecialchars($row['bagian']); ?></td>
                             <td>
                                 <span class="nominal">
                                     Rp <?= number_format($row['nominal'],0,',','.'); ?>
                                 </span>
                             </td>
-                            <td><?= date('d F Y',strtotime($row['tanggal'])); ?></td>
+                            <td><?= date('F d Y',strtotime($row['tanggal'])); ?></td>
                             <?php if($isPetugas || $isAdmin): ?>
                                 <td>
                                     <div class="action-group">

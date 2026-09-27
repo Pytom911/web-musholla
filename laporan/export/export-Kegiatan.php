@@ -122,8 +122,8 @@ $html = '
             <th width="7%" class="center">No</th>
             <th width="25%">Nama Kegiatan</th>
             <th width="20%">Pengeluaran</th>
-            <th width="18%">Tanggal</th>
-            <th width="30%">Deskripsi</th>
+            <th width="21%">Deskripsi</th>
+            <th width="27%">Tanggal</th>
         </tr>
     </thead>
     <tbody>
@@ -135,19 +135,19 @@ $no = 1;
 if ($data && mysqli_num_rows($data) > 0) {
     while ($row = mysqli_fetch_assoc($data)) {
         $timestamp = strtotime($row['tanggal']);
-        $tanggal = date('d', $timestamp) . ' ' . $bulan[(int)date('m', $timestamp)] . ' ' . date('Y', $timestamp);
-        
+        $tanggal =  $bulan[(int)date('m', $timestamp)] . ' ' . date('d', $timestamp) . ' ' . date('Y', $timestamp);
+
         $namaKegiatan = htmlspecialchars($row['nama_kegiatan'], ENT_QUOTES, 'UTF-8');
         $deskripsi = htmlspecialchars($row['deskripsi'] ?? '-', ENT_QUOTES, 'UTF-8');
         $pengeluaran = number_format($row['pengeluaran'], 0, ',', '.');
 
         $html .= '
-        <tr>
-            <td class="center">' . $no++ . '</td>
-            <td>' . $namaKegiatan . '</td>
+        <tr class="center">
+            <td>' . $no++ . '</td>
+            <td><strong>' . $namaKegiatan . '</strong></td>
             <td class="nominal">Rp ' . $pengeluaran . '</td>
-            <td>' . $tanggal . '</td>
             <td>' . nl2br($deskripsi) . '</td>
+            <td>' . $tanggal . '</td>
         </tr>';
     }
 } else {
@@ -165,7 +165,7 @@ $html .= '
     <tr>
         <td></td>
         <td class="signature">
-            Kraksaan, ' . date('d') . ' ' . $bulan[(int)date('m')] . ' ' . date('Y') . '<br>
+            Kraksaan, ' . $bulan[(int)date('m')] . ' ' . date('d') . ' ' . date('Y') . '<br>
             Pengurus Musholla
             <div class="signature-space"></div>
             <strong>__________________________</strong>

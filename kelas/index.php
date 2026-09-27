@@ -66,9 +66,9 @@ $canManage = $isPetugas || $isAdmin;
                     <i class="bi bi-mortarboard-fill"></i>
                 </div>
                 <div class="stats-info">
-                    <small>Total Nama Kelas</small>
+                    <small>Total Jurusan</small>
                     <h2><?= (int) ($totalNamaKelas['total'] ?? 0) ?></h2>
-                    <span>Kelas</span>
+                    <span>Jurusan</span>
                 </div>
             </div>
         </div>

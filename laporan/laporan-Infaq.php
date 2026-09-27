@@ -107,9 +107,9 @@ $bulan = [
                                 <td>
                                     <?php
                                     $tanggal = strtotime($row['tanggal']);
-                                    echo date('d', $tanggal) . ' ' .
-                                         $bulan[(int)date('m', $tanggal)] . ' ' .
-                                         date('Y', $tanggal);
+                                    echo  $bulan[(int)date('m', $tanggal)] . ' ' .
+                                        date('d', $tanggal) . ' ' .
+                                        date('Y', $tanggal);
                                     ?>
                                 </td>
                             </tr>

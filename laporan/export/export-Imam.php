@@ -345,11 +345,11 @@ $html = '
             </th>
 
             <th width="25%">
-                Tanggal
+                Waktu Sholat
             </th>
 
             <th width="30%">
-                Waktu Sholat
+                Tanggal
             </th>
 
         </tr>
@@ -374,17 +374,17 @@ if (mysqli_num_rows($data) > 0) {
         $timestamp = strtotime($row['tanggal']);
 
         $tanggal =
-            date('d', $timestamp) . ' ' .
             $bulan[(int) date('m', $timestamp)] . ' ' .
+            date('d', $timestamp) . ' ' .
             date('Y', $timestamp);
 
         $namaGuru = $row['nama_guru'] ?? 'Nama guru tidak ditemukan';
 
         $html .= '
 
-        <tr>
+        <tr class="center">
 
-            <td class="center">
+            <td>
                 ' . $no++ . '
             </td>
 
@@ -393,11 +393,11 @@ if (mysqli_num_rows($data) > 0) {
             </td>
 
             <td>
-                ' . $tanggal . '
-            </td>
-
-            <td>
                 ' . htmlspecialchars($row['waktu_sholat']) . '
+            </td>
+            
+            <td>
+                ' . $tanggal . '
             </td>
 
         </tr>
@@ -437,8 +437,8 @@ $html .= '
         <td class="signature">
 
             Kraksaan,
-            ' . date('d') . ' ' .
-            $bulan[(int) date('m')] . ' ' .
+            ' . $bulan[(int) date('m')] . ' ' .
+            date('d') . ' ' .
             date('Y') . '
 
             <br>

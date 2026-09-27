@@ -121,7 +121,7 @@ $data = mysqli_query($connect, "SELECT * FROM infaq ORDER BY tanggal DESC,id_inf
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_donatur']); ?></strong></td>
                                 <td><span class="nominal">Rp <?= number_format($row['nominal'], 0, ',', '.'); ?></span></td>
-                                <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
+                                <td><?= date('F d Y',strtotime($row['tanggal'])); ?></td>
                                 <?php if ($isPetugas OR $isAdmin): ?>
                                     <td>
                                         <div class="action-group">

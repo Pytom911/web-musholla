@@ -11,8 +11,8 @@ if ($id <= 0) {
 
 $stmt = $connect->prepare(
     "SELECT id_jadwal, tanggal, waktu_sholat, id_kelas
-     FROM jadwal_sholat
-     WHERE id_jadwal = ?"
+    FROM jadwal_sholat
+    WHERE id_jadwal = ?"
 );
 $stmt->bind_param('i', $id);
 $stmt->execute();
@@ -25,9 +25,15 @@ if (!$row) {
 
 $kelas = mysqli_query(
     $connect,
-    "SELECT id_kelas, nama_kelas, tingkat, bagian
-     FROM kelas
-     ORDER BY FIELD(tingkat, 'X', 'XI', 'XII'), nama_kelas ASC, id_kelas ASC"
+    "SELECT * FROM kelas
+    ORDER BY nama_kelas ASC,
+    CASE tingkat
+        WHEN 'X' THEN 1
+        WHEN 'XI' THEN 2
+        WHEN 'XII' THEN 3
+        ELSE 4
+    END ASC,
+    bagian ASC"
 );
 
 $pageTitle = 'Edit Jadwal Sholat';
@@ -85,18 +91,39 @@ require_once __DIR__ . '/../template/header.php';
                     </span>
                     <select id="id_kelas" name="id_kelas" class="form-select" required>
                         <option value="">-- Pilih Kelas --</option>
-                        <?php while ($kelasRow = mysqli_fetch_assoc($kelas)): ?>
-                            <?php
-                            $labelKelas = $kelasRow['nama_kelas'] . ' - ' . $kelasRow['tingkat'];
-                            if ($kelasRow['bagian'] !== null && $kelasRow['bagian'] !== '') {
-                                $labelKelas .= ' (Bagian ' . $kelasRow['bagian'] . ')';
+
+                        <?php
+                        $jurusanAktif = '';
+
+                        while ($kelasRow = mysqli_fetch_assoc($kelas)):
+                            $jurusan = $kelasRow['nama_kelas'];
+
+                            if ($jurusanAktif !== $jurusan) {
+                                if ($jurusanAktif !== '') {
+                                    echo '</optgroup>';
+                                }
+
+                                echo '<optgroup label="' . htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8') . '">';
+                                $jurusanAktif = $jurusan;
                             }
-                            ?>
+
+                            $labelKelas = $kelasRow['nama_kelas'] . ' - ' . $kelasRow['tingkat'];
+
+                            if ($kelasRow['bagian'] !== null && $kelasRow['bagian'] !== '') {
+                                $labelKelas .= ' (' . $kelasRow['bagian'] . ')';
+                            }
+                        ?>
+
                             <option value="<?= (int) $kelasRow['id_kelas'] ?>"
                                 <?= (int) $row['id_kelas'] === (int) $kelasRow['id_kelas'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($labelKelas, ENT_QUOTES, 'UTF-8') ?>
                             </option>
+
                         <?php endwhile; ?>
+
+                        <?php if ($jurusanAktif !== ''): ?>
+                            </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>

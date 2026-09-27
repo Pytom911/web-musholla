@@ -2,7 +2,7 @@
 $pageTitle = 'Edit Data Shodaqoh';
 require_once '../template/header.php';
 require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
+requireRole(['admin', 'petugas']);
 
 $id = mysqli_real_escape_string($connect, $_GET['id']);
 
@@ -14,7 +14,18 @@ if (!$row) {
     exit;
 }
 
-$kelas = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas ASC");
+$kelas = mysqli_query(
+    $connect,
+    "SELECT * FROM kelas
+    ORDER BY nama_kelas ASC,
+    CASE tingkat
+        WHEN 'X' THEN 1
+        WHEN 'XI' THEN 2
+        WHEN 'XII' THEN 3
+        ELSE 4
+    END ASC,
+    bagian ASC"
+);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -48,13 +59,42 @@ $kelas = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas ASC");
                     <span class="input-group-text">
                         <i class="bi bi-mortarboard-fill"></i>
                     </span>
-                    <select name="id_kelas" class="form-select" required>
+                    <select id="id_kelas" name="id_kelas" class="form-select" required>
                         <option value="">-- Pilih Kelas --</option>
-                        <?php while($kelasRow = mysqli_fetch_assoc($kelas)): ?>
-                            <option value="<?= $kelasRow['id_kelas']; ?>" <?= $kelasRow['id_kelas'] == $row['id_kelas'] ? 'selected' : ''; ?>>
-                                <?= htmlspecialchars($kelasRow['nama_kelas']); ?>
+
+                        <?php
+                        $jurusanAktif = '';
+
+                        while ($kelasRow = mysqli_fetch_assoc($kelas)):
+                            $jurusan = $kelasRow['nama_kelas'];
+
+                            if ($jurusanAktif !== $jurusan) {
+                                if ($jurusanAktif !== '') {
+                                    echo '</optgroup>';
+                                }
+
+                                echo '<optgroup label="' . htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8') . '">';
+                                $jurusanAktif = $jurusan;
+                            }
+
+                            $labelKelas = $kelasRow['nama_kelas'] . ' - ' . $kelasRow['tingkat'];
+
+                            if ($kelasRow['bagian'] !== null && $kelasRow['bagian'] !== '') {
+                                $labelKelas .= ' (' . $kelasRow['bagian'] . ')';
+                            }
+                        ?>
+
+                            <option
+                                value="<?= (int) $kelasRow['id_kelas']; ?>"
+                                <?= (int) $row['id_kelas'] === (int) $kelasRow['id_kelas'] ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($labelKelas, ENT_QUOTES, 'UTF-8'); ?>
                             </option>
+
                         <?php endwhile; ?>
+
+                        <?php if ($jurusanAktif !== ''): ?>
+                            </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>

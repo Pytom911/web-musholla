@@ -27,15 +27,14 @@ $totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "
 "));
 
 $data = mysqli_query($connect, "
-    SELECT
+     SELECT 
         jadwal_imam.id_imam,
         jadwal_imam.tanggal,
         jadwal_imam.waktu_sholat,
-        jadwal_imam.id_guru,
-        guru.nama_guru AS nama_guru
+        guru.nama_guru
     FROM jadwal_imam
     LEFT JOIN guru ON jadwal_imam.id_guru = guru.id_guru
-    ORDER BY jadwal_imam.tanggal DESC, jadwal_imam.id_imam DESC
+    ORDER BY jadwal_imam.tanggal ASC, jadwal_imam.id_imam ASC
 ");
 ?>
 
@@ -131,7 +130,7 @@ $data = mysqli_query($connect, "
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_guru']); ?></strong></td>
                                 <td><strong><?= htmlspecialchars($row['waktu_sholat']); ?></strong></td>
-                                <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
+                                <td><?= date('F d Y',strtotime($row['tanggal'])); ?></td>
                                 <?php if ($isPetugas OR $isAdmin): ?>
                                     <td>
                                         <div class="action-group">

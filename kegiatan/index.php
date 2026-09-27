@@ -78,8 +78,8 @@ $data = mysqli_query($connect, "SELECT * FROM kegiatan ORDER BY id_kegiatan DESC
                         <th>No</th>
                         <th>Nama Kegiatan</th>
                         <th>Pengeluaran</th>
-                        <th>Tanggal</th>
                         <th>Deskripsi</th>
+                        <th>Tanggal</th>
                         <?php if ($isPetugas || $isAdmin): ?>
                             <th>Aksi</th>
                         <?php endif; ?>
@@ -97,8 +97,8 @@ $data = mysqli_query($connect, "SELECT * FROM kegiatan ORDER BY id_kegiatan DESC
                                         Rp <?= number_format($row['pengeluaran'], 0, ',', '.'); ?>
                                     </span>
                                 </td>
-                                <td><?= date('d F Y', strtotime($row['tanggal'])); ?></td>
                                 <td><strong><?= nl2br(htmlspecialchars($row['deskripsi'])); ?></strong></td>
+                                <td><?= date('F d Y',strtotime($row['tanggal'])); ?></td>
                                 <?php if ($isPetugas || $isAdmin): ?>
                                     <td>
                                         <div class="action-group">

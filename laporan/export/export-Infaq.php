@@ -111,7 +111,7 @@ $html = '
 <table class="data-table">
     <thead>
         <tr>
-            <th width="8%" class="center">No</th>
+            <th width="8%">No</th>
             <th width="42%">Nama Donatur</th>
             <th width="25%">Nominal</th>
             <th width="25%">Tanggal</th>
@@ -124,11 +124,11 @@ $no = 1;
 if (mysqli_num_rows($data) > 0) {
     while ($row = mysqli_fetch_assoc($data)) {
         $timestamp = strtotime($row['tanggal']);
-        $tanggal = date('d', $timestamp) . ' ' . $bulan[(int)date('m', $timestamp)] . ' ' . date('Y', $timestamp);
+        $tanggal =  $bulan[(int)date('m', $timestamp)] . ' ' . date('d', $timestamp) . ' ' . date('Y', $timestamp);
 
         $html .= '
-        <tr>
-            <td class="center">' . $no++ . '</td>
+        <tr class="center">
+            <td>' . $no++ . '</td>
             <td>' . htmlspecialchars($row['nama_donatur']) . '</td>
             <td class="nominal">Rp ' . number_format($row['nominal'], 0, ',', '.') . '</td>
             <td>' . $tanggal . '</td>
@@ -149,7 +149,7 @@ $html .= '
     <tr>
         <td></td>
         <td class="signature">
-            Kraksaan, ' . date('d') . ' ' . $bulan[(int)date('m')] . ' ' . date('Y') . '
+            Kraksaan, ' . $bulan[(int)date('m')] . ' ' . date('d') . ' ' . date('Y') . '
             <br>Pengurus Musholla
             <div class="signature-space"></div>
             <strong>________________________</strong>

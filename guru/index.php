@@ -8,7 +8,7 @@ $totalGuru = mysqli_fetch_assoc(mysqli_query($connect, "
 
 $data = mysqli_query($connect, "
     SELECT * FROM guru
-    ORDER BY id_guru DESC
+    ORDER BY nip ASC
 ");
 ?>
 

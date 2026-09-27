@@ -6,12 +6,27 @@ $totalData = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total
 $totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh"));
 $totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh"));
 
-$data = mysqli_query($connect, "
-    SELECT shodaqoh.*, kelas.nama_kelas 
-    FROM shodaqoh 
-    INNER JOIN kelas ON shodaqoh.id_kelas = kelas.id_kelas 
-    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
+$data = mysqli_query (
+    $connect, 
+    "SELECT shodaqoh.*, kelas.nama_kelas, kelas.tingkat, kelas.bagian
+    FROM shodaqoh
+    JOIN kelas
+    ON shodaqoh.id_kelas = kelas.id_kelas
+    ORDER BY 
+    CASE WHEN shodaqoh.tanggal IS NULL THEN 3
+        WHEN shodaqoh.tanggal = CURDATE() THEN 0
+        WHEN shodaqoh.tanggal > CURDATE() THEN 1
+        ELSE 2
+    END ASC,
+    CASE WHEN shodaqoh.tanggal > CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END ASC,
+    CASE WHEN shodaqoh.tanggal < CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END DESC,
+    shodaqoh.id_shodaqoh DESC
 ");
+$dataCount = mysqli_num_rows($data);
 
 $bulan = [
     1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -84,9 +99,11 @@ $bulan = [
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Tanggal</th>
                         <th>Nama Kelas</th>
+                        <th>Tingkat</th>
+                        <th>Bagian</th>
                         <th>Nominal</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,17 +111,21 @@ $bulan = [
                         <?php $no = 1; while ($row = mysqli_fetch_assoc($data)): ?>
                             <?php
                             $timestamp = strtotime($row['tanggal']);
-                            $tanggal = date('d', $timestamp) . ' ' . $bulan[(int)date('m', $timestamp)] . ' ' . date('Y', $timestamp);
+                            $tanggal =  $bulan[(int)date('m', $timestamp)] . ' ' .
+                                date('d', $timestamp) . ' ' .
+                                date('Y', $timestamp);
                             ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><?= $tanggal; ?></td>
                                 <td><strong><?= htmlspecialchars($row['nama_kelas']); ?></strong></td>
+                                <td><?= htmlspecialchars($row['tingkat']); ?></td>
+                                <td><?= htmlspecialchars($row['bagian']); ?></td>
                                 <td>
                                     <span class="nominal">
                                         Rp <?= number_format($row['nominal'], 0, ',', '.'); ?>
                                     </span>
                                 </td>
+                                <td><?= $tanggal; ?></td>   
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>

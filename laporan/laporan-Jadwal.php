@@ -57,7 +57,7 @@ $data = mysqli_query(
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-xl-6 col-md-6">
+        <div class="col-xl-12 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-check"></i>
@@ -66,18 +66,6 @@ $data = mysqli_query(
                     <small>Total Jadwal</small>
                     <h2><?= (int) ($totalJadwal['total'] ?? 0) ?></h2>
                     <span>Jadwal Sholat</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-6 col-md-6">
-            <div class="stats-card">
-                <div class="icon icon-red">
-                    <i class="bi bi-mortarboard"></i>
-                </div>
-                <div class="stats-info">
-                    <small>Total Kelas</small>
-                    <h2><?= (int) ($totalKelas['total'] ?? 0) ?></h2>
-                    <span>Kelas</span>
                 </div>
             </div>
         </div>
@@ -99,12 +87,12 @@ $data = mysqli_query(
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Hari</th>
-                        <th>Tanggal</th>
-                        <th>Waktu Sholat</th>
                         <th>Nama Kelas</th>
                         <th>Tingkat</th>
                         <th>Bagian</th>
+                        <th>Waktu Sholat</th>
+                        <th>Hari</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,15 +101,12 @@ $data = mysqli_query(
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <?php
                             $tanggal = !empty($row['tanggal'])
-                                ? date('d/m/Y', strtotime($row['tanggal']))
+                                ? date('F d Y',strtotime($row['tanggal']))
                                 : '-';
                             $hari = hari_indonesia($row['tanggal'] ?? null);
                             ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
-                                <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
-                                <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><strong><?= htmlspecialchars((string) ($row['nama_kelas'] ?? 'Kelas Tidak Ditemukan'), ENT_QUOTES, 'UTF-8') ?></strong></td>
                                 <td><?= htmlspecialchars((string) ($row['tingkat'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
@@ -129,6 +114,9 @@ $data = mysqli_query(
                                         ? htmlspecialchars((string) $row['bagian'], ENT_QUOTES, 'UTF-8')
                                         : '-' ?>
                                 </td>
+                                <td><strong><?= htmlspecialchars((string) $row['waktu_sholat'], ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars($hari, ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td><strong><?= htmlspecialchars($tanggal, ENT_QUOTES, 'UTF-8') ?></strong></td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>

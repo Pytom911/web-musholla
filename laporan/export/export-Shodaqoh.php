@@ -13,12 +13,25 @@ $dompdf = new Dompdf($options);
 
 $data = mysqli_query (
     $connect, 
-    "SELECT shodaqoh.*, kelas.nama_kelas
+    "SELECT shodaqoh.*, kelas.nama_kelas, kelas.tingkat, kelas.bagian
     FROM shodaqoh
     JOIN kelas
     ON shodaqoh.id_kelas = kelas.id_kelas
-    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
+    ORDER BY 
+    CASE WHEN shodaqoh.tanggal IS NULL THEN 3
+        WHEN shodaqoh.tanggal = CURDATE() THEN 0
+        WHEN shodaqoh.tanggal > CURDATE() THEN 1
+        ELSE 2
+    END ASC,
+    CASE WHEN shodaqoh.tanggal > CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END ASC,
+    CASE WHEN shodaqoh.tanggal < CURDATE() THEN shodaqoh.tanggal
+        ELSE NULL
+    END DESC,
+    shodaqoh.id_shodaqoh DESC
 ");
+$dataCount = mysqli_num_rows($data);
 $totalShodaqoh = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal),0) AS total FROM shodaqoh"));
 $totalKelas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh"));
 $totalTransaksi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh"));
@@ -119,9 +132,11 @@ $html = '
     <thead>
         <tr>
             <th width="8%" class="center">No</th>
+            <th width="25%">Nama Kelas</th>
+            <th width="20%">Tingkat</th>
+            <th width="15%">Bagian</th>
+            <th width="42%  ">Nominal</th>
             <th width="25%">Tanggal</th>
-            <th width="42%">Nama Kelas</th>
-            <th width="25%">Nominal</th>
         </tr>
     </thead>
     <tbody>
@@ -132,14 +147,16 @@ $no = 1;
 if (mysqli_num_rows($data) > 0) {
     while ($row = mysqli_fetch_assoc($data)) {
         $timestamp = strtotime($row['tanggal']);
-        $tanggal = date('d', $timestamp) . ' ' . $bulan[(int)date('m', $timestamp)] . ' ' . date('Y', $timestamp);
+        $tanggal =  $bulan[(int)date('m', $timestamp)] . ' ' . date('d', $timestamp) . ' ' . date('Y', $timestamp);
 
         $html .= '
-        <tr>
-            <td class="center">' . $no++ . '</td>
-            <td>' . $tanggal . '</td>
+        <tr class="center">
+            <td>' . $no++ . '</td>
             <td>' . htmlspecialchars($row['nama_kelas']) . '</td>
+            <td>' . htmlspecialchars($row['tingkat']) . '</td>
+            <td>' . htmlspecialchars($row['bagian']) . '</td>
             <td class="nominal">Rp ' . number_format($row['nominal'], 0, ',', '.') . '</td>
+            <td>' . $tanggal . '</td>
         </tr>';
     }
 } else {
@@ -157,7 +174,7 @@ $html .= '
     <tr>
         <td></td>
         <td class="signature">
-            Kraksaan, ' . date('d') . ' ' . $bulan[(int)date('m')] . ' ' . date('Y') . '<br>
+            Kraksaan, ' . $bulan[(int)date('m')] . ' ' . date('d') . ' ' . date('Y') . '<br>
             Pengurus Musholla
             <div class="signature-space"></div>
             <strong>______________________________</strong>

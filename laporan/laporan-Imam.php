@@ -122,8 +122,8 @@ $bulan = [
                     <tr>
                         <th>No</th>
                         <th>Nama Imam</th>
-                        <th>Tanggal</th>
                         <th>Waktu Sholat</th>
+                        <th>Tanggal</th>
                         
                     </tr>
                 </thead>
@@ -151,21 +151,21 @@ $bulan = [
                                 </td>
 
                                 <td>
+                                    <strong>
+                                        <?= htmlspecialchars($row['waktu_sholat']); ?>
+                                    </strong>
+                                </td>
+
+                                <td>
 
                                     <?php
                                     $tanggal = strtotime($row['tanggal']);
 
-                                    echo date('d', $tanggal) . ' ' .
-                                        $bulan[(int)date('m', $tanggal)] . ' ' .
+                                    echo  $bulan[(int)date('m', $tanggal)] . ' ' .
+                                        date('d', $tanggal) . ' ' .
                                         date('Y', $tanggal);
                                     ?>
 
-                                </td>
-
-                                <td>
-                                    <strong>
-                                        <?= htmlspecialchars($row['waktu_sholat']); ?>
-                                    </strong>
                                 </td>
 
                             </tr>

@@ -72,8 +72,8 @@ $bulan = [
                         <th>No</th>
                         <th>Nama Kegiatan</th>
                         <th>Pengeluaran</th>
-                        <th>Tanggal</th>
                         <th>Deskripsi</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,13 +91,15 @@ $bulan = [
                                     </span>
                                 </td>
                                 <td>
-                                    <?php
-                                    $tanggal = strtotime($row['tanggal']);
-                                    echo date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal)] . ' ' . date('Y', $tanggal);
-                                    ?>
+                                    <?= nl2br(htmlspecialchars($row['deskripsi'])); ?>
                                 </td>
                                 <td>
-                                    <?= nl2br(htmlspecialchars($row['deskripsi'])); ?>
+                                    <?php
+                                    $tanggal = strtotime($row['tanggal']);
+                                    echo  $bulan[(int)date('m', $tanggal)] . ' ' .
+                                        date('d', $tanggal) . ' ' .
+                                        date('Y', $tanggal);
+                                    ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

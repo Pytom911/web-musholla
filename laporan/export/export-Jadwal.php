@@ -250,18 +250,6 @@ $html = '
             </th>
 
             <th width="14%">
-                Hari
-            </th>
-
-            <th width="20%">
-                Tanggal
-            </th>
-
-            <th width="16%">
-                Waktu Sholat
-            </th>
-
-            <th width="22%">
                 Nama Kelas
             </th>
 
@@ -271,6 +259,18 @@ $html = '
 
             <th width="11%">
                 Bagian
+            </th>
+
+            <th width="22%">
+                Waktu Sholat
+            </th>
+
+            <th width="11%">
+                Hari
+            </th>
+
+            <th width="25%">
+                Tanggal
             </th>
 
         </tr>
@@ -295,7 +295,7 @@ if (mysqli_num_rows($data) > 0) {
     while ($row = mysqli_fetch_assoc($data)) {
 
         $tanggal = !empty($row['tanggal'])
-            ? date('d/m/Y', strtotime($row['tanggal']))
+            ? date('F d Y',strtotime($row['tanggal']))
             : '-';
         $hari = hari_indonesia($row['tanggal'] ?? null);
         $bagian = !empty($row['bagian'])
@@ -351,34 +351,34 @@ if (mysqli_num_rows($data) > 0) {
 
         $html .= '
 
-        <tr>
+        <tr class="center">
 
-            <td class="center">
+            <td>
                 ' . $no++ . '
-            </td>
-
-            <td class="center">
-                ' . htmlspecialchars($hari) . '
-            </td>
-
-            <td class="bold">
-                ' . htmlspecialchars($tanggal) . '
-            </td>
-
-            <td class="sholat">
-                ' . htmlspecialchars($sholat) . '
             </td>
 
             <td class="bold">
                 ' . htmlspecialchars($namaKelas) . '
             </td>
 
-            <td class="center">
+            <td>
                 ' . htmlspecialchars($row['tingkat'] ?? '-') . '
             </td>
 
-            <td class="center">
+            <td>
                 ' . htmlspecialchars($bagian) . '
+            </td>
+
+            <td>
+                ' . htmlspecialchars($hari) . '
+            </td>
+
+            <td class="bold">
+                ' . htmlspecialchars($sholat) . '
+            </td>
+
+            <td class="sholat">
+                ' . htmlspecialchars($tanggal) . '
             </td>
 
         </tr>
@@ -428,9 +428,9 @@ $html .= '
         <td class="signature">
 
             Kraksaan,
-            ' . date('d') . '
-            ' . $bulan[(int)date('m')] . '
-            ' . date('Y') . '
+            ' . $bulan[(int)date('m')] . ' ' .
+            date('d') . ' ' .
+            date('Y') . '
 
             <br>
 
