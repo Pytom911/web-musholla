@@ -47,7 +47,11 @@ $tanggalHariIni = date('Y-m-d');
    JADWAL IMAM
 ========================= */
 
-$jadwalImam = mysqli_query($connect, "
+/* =========================
+   JADWAL IMAM HARI INI
+========================= */
+
+$jadwalImamHariIni = mysqli_query($connect, "
     SELECT 
         jadwal_imam.id_imam,
         jadwal_imam.tanggal,
@@ -56,12 +60,33 @@ $jadwalImam = mysqli_query($connect, "
     FROM jadwal_imam
     LEFT JOIN guru 
         ON jadwal_imam.id_guru = guru.id_guru
-    WHERE jadwal_imam.tanggal >= CURDATE()
-    ORDER BY jadwal_imam.tanggal ASC,
+    WHERE jadwal_imam.tanggal = CURDATE()
+      AND jadwal_imam.waktu_sholat IN ('Dzuhur', 'Ashar')
+    ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
              jadwal_imam.id_imam ASC
     LIMIT 2
 ");
 
+
+/* =========================
+   JADWAL IMAM BESOK
+========================= */
+
+$jadwalImamBesok = mysqli_query($connect, "
+    SELECT 
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        guru.nama_guru
+    FROM jadwal_imam
+    LEFT JOIN guru 
+        ON jadwal_imam.id_guru = guru.id_guru
+    WHERE jadwal_imam.tanggal = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      AND jadwal_imam.waktu_sholat IN ('Dzuhur', 'Ashar')
+    ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
+             jadwal_imam.id_imam ASC
+    LIMIT 2
+");
 
 /* =========================
    JADWAL SHOLAT HARI INI
@@ -518,186 +543,88 @@ $jadwalDashboard = [
     </div>
 
 
-    <!-- =====================
-         JADWAL IMAM
-    ====================== -->
+   <!-- =====================
+     JADWAL IMAM
+====================== -->
 
-    <div class="col-12 col-lg-6">
+<div class="col-12 col-lg-6">
 
-        <div class="section-header">
+    <div class="section-header">
 
-            <h4 class="section-title">
-                Jadwal Imam
-            </h4>
+        <h4 class="section-title">
+            Jadwal Imam
+        </h4>
 
-            <a
-                href="<?= url('jadwal_imam/index.php') ?>"
-                class="section-link"
-            >
-                Lihat Semua &rarr;
-            </a>
-
-        </div>
-
-
-        <div class="col-12">
-
-            <div class="info-card">
-
-
-                <?php if (
-                    $jadwalImam &&
-                    mysqli_num_rows($jadwalImam) > 0
-                ): ?>
-
-
-                    <?php
-                    $bulan = [
-                        1 => 'Jan',
-                        2 => 'Feb',
-                        3 => 'Mar',
-                        4 => 'Apr',
-                        5 => 'Mei',
-                        6 => 'Jun',
-                        7 => 'Jul',
-                        8 => 'Agu',
-                        9 => 'Sep',
-                        10 => 'Okt',
-                        11 => 'Nov',
-                        12 => 'Des'
-                    ];
-                    ?>
-
-
-                    <?php while (
-                        $imam = mysqli_fetch_assoc($jadwalImam)
-                    ): ?>
-
-                        <?php
-                        $tanggalImam = strtotime(
-                            $imam['tanggal']
-                        );
-                        ?>
-
-
-                        <div class="kegiatan-item">
-
-
-                            <!-- TANGGAL -->
-
-                            <div class="kegiatan-date-box-green">
-
-                                <div class="clock-icon">
-
-                                    <i class="bi bi-calendar-check-fill"></i>
-
-                                </div>
-
-
-                                <span class="date-number">
-
-                                    <?= date(
-                                        'd',
-                                        $tanggalImam
-                                    ) ?>
-
-                                </span>
-
-
-                                <span class="date-month-year">
-
-                                    <?= $bulan[
-                                        (int)date(
-                                            'm',
-                                            $tanggalImam
-                                        )
-                                    ] ?>
-
-                                    <br>
-
-                                    <?= date(
-                                        'Y',
-                                        $tanggalImam
-                                    ) ?>
-
-                                </span>
-
-                            </div>
-
-
-                            <!-- DATA IMAM -->
-
-                            <div class="kegiatan-info">
-
-                                <h6>
-
-                                    <?= htmlspecialchars(
-                                        $imam['nama_guru']
-                                        ?? 'Nama imam tidak ditemukan'
-                                    ) ?>
-
-                                </h6>
-
-
-                                <p class="mb-2">
-
-                                    <?= htmlspecialchars(
-                                        $imam['waktu_sholat']
-                                    ) ?>
-
-                                </p>
-
-
-                                <span class="imam-badge">
-
-                                    Imam Sholat
-
-                                </span>
-
-                            </div>
-
-
-                            <!-- ARROW -->
-
-                            <div class="text-secondary">
-
-                                <i class="bi bi-chevron-right"></i>
-
-                            </div>
-
-
-                        </div>
-
-
-                    <?php endwhile; ?>
-
-
-                <?php else: ?>
-
-
-                    <div class="text-center py-5 text-muted">
-
-                        <i class="bi bi-calendar-event fs-1"></i>
-
-                        <p class="mt-3 mb-0">
-
-                            Belum ada jadwal imam.
-
-                        </p>
-
-                    </div>
-
-
-                <?php endif; ?>
-
-
-            </div>
-
-        </div>
+        <a href="<?= url('jadwal_imam/index.php') ?>" class="stat-link">
+            Lihat Semua &rarr;
+        </a>
 
     </div>
 
+<div class="imam-dashboard">
+    <div class="row g-3">
+
+        <!-- Hari Ini -->
+        <div class="col-12 col-sm-6 d-flex">
+            <div class="info-card w-100 h-100">
+
+                <div class="jadwal-name">
+                    Hari Ini
+                </div>
+
+                <div class="jadwal-kelas mb-3">
+                    <?= htmlspecialchars(hari_indonesia(date('Y-m-d'))) ?>,
+                    <?= date('d/m/Y') ?>
+                </div>
+
+                <?php while ($imamHariIni = mysqli_fetch_assoc($jadwalImamHariIni)): ?>
+
+                    <div class="jadwal-name mb-2">
+                        <?= htmlspecialchars($imamHariIni['nama_guru']) ?>
+                    </div>
+
+                    <div class="jadwal-time mb-3">
+                        <?= htmlspecialchars($imamHariIni['waktu_sholat']) ?>
+                    </div>
+
+                <?php endwhile; ?>
+
+            </div>
+        </div>
+
+
+        <!-- Besok -->
+        <div class="col-12 col-sm-6 d-flex">
+            <div class="info-card w-100 h-100">
+
+                <div class="jadwal-name">
+                    Besok
+                </div>
+
+                <?php
+                $tanggalBesok = date('Y-m-d', strtotime('+1 day'));
+                ?>
+
+                <div class="jadwal-kelas mb-3">
+                    <?= htmlspecialchars(hari_indonesia($tanggalBesok)) ?>,
+                    <?= date('d/m/Y', strtotime($tanggalBesok)) ?>
+                </div>
+
+                <?php while ($imamBesok = mysqli_fetch_assoc($jadwalImamBesok)): ?>
+
+                    <div class="jadwal-name mb-2">
+                        <?= htmlspecialchars($imamBesok['nama_guru']) ?>
+                    </div>
+
+                    <div class="jadwal-time mb-3">
+                        <?= htmlspecialchars($imamBesok['waktu_sholat']) ?>
+                    </div>
+
+                <?php endwhile; ?>
+
+            </div>
+        </div>
+
+    </div>
 </div>
-
-
 <?php require_once __DIR__ . '/template/footer.php'; ?>
