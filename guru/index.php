@@ -1,21 +1,16 @@
 <?php
 $pageTitle = 'Data Guru';
 require_once '../template/header.php';
-
 $totalGuru = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(*) AS total FROM guru
 "));
-
 $data = mysqli_query($connect, "
     SELECT * FROM guru
     ORDER BY nip ASC
 ");
 ?>
-
 <link rel="stylesheet" href="../assets/css/data.css">
-
 <div class="container-fluid">
-
     <?php if (isset($_GET['pesan'])): ?>
         <?php if ($_GET['pesan'] == "simpan"): ?>
             <div class="alert alert-success">Data guru berhasil ditambahkan.</div>
@@ -27,7 +22,6 @@ $data = mysqli_query($connect, "
             <div class="alert alert-danger">Terjadi kesalahan.</div>
         <?php endif; ?>
     <?php endif; ?>
-
     <div class="page-header">
         <div>
             <h3>Data Guru</h3>
@@ -40,7 +34,6 @@ $data = mysqli_query($connect, "
             </a>
         <?php endif; ?>
     </div>
-
     <div class="row g-4 mb-4">
         <div class="col-xl-12 col-md-6">
             <div class="stats-card">
@@ -55,7 +48,6 @@ $data = mysqli_query($connect, "
             </div>
         </div>
     </div>
-
     <div class="data-card">
         <div class="data-toolbar">
             <div class="search-box">
@@ -63,7 +55,6 @@ $data = mysqli_query($connect, "
                 <input type="text" id="searchInput" placeholder="Cari nama guru...">
             </div>
         </div>
-
         <div class="table-responsive">
             <table class="table-modern" id="dataTable">
                 <thead>
@@ -77,7 +68,6 @@ $data = mysqli_query($connect, "
                         <?php endif; ?>
                     </tr>
                 </thead>
-
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
                         <?php $no = 1; ?>
@@ -118,17 +108,13 @@ $data = mysqli_query($connect, "
                 </tbody>
             </table>
         </div>
-
         <div class="table-footer">
             <div class="table-info">
                 Total Data : <strong><?= mysqli_num_rows($data); ?></strong>
             </div>
         </div>
     </div>
-
 </div>
-
 <script src="../assets/js/script.js"></script>
-
 <?php require_once '../template/footer.php'; ?>
 ```

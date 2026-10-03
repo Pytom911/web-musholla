@@ -190,6 +190,31 @@
 }
 
 /*==========================
+  FILTER BOX
+==========================*/
+
+.filter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-box label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filter-box select {
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+}
+
+/*==========================
   SEARCH BOX
 ==========================*/
 

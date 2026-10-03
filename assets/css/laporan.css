@@ -71,6 +71,25 @@
     box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
+.table-tools {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.filter-box {
+    margin-left: auto;
+}
+
+.filter-box select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+}
+
 .filter-title{
     display:flex;
     align-items:center;

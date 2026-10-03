@@ -38,6 +38,36 @@ $data = mysqli_query($connect, "
 ");
 ?>
 
+<?php
+// Jadwal Imam Hari Ini
+$jadwalImamHariIni = mysqli_query($connect, "
+    SELECT 
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        guru.nama_guru
+    FROM jadwal_imam
+    LEFT JOIN guru ON jadwal_imam.id_guru = guru.id_guru
+    WHERE DATE(jadwal_imam.tanggal) = CURDATE()
+    ORDER BY jadwal_imam.id_imam ASC
+    LIMIT 1
+");
+
+// Jadwal Imam Besok
+$jadwalImamBesok = mysqli_query($connect, "
+    SELECT 
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        guru.nama_guru
+    FROM jadwal_imam
+    LEFT JOIN guru ON jadwal_imam.id_guru = guru.id_guru
+    WHERE DATE(jadwal_imam.tanggal) = DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+    ORDER BY jadwal_imam.id_imam ASC
+    LIMIT 1
+");
+?>
+
 <link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
