@@ -1,4 +1,7 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
+
 $pageTitle = 'Laporan Jadwal Sholat';
 require_once __DIR__ . '/../template/header.php';
 

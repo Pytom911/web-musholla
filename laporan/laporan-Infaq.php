@@ -1,4 +1,7 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
+
 $pageTitle = 'Laporan Infaq';
 require_once '../template/header.php';
 
