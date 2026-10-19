@@ -40,7 +40,7 @@ if (!$row) {
                         <i class="bi bi-person"></i>
                     </span>
 
-                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($row['username']); ?>" required>
+                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($row['username']); ?>" maxlength="50" required>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@ if (!$row) {
                         <i class="bi bi-person-vcard"></i>
                     </span>
 
-                    <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($row['nama']); ?>" required>
+                    <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($row['nama']); ?>" maxlength="100" required>
                 </div>
             </div>
 
@@ -79,7 +79,7 @@ if (!$row) {
                         <i class="bi bi-lock"></i>
                     </span>
 
-                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password" maxlength="50">
                 </div>
             </div>
 

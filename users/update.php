@@ -29,7 +29,7 @@ if (isset($_POST['id_user'])) {
     if ($query) {
         header('Location: index.php?pesan=update');
     } else {
-        header('Location: edit.php?id='.$id.'&pesan=gagal');
+        header('Location: edit.php?id=' . $id . '&pesan=gagal');
     }
 
 } else {

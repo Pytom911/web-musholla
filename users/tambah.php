@@ -23,12 +23,12 @@ require_once '../template/header.php';
 
             <div class="form-group">
                 <label>Username <span class="required">*</span></label>
-                <input type="text" name="username" class="form-control" placeholder="Masukkan Username" required>
+                <input type="text" name="username" class="form-control" placeholder="Masukkan Username" maxlength="50" required>
             </div>
 
             <div class="form-group">
                 <label>Nama <span class="required">*</span></label>
-                <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama" required>
+                <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama" maxlength="100" required>
             </div>
 
             <div class="form-group">
@@ -53,7 +53,7 @@ require_once '../template/header.php';
                         <i class="bi bi-lock"></i>
                     </span>
 
-                    <input type="password" name="password" class="form-control" placeholder="Masukan Password" required>
+                    <input type="password" name="password" class="form-control" placeholder="Masukan Password" maxlength="50" required>
                 </div>
             </div>
 
