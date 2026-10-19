@@ -1,5 +1,8 @@
 <?php
 
+require_once '../../auth/auth.php';
+requireRole(['admin', 'petugas']);
+
 require_once '../../config/connect.php';
 require_once '../dompdf/autoload.inc.php';
 
@@ -11,53 +14,6 @@ $options->set('isRemoteEnabled', true);
 $options->set('defaultFont', 'DejaVu Sans');
 
 $dompdf = new Dompdf($options);
-
-/*
-|--------------------------------------------------------------------------
-| Ambil Data Jadwal Imam
-|--------------------------------------------------------------------------
-*/
-
-$data = mysqli_query($connect, "
-    SELECT
-        jadwal_imam.id_imam,
-        jadwal_imam.tanggal,
-        jadwal_imam.waktu_sholat,
-        jadwal_imam.id_guru,
-        guru.nama_guru
-    FROM jadwal_imam
-    LEFT JOIN guru
-        ON jadwal_imam.id_guru = guru.id_guru
-    ORDER BY
-        jadwal_imam.tanggal ASC,
-        jadwal_imam.id_imam ASC
-");
-
-/*
-|--------------------------------------------------------------------------
-| Statistik
-|--------------------------------------------------------------------------
-*/
-
-$totalImam = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(DISTINCT id_guru) AS total
-    FROM jadwal_imam
-"));
-
-$totalJadwal = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(*) AS total
-    FROM jadwal_imam
-"));
-
-$totalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(*) AS total
-    FROM jadwal_imam
-    WHERE tanggal = CURDATE()
-"));
-
-$jumlahImam = $totalImam['total'] ?? 0;
-$jumlahJadwal = $totalJadwal['total'] ?? 0;
-$jumlahHariIni = $totalHariIni['total'] ?? 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +35,117 @@ $bulan = [
     11 => 'November',
     12 => 'Desember'
 ];
+
+/*
+|--------------------------------------------------------------------------
+| PARAMETER FILTER (dikirim dari halaman laporan)
+|--------------------------------------------------------------------------
+*/
+
+$tahunSekarang = (int) date('Y');
+
+// Filter bulan (0 = semua bulan)
+$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = 0;
+}
+
+$conditions = [];
+$jenisBind = '';
+$nilaiBind = [];
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $conditions[] = "jadwal_imam.tanggal IS NOT NULL
+        AND MONTH(jadwal_imam.tanggal) = ?
+        AND YEAR(jadwal_imam.tanggal) = ?";
+    $jenisBind .= 'ii';
+    $nilaiBind[] = $bulanDipilih;
+    $nilaiBind[] = $tahunSekarang;
+}
+
+$whereSql = $conditions !== []
+    ? 'WHERE ' . implode(' AND ', $conditions)
+    : '';
+
+$keteranganFilter = 'seluruh data jadwal imam musholla';
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $keteranganFilter = 'Menampilkan data — Periode: '
+        . $bulan[$bulanDipilih] . ' ' . $tahunSekarang;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Ambil Data Jadwal Imam (sesuai filter)
+|--------------------------------------------------------------------------
+*/
+
+$stmtData = $connect->prepare("
+    SELECT
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        jadwal_imam.id_guru,
+        guru.nama_guru
+    FROM jadwal_imam
+    LEFT JOIN guru
+        ON jadwal_imam.id_guru = guru.id_guru
+    $whereSql
+    ORDER BY
+        jadwal_imam.tanggal ASC,
+        jadwal_imam.id_imam ASC
+");
+
+if ($jenisBind !== '') {
+    $stmtData->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtData->execute();
+$data = $stmtData->get_result();
+
+/*
+|--------------------------------------------------------------------------
+| Statistik (sesuai filter)
+|--------------------------------------------------------------------------
+*/
+
+$stmtTotalImam = $connect->prepare("
+    SELECT COUNT(DISTINCT id_guru) AS total
+    FROM jadwal_imam
+    $whereSql
+");
+
+if ($jenisBind !== '') {
+    $stmtTotalImam->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalImam->execute();
+$totalImam = $stmtTotalImam->get_result()->fetch_assoc();
+
+$stmtTotalJadwal = $connect->prepare("
+    SELECT COUNT(*) AS total
+    FROM jadwal_imam
+    $whereSql
+");
+
+if ($jenisBind !== '') {
+    $stmtTotalJadwal->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalJadwal->execute();
+$totalJadwal = $stmtTotalJadwal->get_result()->fetch_assoc();
+
+// Total hari ini (tetap berarti hari ini, tidak ikut filter bulan)
+$totalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
+    SELECT COUNT(*) AS total
+    FROM jadwal_imam
+    WHERE tanggal = CURDATE()
+"));
+
+$jumlahImam = $totalImam['total'] ?? 0;
+$jumlahJadwal = $totalJadwal['total'] ?? 0;
+$jumlahHariIni = $totalHariIni['total'] ?? 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -290,7 +357,7 @@ $html = '
 
     <h3>LAPORAN JADWAL IMAM</h3>
 
-    <p>seluruh data jadwal imam musholla</p>
+    <p>' . $keteranganFilter . '</p>
 
 </div>
 

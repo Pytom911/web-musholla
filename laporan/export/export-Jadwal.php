@@ -1,5 +1,8 @@
 <?php
 
+require_once '../../auth/auth.php';
+requireRole(['admin', 'petugas']);
+
 require_once '../../config/connect.php';
 require_once '../dompdf/autoload.inc.php';
 
@@ -21,25 +24,165 @@ $dompdf = new Dompdf($options);
 
 /*
 |--------------------------------------------------------------------------
-| DATA STATISTIK
+| PARAMETER FILTER (dikirim dari halaman laporan)
+|--------------------------------------------------------------------------
+*/
+
+$tahunSekarang = (int) date('Y');
+
+// Nama bulan untuk keterangan di PDF
+$bulanNama = [
+    1  => 'Januari',
+    2  => 'Februari',
+    3  => 'Maret',
+    4  => 'April',
+    5  => 'Mei',
+    6  => 'Juni',
+    7  => 'Juli',
+    8  => 'Agustus',
+    9  => 'September',
+    10 => 'Oktober',
+    11 => 'November',
+    12 => 'Desember'
+];
+
+// Filter bulan (0 = semua bulan)
+$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = 0;
+}
+
+// Opsi waktu sholat diambil dari enum database
+$waktuSholatTersedia = ['Dzuhur', 'Ashar'];
+$enumStmt = $connect->prepare(
+    "SELECT COLUMN_TYPE
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'jadwal_sholat'
+       AND COLUMN_NAME = 'waktu_sholat'"
+);
+$enumStmt->execute();
+$enumRow = $enumStmt->get_result()->fetch_assoc();
+
+if ($enumRow && preg_match("/^enum\('(.*)'\)$/i", $enumRow['COLUMN_TYPE'], $m)) {
+    $waktuSholatTersedia = explode("','", $m[1]);
+}
+
+// Filter waktu sholat ('' = semua waktu)
+$waktuDipilih = isset($_GET['waktu_sholat']) ? (string) $_GET['waktu_sholat'] : '';
+
+if (!in_array($waktuDipilih, $waktuSholatTersedia, true)) {
+    $waktuDipilih = '';
+}
+
+// Filter kelas (0 = semua kelas, divalidasi ke tabel kelas)
+$idKelasDipilih = isset($_GET['id_kelas']) ? (int) $_GET['id_kelas'] : 0;
+
+if ($idKelasDipilih > 0) {
+    $stmtValidKelas = $connect->prepare(
+        "SELECT nama_kelas, tingkat, bagian FROM kelas WHERE id_kelas = ?"
+    );
+    $stmtValidKelas->bind_param('i', $idKelasDipilih);
+    $stmtValidKelas->execute();
+    $rowValidKelas = $stmtValidKelas->get_result()->fetch_assoc();
+
+    if ($rowValidKelas) {
+        $labelKelasTerpilih = $rowValidKelas['nama_kelas'] . ' - ' . $rowValidKelas['tingkat'];
+
+        if ($rowValidKelas['bagian'] !== null && $rowValidKelas['bagian'] !== '') {
+            $labelKelasTerpilih .= ' (' . $rowValidKelas['bagian'] . ')';
+        }
+    } else {
+        $idKelasDipilih = 0;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| SUSUN WHERE (prepared)
+|--------------------------------------------------------------------------
+*/
+
+$conditions = [];
+$jenisBind = '';
+$nilaiBind = [];
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $conditions[] = "jadwal_sholat.tanggal IS NOT NULL
+        AND MONTH(jadwal_sholat.tanggal) = ?
+        AND YEAR(jadwal_sholat.tanggal) = ?";
+    $jenisBind .= 'ii';
+    $nilaiBind[] = $bulanDipilih;
+    $nilaiBind[] = $tahunSekarang;
+}
+
+if ($waktuDipilih !== '') {
+    $conditions[] = "jadwal_sholat.waktu_sholat = ?";
+    $jenisBind .= 's';
+    $nilaiBind[] = $waktuDipilih;
+}
+
+if ($idKelasDipilih > 0) {
+    $conditions[] = "jadwal_sholat.id_kelas = ?";
+    $jenisBind .= 'i';
+    $nilaiBind[] = $idKelasDipilih;
+}
+
+$whereSql = $conditions !== []
+    ? 'WHERE ' . implode(' AND ', $conditions)
+    : '';
+
+// Keterangan filter yang dicetak di PDF
+$keteranganFilter = 'Seluruh data jadwal sholat berdasarkan tanggal dan kelas';
+$daftarKeterangan = [];
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $daftarKeterangan[] = 'Periode: ' . $bulanNama[$bulanDipilih] . ' ' . $tahunSekarang;
+}
+
+if ($waktuDipilih !== '') {
+    $daftarKeterangan[] = 'Waktu: ' . $waktuDipilih;
+}
+
+if ($idKelasDipilih > 0) {
+    $daftarKeterangan[] = 'Kelas: ' . ($labelKelasTerpilih ?? '');
+}
+
+if ($daftarKeterangan !== []) {
+    $keteranganFilter = 'Menampilkan data — ' . implode(' · ', $daftarKeterangan);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DATA STATISTIK (sesuai filter)
 |--------------------------------------------------------------------------
 */
 
 // Total jadwal
-$totalJadwal = mysqli_fetch_assoc(
-    mysqli_query(
-        $connect,
-        "SELECT COUNT(*) AS total FROM jadwal_sholat"
-    )
+$stmtTotalJadwal = $connect->prepare(
+    "SELECT COUNT(*) AS total FROM jadwal_sholat $whereSql"
 );
 
+if ($jenisBind !== '') {
+    $stmtTotalJadwal->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalJadwal->execute();
+$totalJadwal = $stmtTotalJadwal->get_result()->fetch_assoc();
+
 // Total kelas
-$totalKelas = mysqli_fetch_assoc(
-    mysqli_query(
-        $connect,
-        "SELECT COUNT(DISTINCT id_kelas) AS total FROM jadwal_sholat"
-    )
+$stmtTotalKelas = $connect->prepare(
+    "SELECT COUNT(DISTINCT id_kelas) AS total FROM jadwal_sholat $whereSql"
 );
+
+if ($jenisBind !== '') {
+    $stmtTotalKelas->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalKelas->execute();
+$totalKelas = $stmtTotalKelas->get_result()->fetch_assoc();
 
 $jumlahJadwal = $totalJadwal['total'] ?? 0;
 $jumlahKelas = $totalKelas['total'] ?? 0;
@@ -47,15 +190,36 @@ $jumlahKelas = $totalKelas['total'] ?? 0;
 
 /*
 |--------------------------------------------------------------------------
-| DATA JADWAL SHOLAT
+| DATA JADWAL SHOLAT (sesuai filter)
 |--------------------------------------------------------------------------
 |
 | JOIN tabel jadwal_sholat dengan tabel kelas
 |
 */
 
-$data = mysqli_query(
-    $connect,
+// Saat bulan tertentu dipilih, urutkan per tanggal.
+// Saat "Semua Bulan", urutkan: hari ini -> mendatang -> lampau.
+$urutanSql = ($bulanDipilih >= 1 && $bulanDipilih <= 12)
+    ? "jadwal_sholat.tanggal ASC,
+       FIELD(jadwal_sholat.waktu_sholat, 'Dzuhur', 'Ashar'),
+       jadwal_sholat.id_jadwal DESC"
+    : "CASE
+           WHEN jadwal_sholat.tanggal IS NULL THEN 3
+           WHEN jadwal_sholat.tanggal = CURDATE() THEN 0
+           WHEN jadwal_sholat.tanggal > CURDATE() THEN 1
+           ELSE 2
+       END ASC,
+       CASE
+           WHEN jadwal_sholat.tanggal > CURDATE() THEN jadwal_sholat.tanggal
+           ELSE NULL
+       END ASC,
+       CASE
+           WHEN jadwal_sholat.tanggal < CURDATE() THEN jadwal_sholat.tanggal
+           ELSE NULL
+       END DESC,
+       jadwal_sholat.id_jadwal DESC";
+
+$stmtData = $connect->prepare(
     "SELECT
         jadwal_sholat.id_jadwal,
         jadwal_sholat.tanggal,
@@ -67,23 +231,16 @@ $data = mysqli_query(
     FROM jadwal_sholat
     LEFT JOIN kelas
         ON jadwal_sholat.id_kelas = kelas.id_kelas
-    ORDER BY
-        CASE
-            WHEN jadwal_sholat.tanggal IS NULL THEN 3
-            WHEN jadwal_sholat.tanggal = CURDATE() THEN 0
-            WHEN jadwal_sholat.tanggal > CURDATE() THEN 1
-            ELSE 2
-        END ASC,
-        CASE
-            WHEN jadwal_sholat.tanggal > CURDATE() THEN jadwal_sholat.tanggal
-            ELSE NULL
-        END ASC,
-        CASE
-            WHEN jadwal_sholat.tanggal < CURDATE() THEN jadwal_sholat.tanggal
-            ELSE NULL
-        END DESC,
-        jadwal_sholat.id_jadwal DESC"
+    $whereSql
+    ORDER BY $urutanSql"
 );
+
+if ($jenisBind !== '') {
+    $stmtData->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtData->execute();
+$data = $stmtData->get_result();
 
 
 /*
@@ -195,7 +352,7 @@ $html = '
     <h3>LAPORAN JADWAL SHOLAT</h3>
 
     <p>
-        Seluruh data jadwal sholat berdasarkan tanggal dan kelas
+        ' . $keteranganFilter . '
     </p>
 
 </div>

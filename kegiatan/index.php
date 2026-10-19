@@ -2,7 +2,17 @@
 $pageTitle = 'Data Kegiatan';
 require_once '../template/header.php';
 
-$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
+}
 
 $namaBulan = [
     1 => 'January',
@@ -23,8 +33,9 @@ $whereBulan = '';
 
 if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
     $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
-    AND YEAR(tanggal) = YEAR(CURDATE())";
+        AND YEAR(tanggal) = $tahunSekarang";
 }
+
 
 $totalKegiatan = mysqli_fetch_assoc(mysqli_query(
     $connect,
@@ -104,7 +115,7 @@ $data = mysqli_query(
                         <?php if ($bulanDipilih == 0): ?>
                             Seluruh Kegiatan
                         <?php else: ?>
-                            <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
+                            <?= $namaBulan[$bulanDipilih]; ?> <?= $tahunSekarang; ?>
                         <?php endif; ?>
                     </span>
                 </div>

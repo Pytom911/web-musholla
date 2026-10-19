@@ -15,11 +15,29 @@ $kelas = mysqli_query(
     bagian ASC"
 );
 
+$waktuSholat = ['Dzuhur', 'Ashar'];
+$enumStmt = $connect->prepare(
+    "SELECT COLUMN_TYPE
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'jadwal_sholat'
+       AND COLUMN_NAME = 'waktu_sholat'"
+);
+$enumStmt->execute();
+$enumRow = $enumStmt->get_result()->fetch_assoc();
+if ($enumRow && preg_match("/^enum\('(.*)'\)$/i", $enumRow['COLUMN_TYPE'], $m)) {
+    $waktuSholat = explode("','", $m[1]);
+}
+
 $pageTitle = 'Tambah Jadwal Sholat';
 require_once __DIR__ . '/../template/header.php';
 ?>
 
 <link rel="stylesheet" href="<?= asset('css/data.css') ?>">
+
+<?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
+    <div class="alert alert-danger">Jadwal sholat tidak dapat disimpan. Periksa kembali isian data.</div>
+<?php endif; ?>
 
 <div class="container-fluid">
     <a href="<?= url('jadwal_sholat/index.php') ?>" class="btn-back">
@@ -31,9 +49,6 @@ require_once __DIR__ . '/../template/header.php';
         <h3 class="form-title">Tambah Jadwal Sholat</h3>
         <p class="form-subtitle">Tambahkan jadwal sholat baru ke dalam sistem.</p>
 
-        <?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
-            <div class="alert alert-danger">Jadwal sholat tidak dapat disimpan. Periksa kembali isian data.</div>
-        <?php endif; ?>
 
         <form action="<?= url('jadwal_sholat/simpan.php') ?>" method="POST">
             <div class="form-group">
@@ -54,7 +69,11 @@ require_once __DIR__ . '/../template/header.php';
                     </span>
                     <select id="waktu_sholat" name="waktu_sholat" class="form-select" required>
                         <option value="">-- Pilih Waktu Sholat --</option>
-                        <option value="Ashar">Ashar</option>
+                        <?php foreach ($waktuSholat as $w): ?>
+                            <option value="<?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>

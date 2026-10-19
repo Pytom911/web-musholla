@@ -4,13 +4,13 @@ require_once '../config/connect.php';
 require_once "../auth/auth.php";
 requireRole(['admin','petugas']);
 
-$id = $_POST['id_imam'];
-$tanggal = $_POST['tanggal'];
-$waktu = $_POST['waktu_sholat'];
-$idGuru = $_POST['id_guru'];
+$id = mysqli_real_escape_string($connect, $_POST['id_imam']);
+$tanggal = mysqli_real_escape_string($connect, $_POST['tanggal']);
+$waktu = mysqli_real_escape_string($connect, $_POST['waktu_sholat']);
+$idGuru = mysqli_real_escape_string($connect, $_POST['id_guru']);
 
 $cek = mysqli_query($connect, "
-    SELECT *
+    SELECT id_imam
     FROM jadwal_imam
     WHERE tanggal = '$tanggal'
     AND waktu_sholat = '$waktu'

@@ -1,11 +1,19 @@
 <?php
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
-
 $pageTitle = 'Laporan Kegiatan';
 require_once '../template/header.php';
 
-$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
+}
+
+$tahunDipilih = $tahunSekarang;
 
 $namaBulan = [
     1 => 'January', 
@@ -23,8 +31,10 @@ $namaBulan = [
 ];
 
 $whereBulan = '';
+
 if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
-    $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih AND YEAR(tanggal) = YEAR(CURDATE())";
+    $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
+        AND YEAR(tanggal) = $tahunDipilih";
 }
 
 $totalKegiatan = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM kegiatan $whereBulan"));

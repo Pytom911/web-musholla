@@ -35,7 +35,7 @@ if (!$row) {
             <div class="form-group">
                 <label>Nama Guru <span class="required">*</span></label>
                 <input type="text" name="nama_guru" class="form-control"
-                       value="<?= htmlspecialchars($row['nama_guru']); ?>" required>
+                       value="<?= htmlspecialchars($row['nama_guru']); ?>" maxlength="30" required>
             </div>
 
             <div class="form-group">
@@ -85,4 +85,4 @@ if (!$row) {
 </div>
 
 <?php require_once '../template/footer.php'; ?>
-```
+

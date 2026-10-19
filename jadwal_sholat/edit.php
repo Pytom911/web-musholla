@@ -36,6 +36,20 @@ $kelas = mysqli_query(
     bagian ASC"
 );
 
+$waktuSholat = ['Dzuhur', 'Ashar'];
+$enumStmt = $connect->prepare(
+    "SELECT COLUMN_TYPE
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'jadwal_sholat'
+       AND COLUMN_NAME = 'waktu_sholat'"
+);
+$enumStmt->execute();
+$enumRow = $enumStmt->get_result()->fetch_assoc();
+if ($enumRow && preg_match("/^enum\('(.*)'\)$/i", $enumRow['COLUMN_TYPE'], $m)) {
+    $waktuSholat = explode("','", $m[1]);
+}
+
 $pageTitle = 'Edit Jadwal Sholat';
 require_once __DIR__ . '/../template/header.php';
 ?>
@@ -78,7 +92,12 @@ require_once __DIR__ . '/../template/header.php';
                     </span>
                     <select id="waktu_sholat" name="waktu_sholat" class="form-select" required>
                         <option value="">-- Pilih Waktu Sholat --</option>
-                        <option value="Ashar" <?= $row['waktu_sholat'] === 'Ashar' ? 'selected' : ''; ?>>Ashar</option>
+                        <?php foreach ($waktuSholat as $w): ?>
+                            <option value="<?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>"
+                                <?= (isset($row) && $row['waktu_sholat'] === $w) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>

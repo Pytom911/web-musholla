@@ -2,7 +2,16 @@
 $pageTitle = 'Data Shodaqoh Jumat';
 require_once '../template/header.php';
 
-$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
+}   
 
 $namaBulan = [
     1 => 'January',
@@ -23,7 +32,7 @@ $whereBulan = '';
 
 if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
     $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
-    AND YEAR(tanggal) = YEAR(CURDATE())";
+        AND YEAR(tanggal) = $tahunSekarang";
 }
 
 $totalShodaqoh = mysqli_fetch_assoc(
@@ -183,13 +192,8 @@ $dataCount = mysqli_num_rows($data);
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="bi bi-search"></i>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Cari nama kelas..."
-                >
+                <input type="text" id="searchInput" placeholder="Cari nama kelas...">
             </div>
-
             <form method="GET" class="filter-box">
                 <select name="bulan" id="bulan" onchange="this.form.submit()">
                     <option value="0" <?= $bulanDipilih == 0 ? 'selected' : ''; ?>>Semua Bulan</option>
@@ -247,7 +251,7 @@ $dataCount = mysqli_num_rows($data);
                                 </td>
                                 <td>
                                     <span class="nominal">
-                                        Rp <?= number_format($row['nominal'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($row['nominal'], 0, ',','.'); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -304,7 +308,6 @@ $dataCount = mysqli_num_rows($data);
             </div>
         </div>
     </div>
-
 </div>
 
 <script src="../assets/js/script.js"></script>

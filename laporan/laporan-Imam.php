@@ -5,35 +5,6 @@ requireRole(['admin','petugas']);
 $pageTitle = 'Laporan Imam';
 require_once '../template/header.php';
 
-$totalImam = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(DISTINCT id_guru) AS total
-    FROM jadwal_imam
-"));
-
-$totalJadwal = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(*) AS total
-    FROM jadwal_imam
-"));
-
-$totalJadwalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
-    SELECT COUNT(*) AS total
-    FROM jadwal_imam
-    WHERE tanggal = CURDATE()
-"));
-
-$data = mysqli_query($connect, "
-    SELECT
-        jadwal_imam.id_imam,
-        jadwal_imam.tanggal,
-        jadwal_imam.waktu_sholat,
-        jadwal_imam.id_guru,
-        guru.nama_guru
-    FROM jadwal_imam
-    LEFT JOIN guru
-        ON jadwal_imam.id_guru = guru.id_guru
-    ORDER BY jadwal_imam.tanggal DESC, jadwal_imam.id_imam DESC
-");
-
 $bulan = [
     1 => 'Januari',
     2 => 'Februari',
@@ -48,6 +19,115 @@ $bulan = [
     11 => 'November',
     12 => 'Desember'
 ];
+
+$tahunSekarang = (int) date('Y');
+
+/* =========================
+   PARAMETER FILTER
+========================= */
+
+// Filter bulan (0 = semua bulan)
+$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = 0;
+}
+
+/* =========================
+   SUSUN WHERE (prepared)
+========================= */
+
+$conditions = [];
+$jenisBind = '';
+$nilaiBind = [];
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $conditions[] = "jadwal_imam.tanggal IS NOT NULL
+        AND MONTH(jadwal_imam.tanggal) = ?
+        AND YEAR(jadwal_imam.tanggal) = ?";
+    $jenisBind .= 'ii';
+    $nilaiBind[] = $bulanDipilih;
+    $nilaiBind[] = $tahunSekarang;
+}
+
+$whereSql = $conditions !== []
+    ? 'WHERE ' . implode(' AND ', $conditions)
+    : '';
+
+/* =========================
+   STATISTIK
+========================= */
+
+// Jumlah imam (sesuai filter)
+$stmtTotalImam = $connect->prepare(
+    "SELECT COUNT(DISTINCT id_guru) AS total FROM jadwal_imam $whereSql"
+);
+
+if ($jenisBind !== '') {
+    $stmtTotalImam->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalImam->execute();
+$totalImam = $stmtTotalImam->get_result()->fetch_assoc();
+
+// Total jadwal (sesuai filter)
+$stmtTotalJadwal = $connect->prepare(
+    "SELECT COUNT(*) AS total FROM jadwal_imam $whereSql"
+);
+
+if ($jenisBind !== '') {
+    $stmtTotalJadwal->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtTotalJadwal->execute();
+$totalJadwal = $stmtTotalJadwal->get_result()->fetch_assoc();
+
+// Total jadwal hari ini (tetap berarti hari ini, tidak ikut filter bulan)
+$totalJadwalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
+    SELECT COUNT(*) AS total
+    FROM jadwal_imam
+    WHERE tanggal = CURDATE()
+"));
+
+/* =========================
+   DATA SESUAI FILTER
+========================= */
+
+// Saat bulan tertentu dipilih, urutkan per tanggal (ASC).
+// Saat "Semua Bulan", urutkan terbaru dahulu seperti biasa.
+$urutanSql = ($bulanDipilih >= 1 && $bulanDipilih <= 12)
+    ? "jadwal_imam.tanggal ASC, jadwal_imam.id_imam ASC"
+    : "jadwal_imam.tanggal DESC, jadwal_imam.id_imam DESC";
+
+$stmtData = $connect->prepare(
+    "SELECT
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        jadwal_imam.id_guru,
+        guru.nama_guru
+    FROM jadwal_imam
+    LEFT JOIN guru
+        ON jadwal_imam.id_guru = guru.id_guru
+    $whereSql
+    ORDER BY $urutanSql"
+);
+
+if ($jenisBind !== '') {
+    $stmtData->bind_param($jenisBind, ...$nilaiBind);
+}
+
+$stmtData->execute();
+$data = $stmtData->get_result();
+
+/* =========================
+   TAUTAN EXPORT (filter ikut)
+========================= */
+
+$tautanExport = url('laporan/export/export-Imam.php')
+    . ($bulanDipilih >= 1 && $bulanDipilih <= 12
+        ? '?' . http_build_query(['bulan' => $bulanDipilih])
+        : '');
 ?>
 
 <link rel="stylesheet" href="../assets/css/laporan.css">
@@ -61,7 +141,7 @@ $bulan = [
             <p>seluruh data jadwal imam musholla.</p>
         </div>
 
-        <a href="export/export-Imam.php" target="_blank" class="btn-export">
+        <a href="<?= $tautanExport ?>" target="_blank" class="btn-export">
             <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
         </a>
     </div>
@@ -91,7 +171,7 @@ $bulan = [
                 <div class="stats-info">
                     <small>Total Jadwal</small>
                     <h2><?= $totalJadwal['total'] ?? 0; ?></h2>
-                    <span>Data Jadwal</span>
+                    <span><?= $whereSql !== '' ? 'Data Jadwal (Sesuai Filter)' : 'Data Jadwal' ?></span>
                 </div>
             </div>
         </div>
@@ -113,6 +193,17 @@ $bulan = [
                         placeholder="Cari nama imam..."
                     >
                 </div>
+
+                <form method="GET" class="filter-box">
+                    <select name="bulan" id="bulan" onchange="this.form.submit()">
+                        <option value="0" <?= $bulanDipilih == 0 ? 'selected' : ''; ?>>Semua Bulan</option>
+                        <?php foreach ($bulan as $nomorBulan => $labelBulan): ?>
+                            <option value="<?= $nomorBulan ?>" <?= $bulanDipilih === $nomorBulan ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($labelBulan, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
 
             </div>
         </div>

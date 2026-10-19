@@ -289,7 +289,7 @@ $html = '
     <thead>
         <tr>
             <th width="7%">No</th>
-            <th width="18%">Nama Kelas</th>
+            <th width="18%">Nama Jurusan</th>
             <th width="15%">Tingkat</th>
             <th width="15%">Bagian</th>
             <th width="18%">Nominal</th>

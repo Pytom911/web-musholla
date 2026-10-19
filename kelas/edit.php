@@ -47,7 +47,7 @@ require_once __DIR__ . '/../template/header.php';
             <input type="hidden" name="id_kelas" value="<?= (int) $row['id_kelas'] ?>">
 
             <div class="form-group">
-                <label for="nama_kelas">Nama Kelas <span class="required">*</span></label>
+                <label for="nama_kelas">Nama Jurusan <span class="required">*</span></label>
                 <input type="text" id="nama_kelas" name="nama_kelas" class="form-control"
                     value="<?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?>"
                     maxlength="30" required>

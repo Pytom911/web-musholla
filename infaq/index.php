@@ -2,7 +2,18 @@
 $pageTitle = 'Data Infaq';
 require_once '../template/header.php';
 
-$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+$tahunDipilih = isset($_GET['tahun'])
+    ? (int) $_GET['tahun']
+    : $tahunSekarang;
+
 $whereBulan = '';
 $namaBulan = [
     1 => 'January',
@@ -21,8 +32,11 @@ $namaBulan = [
 
 if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
     $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
-    AND YEAR(tanggal) = YEAR(CURDATE())";
+        AND YEAR(tanggal) = $tahunDipilih";
+} else {
+    $bulanDipilih = 0;
 }
+
 
 $totalBulan = mysqli_fetch_assoc(mysqli_query(
     $connect, 
@@ -101,7 +115,7 @@ $data = mysqli_query(
                         <?php if ($bulanDipilih == 0): ?>
                             Keseluruhan
                         <?php else: ?>
-                            <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
+                            <?= $namaBulan[$bulanDipilih]; ?> <?= $tahunDipilih; ?>
                         <?php endif; ?>
                     </span>
                 </div>

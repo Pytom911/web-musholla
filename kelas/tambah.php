@@ -8,6 +8,10 @@ require_once __DIR__ . '/../template/header.php';
 
 <link rel="stylesheet" href="<?= asset('css/data.css') ?>">
 
+<?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
+    <div class="alert alert-danger">Data kelas tidak dapat disimpan. Periksa kembali isian data.</div>
+<?php endif; ?>
+
 <div class="container-fluid">
     <a href="<?= url('kelas/index.php') ?>" class="btn-back">
         <i class="bi bi-arrow-left"></i>
@@ -18,13 +22,10 @@ require_once __DIR__ . '/../template/header.php';
         <h3 class="form-title">Tambah Data Kelas</h3>
         <p class="form-subtitle">Tambahkan data kelas baru ke dalam sistem.</p>
 
-        <?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
-            <div class="alert alert-danger">Data kelas tidak dapat disimpan. Periksa kembali isian data.</div>
-        <?php endif; ?>
 
         <form action="<?= url('kelas/simpan.php') ?>" method="POST">
             <div class="form-group">
-                <label for="nama_kelas">Nama Kelas <span class="required">*</span></label>
+                <label for="nama_kelas">Nama Jurusan <span class="required">*</span></label>
                 <div class="input-group">
                     <input type="text" id="nama_kelas" name="nama_kelas" class="form-control"
                         placeholder="Masukkan nama kelas" maxlength="30" required>

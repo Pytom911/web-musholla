@@ -3,22 +3,63 @@ $pageTitle = 'Data Jadwal Imam';
 session_start();
 require_once __DIR__ . '/../template/header.php';
 
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+// Validasi pilihan bulan
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
+}
+
+// Nama bulan
+$namaBulan = [
+    1 => 'January',
+    2 => 'February',
+    3 => 'March',
+    4 => 'April',
+    5 => 'May',
+    6 => 'June',
+    7 => 'July',
+    8 => 'August',
+    9 => 'September',
+    10 => 'October',
+    11 => 'November',
+    12 => 'December'
+];
+
+// Filter bulan
+// Bulan 0 berarti semua bulan dan semua tahun.
+$whereBulan = '';
+
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $whereBulan = "WHERE MONTH(jadwal_imam.tanggal) = $bulanDipilih
+        AND YEAR(jadwal_imam.tanggal) = $tahunSekarang";
+}
+
+// Statistik jumlah imam
 $totalImam = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(DISTINCT id_guru) AS total
     FROM jadwal_imam
 "));
 
+// Statistik total jadwal
 $totalJadwal = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(*) AS total
     FROM jadwal_imam
 "));
 
+// Jadwal hari ini
 $totalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(*) AS total
     FROM jadwal_imam
     WHERE tanggal = CURDATE()
 "));
 
+// Jadwal bulan ini
 $totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(*) AS total
     FROM jadwal_imam
@@ -26,22 +67,22 @@ $totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "
     AND YEAR(tanggal) = YEAR(CURDATE())
 "));
 
+// Data jadwal imam berdasarkan filter bulan
 $data = mysqli_query($connect, "
-     SELECT 
+    SELECT
         jadwal_imam.id_imam,
         jadwal_imam.tanggal,
         jadwal_imam.waktu_sholat,
         guru.nama_guru
     FROM jadwal_imam
     LEFT JOIN guru ON jadwal_imam.id_guru = guru.id_guru
+    $whereBulan
     ORDER BY jadwal_imam.tanggal ASC, jadwal_imam.id_imam ASC
 ");
-?>
 
-<?php
 // Jadwal Imam Hari Ini
 $jadwalImamHariIni = mysqli_query($connect, "
-    SELECT 
+    SELECT
         jadwal_imam.id_imam,
         jadwal_imam.tanggal,
         jadwal_imam.waktu_sholat,
@@ -55,7 +96,7 @@ $jadwalImamHariIni = mysqli_query($connect, "
 
 // Jadwal Imam Besok
 $jadwalImamBesok = mysqli_query($connect, "
-    SELECT 
+    SELECT
         jadwal_imam.id_imam,
         jadwal_imam.tanggal,
         jadwal_imam.waktu_sholat,
@@ -72,6 +113,7 @@ $jadwalImamBesok = mysqli_query($connect, "
 
 <div class="container-fluid">
 
+    <!-- Pesan Notifikasi -->
     <?php if (isset($_GET['pesan'])): ?>
         <?php if ($_GET['pesan'] == 'simpan'): ?>
             <div class="alert alert-success">Jadwal imam berhasil ditambahkan.</div>
@@ -84,6 +126,7 @@ $jadwalImamBesok = mysqli_query($connect, "
         <?php endif; ?>
     <?php endif; ?>
 
+    <!-- Header Halaman -->
     <div class="page-header">
         <div>
             <h3>Data Jadwal Imam</h3>
@@ -98,6 +141,7 @@ $jadwalImamBesok = mysqli_query($connect, "
         <?php endif; ?>
     </div>
 
+    <!-- Statistik -->
     <div class="row g-4 mb-4">
 
         <div class="col-xl-6 col-md-6">
@@ -105,6 +149,7 @@ $jadwalImamBesok = mysqli_query($connect, "
                 <div class="icon icon-green">
                     <i class="fas fa-users"></i>
                 </div>
+
                 <div class="stats-info">
                     <small>Jumlah Imam</small>
                     <h2><?= $totalImam['total'] ?? 0; ?></h2>
@@ -118,6 +163,7 @@ $jadwalImamBesok = mysqli_query($connect, "
                 <div class="icon icon-red">
                     <i class="bi bi-calendar-check"></i>
                 </div>
+
                 <div class="stats-info">
                     <small>Total Jadwal</small>
                     <h2><?= $totalJadwal['total'] ?? 0; ?></h2>
@@ -128,23 +174,53 @@ $jadwalImamBesok = mysqli_query($connect, "
 
     </div>
 
+    <!-- Tabel Data -->
     <div class="data-card">
 
         <div class="data-toolbar">
+
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama imam...">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari nama, waktu sholat, atau tanggal..."
+                    autocomplete="off"
+                >
             </div>
+
+            <!-- Filter Bulan -->
+            <form method="GET" class="filter-box">
+                <select name="bulan" id="bulan" onchange="this.form.submit()">
+
+                    <option value="0" <?= $bulanDipilih == 0 ? 'selected' : ''; ?>>
+                        Semua Bulan
+                    </option>
+
+                    <?php foreach ($namaBulan as $nomor => $bulan): ?>
+                        <option
+                            value="<?= $nomor; ?>"
+                            <?= $bulanDipilih == $nomor ? 'selected' : ''; ?>
+                        >
+                            <?= $bulan; ?>
+                        </option>
+                    <?php endforeach; ?>
+
+                </select>
+            </form>
+
         </div>
 
         <div class="table-responsive">
             <table class="table-modern" id="dataTable">
+
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama Imam</th>
                         <th>Waktu Sholat</th>
                         <th>Tanggal</th>
+
                         <?php if ($isPetugas OR $isAdmin): ?>
                             <th>Aksi</th>
                         <?php endif; ?>
@@ -152,38 +228,62 @@ $jadwalImamBesok = mysqli_query($connect, "
                 </thead>
 
                 <tbody>
-                    <?php if (mysqli_num_rows($data) > 0): ?>
+                    <?php if ($data && mysqli_num_rows($data) > 0): ?>
+
                         <?php $no = 1; ?>
 
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><strong><?= htmlspecialchars($row['nama_guru']); ?></strong></td>
-                                <td><strong><?= htmlspecialchars($row['waktu_sholat']); ?></strong></td>
-                                <td><?= date('F d Y',strtotime($row['tanggal'])); ?></td>
+
+                                <td>
+                                    <strong>
+                                        <?= htmlspecialchars($row['nama_guru'] ?? '-'); ?>
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        <?= htmlspecialchars($row['waktu_sholat']); ?>
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <?= date('F d Y', strtotime($row['tanggal'])); ?>
+                                </td>
+
                                 <?php if ($isPetugas OR $isAdmin): ?>
                                     <td>
                                         <div class="action-group">
 
-                                            <a href="edit.php?id=<?= $row['id_imam']; ?>" class="btn-edit">
+                                            <a
+                                                href="edit.php?id=<?= $row['id_imam']; ?>"
+                                                class="btn-edit"
+                                            >
                                                 <i class="bi bi-pencil-fill"></i>
                                                 Edit
                                             </a>
 
-                                            <a href="hapus.php?id=<?= $row['id_imam']; ?>" class="btn-delete" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal imam ini?');">
+                                            <a
+                                                href="hapus.php?id=<?= $row['id_imam']; ?>"
+                                                class="btn-delete"
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal imam ini?');"
+                                            >
                                                 <i class="bi bi-trash-fill"></i>
                                                 Hapus
                                             </a>
-                                        </div>
 
+                                        </div>
                                     </td>
                                 <?php endif; ?>
+
                             </tr>
                         <?php endwhile; ?>
+
                     <?php else: ?>
+
                         <tr>
-                            <td colspan="5">
+                            <td colspan="<?= ($isPetugas OR $isAdmin) ? 5 : 4; ?>">
                                 <div class="empty-data">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Jadwal Imam</h4>
@@ -191,14 +291,25 @@ $jadwalImamBesok = mysqli_query($connect, "
                                 </div>
                             </td>
                         </tr>
+
                     <?php endif; ?>
                 </tbody>
+
             </table>
         </div>
 
+        <!-- Hasil Pencarian Kosong -->
+        <div id="noSearchResult" class="text-center py-4" style="display: none;">
+            <i class="fas fa-search mb-2"></i>
+            <h5>Data tidak ditemukan</h5>
+            <p class="text-muted mb-0">Coba gunakan kata kunci yang berbeda.</p>
+        </div>
+
+        <!-- Footer Tabel -->
         <div class="table-footer">
             <div class="table-info">
-                Total Data : <strong><?= mysqli_num_rows($data); ?></strong>
+                Total Data:
+                <strong id="totalData"><?= $data ? mysqli_num_rows($data) : 0; ?></strong>
             </div>
         </div>
 
@@ -206,6 +317,86 @@ $jadwalImamBesok = mysqli_query($connect, "
 
 </div>
 
-<script src="../assets/js/script.js"></script>
+<!-- Pencarian Gabungan -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('dataTable');
+    const tbody = table.querySelector('tbody');
+    const totalData = document.getElementById('totalData');
+    const noSearchResult = document.getElementById('noSearchResult');
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(function (row) {
+        return !row.querySelector('.empty-data');
+    });
+
+    const totalAwal = rows.length;
+
+    rows.forEach(function (row) {
+        const cells = row.querySelectorAll('td');
+
+        // Simpan tanggal asli untuk pencarian.
+        const tanggalText = cells[3] ? cells[3].textContent.trim() : '';
+        const tanggalMatch = tanggalText.match(/^([A-Za-z]+)\s+(\d{1,2})\s+(\d{4})$/);
+
+        row.dataset.nama = cells[1]
+            ? cells[1].textContent.toLowerCase().trim()
+            : '';
+
+        row.dataset.sholat = cells[2]
+            ? cells[2].textContent.toLowerCase().trim()
+            : '';
+
+        row.dataset.tanggal = tanggalMatch ? tanggalMatch[2] : '';
+        row.dataset.bulan = tanggalMatch ? tanggalMatch[1].toLowerCase() : '';
+        row.dataset.tahun = tanggalMatch ? tanggalMatch[3] : '';
+        row.dataset.tanggalTeks = tanggalText.toLowerCase();
+    });
+
+    searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase().trim();
+        const keywords = keyword.split(/\s+/).filter(Boolean);
+        let jumlahTampil = 0;
+
+        rows.forEach(function (row) {
+            const teksUmum = [
+                row.dataset.nama,
+                row.dataset.sholat,
+                row.dataset.tanggalTeks
+            ].join(' ');
+
+            const cocok = keywords.every(function (kata) {
+
+                // Angka satu atau dua digit dicocokkan sebagai tanggal.
+                if (/^\d{1,2}$/.test(kata)) {
+                    return row.dataset.tanggal === String(parseInt(kata, 10)) ||
+                        row.dataset.sholat.includes(kata) ||
+                        row.dataset.nama.includes(kata);
+                }
+
+                return teksUmum.includes(kata);
+            });
+
+            row.style.display = cocok ? '' : 'none';
+
+            if (cocok) {
+                jumlahTampil++;
+            }
+        });
+
+        totalData.textContent = keyword === '' ? totalAwal : jumlahTampil;
+
+        noSearchResult.style.display =
+            keyword !== '' && jumlahTampil === 0 ? 'block' : 'none';
+
+        const emptyRow = tbody.querySelector('.empty-data');
+
+        if (emptyRow) {
+            emptyRow.closest('tr').style.display =
+                keyword === '' ? '' : 'none';
+        }
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

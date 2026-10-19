@@ -25,7 +25,6 @@ if ($id <= 0) {
 
 if (
     !$tanggalValid
-    || !in_array($waktu, ['Dzuhur', 'Ashar'], true)
     || $idKelas <= 0
 ) {
     redirect('jadwal_sholat/edit.php?id=' . $id . '&pesan=gagal');

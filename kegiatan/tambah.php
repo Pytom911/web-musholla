@@ -8,7 +8,40 @@ requireRole(['admin','petugas']);
 <link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
+    <?php if (isset($_GET['pesan'])): ?>
+        <?php
+            $peringatan = [
+                'duplikat' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
+                ],
+                'bulan_tidak_valid' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Tanggal kegiatan harus sesuai bulan dan tahun sekarang.'
+                ],
+                'invalid' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
+                ],
+                'saldo_tidak_cukup' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Saldo tidak cukup untuk melanjutkan. Pengeluaran melebihi saldo keuangan yang tersedia.'
+                ],
+                'gagal' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data kegiatan gagal disimpan. Silakan coba kembali.'
+                ]
+            ];
 
+            $pesan = $peringatan[$_GET['pesan']] ?? null;
+            ?>
+
+        <?php if ($pesan): ?>
+            <div class="alert <?= $pesan['class']; ?>" role="alert">
+                <?= htmlspecialchars($pesan['teks'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
     <div class="breadcrumb-wrapper">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -47,7 +80,7 @@ requireRole(['admin','petugas']);
                     <span class="input-group-text">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan" required>
+                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan" maxlength="50" required>
                 </div>
             </div>
 
@@ -77,7 +110,7 @@ requireRole(['admin','petugas']);
                     <span class="input-group-text">
                         <i class="bi bi-card-text"></i>
                     </span>
-                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)" required></textarea>
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan" required></textarea>
                 </div>
             </div>
 

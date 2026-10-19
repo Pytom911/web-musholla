@@ -78,7 +78,7 @@ $canManage = $isPetugas || $isAdmin;
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama kelas, tingkat, atau bagian...">
+                <input type="text" id="searchInput" placeholder="Cari nama jurusan, tingkat, atau bagian...">
             </div>
         </div>
 
@@ -87,7 +87,7 @@ $canManage = $isPetugas || $isAdmin;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama Kelas</th>
+                        <th>Nama Jurusan</th>
                         <th>Tingkat</th>
                         <th>Bagian</th>
                         <?php if ($canManage): ?>

@@ -1,11 +1,20 @@
 <?php
-require_once "../auth/auth.php";
-requireRole(['admin','petugas']);
-
 $pageTitle = 'Laporan Infaq';
 require_once '../template/header.php';
 
-$bulanDipilih = isset($_GET['bulan']) ? (int) $_GET['bulan'] : 0;
+
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
+
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
+}
+
+$tahunDipilih = $tahunSekarang;
 
 $namaBulan = [
     1 => 'January',
@@ -40,14 +49,33 @@ $bulan = [
 $whereBulan = '';
 
 if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
-    $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih AND YEAR(tanggal) = YEAR(CURDATE())";
+    $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
+        AND YEAR(tanggal) = $tahunDipilih";
 }
 
-$totalInfaq = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(nominal), 0) AS total FROM infaq $whereBulan"));
-$totalDonatur = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(DISTINCT nama_donatur) AS total FROM infaq $whereBulan"));
-$totalTransaksi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM infaq $whereBulan"));
+$totalInfaq = mysqli_fetch_assoc(mysqli_query(
+    $connect,
+    "SELECT COALESCE(SUM(nominal), 0) AS total
+     FROM infaq $whereBulan"
+));
 
-$data = mysqli_query($connect, "SELECT * FROM infaq $whereBulan ORDER BY tanggal DESC, id_infaq DESC");
+$totalDonatur = mysqli_fetch_assoc(mysqli_query(
+    $connect,
+    "SELECT COUNT(DISTINCT nama_donatur) AS total
+     FROM infaq $whereBulan"
+));
+
+$totalTransaksi = mysqli_fetch_assoc(mysqli_query(
+    $connect,
+    "SELECT COUNT(*) AS total
+     FROM infaq $whereBulan"
+));
+
+$data = mysqli_query(
+    $connect,
+    "SELECT * FROM infaq $whereBulan
+     ORDER BY tanggal DESC, id_infaq DESC"
+);
 ?>
 
 <link rel="stylesheet" href="../assets/css/laporan.css">

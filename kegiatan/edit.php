@@ -22,7 +22,44 @@ $row = mysqli_fetch_assoc($data);
 <link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
+    <?php if (isset($_GET['pesan'])): ?>
+        <?php
+        $peringatan = [
+            'duplikat' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Data shodaqoh untuk kelas dan tanggal tersebut sudah tersedia.'
+                ],
+                'bulan_tidak_valid' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Tanggal shodaqoh harus sesuai bulan dan tahun sekarang.'
+                ],
+                'duplikat' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
+                ],
+                'invalid' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data tidak valid. Periksa kembali tanggal, kelas, dan nominal.'
+                ],
+                    'saldo_tidak_cukup' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Saldo tidak cukup untuk melanjutkan. Pengeluaran melebihi saldo keuangan yang tersedia.'
+                ],
+                'gagal' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data shodaqoh gagal disimpan. Silakan coba kembali.'
+                ]
+            ];
 
+            $pesan = $peringatan[$_GET['pesan']] ?? null;
+            ?>
+
+        <?php if ($pesan): ?>
+            <div class="alert <?= $pesan['class']; ?>" role="alert">
+                <?= htmlspecialchars($pesan['teks'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
     <a href="index.php" class="btn-back">
         <i class="bi bi-arrow-left"></i>
         Kembali
@@ -47,7 +84,7 @@ $row = mysqli_fetch_assoc($data);
                         <i class="bi bi-calendar-event"></i>
                     </span>
 
-                    <input type="text" name="nama_kegiatan" class="form-control" value="<?= htmlspecialchars($row['nama_kegiatan']); ?>" required>
+                    <input type="text" name="nama_kegiatan" class="form-control" maxlength="50" value="<?= htmlspecialchars($row['nama_kegiatan']); ?>" required>
                 </div>
             </div>
 
@@ -81,7 +118,7 @@ $row = mysqli_fetch_assoc($data);
                         <i class="bi bi-card-text"></i>
                     </span>
 
-                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)" required><?= htmlspecialchars($row['deskripsi']); ?></textarea>
+                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan" required><?= htmlspecialchars($row['deskripsi']); ?></textarea>
                 </div>
             </div>
 

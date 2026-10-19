@@ -17,6 +17,36 @@ if (!$row) {
 <link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
+    <?php if (isset($_GET['pesan'])): ?>
+        <?php
+        $peringatan = [
+            'duplikat' => [
+                'class' => 'alert-warning',
+                'teks' => 'Data infaq sudah tersedia. Data yang sama tidak dapat ditambahkan kembali.'
+            ],
+            'invalid' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data tidak valid. Periksa kembali nama, nominal, dan tanggal.'
+            ],
+            'gagal' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data infaq gagal diperbarui. Silakan coba kembali.'
+            ],
+            'bulan_tidak_valid' => [
+                'class' => 'alert-warning',
+                'teks' => 'Bulan tidak valid. Harap masukkan tanggal sesuai bulan sekarang.'
+            ],
+        ];
+
+        $pesan = $peringatan[$_GET['pesan']] ?? null;
+        ?>
+
+        <?php if ($pesan): ?>
+            <div class="alert <?= $pesan['class']; ?>" role="alert">
+                <?= htmlspecialchars($pesan['teks']); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <a href="index.php" class="btn-back">
         <i class="bi bi-arrow-left"></i>
@@ -38,7 +68,7 @@ if (!$row) {
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                    <input type="text" name="nama_donatur" class="form-control" maxlength="50" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
                 </div>
             </div>
 

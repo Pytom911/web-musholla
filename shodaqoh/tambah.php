@@ -21,6 +21,36 @@ $kelas = mysqli_query(
 <link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
+    <?php if (isset($_GET['pesan'])): ?>
+        <?php
+        $peringatan = [
+            'duplikat' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Data shodaqoh untuk kelas dan tanggal tersebut sudah tersedia.'
+                ],
+                'bulan_tidak_valid' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Tanggal shodaqoh harus sesuai bulan dan tahun sekarang.'
+                ],
+                'invalid' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data tidak valid. Periksa kembali tanggal, kelas, dan nominal.'
+                ],
+                'gagal' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Data shodaqoh gagal disimpan. Silakan coba kembali.'
+                ]
+            ];
+
+            $pesan = $peringatan[$_GET['pesan']] ?? null;
+            ?>
+
+        <?php if ($pesan): ?>
+            <div class="alert <?= $pesan['class']; ?>" role="alert">
+                <?= htmlspecialchars($pesan['teks'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
     <a href="index.php" class="btn-back">
         <i class="bi bi-arrow-left"></i>
         Kembali
