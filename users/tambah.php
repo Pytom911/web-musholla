@@ -19,6 +19,14 @@ require_once '../template/header.php';
         <h3 class="form-title">Tambah Data Pengguna</h3>
         <p class="form-subtitle">Tambahkan data pengguna baru ke dalam sistem.</p>
 
+        <?php if (($_GET['pesan'] ?? '') === 'duplikat_username'): ?>
+            <div class="alert alert-warning">Username sudah digunakan. Silakan gunakan username lain.</div>
+        <?php elseif (($_GET['pesan'] ?? '') === 'duplikat_nama'): ?>
+            <div class="alert alert-warning">Nama sudah terdaftar untuk pengguna lain. Silakan gunakan nama yang berbeda.</div>
+        <?php elseif (($_GET['pesan'] ?? '') === 'gagal'): ?>
+            <div class="alert alert-danger">Data pengguna tidak dapat disimpan. Periksa kembali isian data.</div>
+        <?php endif; ?>
+
         <form action="simpan.php" method="POST">
 
             <div class="form-group">
