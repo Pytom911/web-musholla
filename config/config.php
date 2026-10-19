@@ -309,35 +309,14 @@ try {
 
     $connect = mysqli_init();
 
-
-    /*
-     * SSL/TLS TiDB Cloud
-     *
-     * Sertifikat CA:
-     * config/isrgrootx1.pem
-     */
-
-    mysqli_ssl_set(
-        $connect,
-        null,
-        null,
-        __DIR__ . '/isrgrootx1.pem',
-        null,
-        null
-    );
-
-
     mysqli_real_connect(
         $connect,
         DB_HOST,
         DB_USER,
         DB_PASS,
         DB_NAME,
-        DB_PORT,
-        null,
-        MYSQLI_CLIENT_SSL
+        DB_PORT
     );
-
 
     mysqli_set_charset(
         $connect,
