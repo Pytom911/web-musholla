@@ -47,6 +47,21 @@ $totalPengeluaran = mysqli_fetch_assoc(mysqli_query(
     "SELECT COALESCE(SUM(pengeluaran), 0) AS total FROM kegiatan $whereBulan"
 ));
 
+// Arus kas bulan terpilih, sama dengan saldo keuangan di dashboard; "Semua Bulan" tanpa filter.
+$ringkasSaldo = mysqli_fetch_assoc(mysqli_query(
+    $connect,
+    "SELECT
+        (
+            (SELECT COALESCE(SUM(nominal), 0) FROM infaq $whereBulan)
+            +
+            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh $whereBulan)
+            -
+            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan $whereBulan)
+        ) AS saldo"
+));
+
+$saldoTersedia = (float) ($ringkasSaldo['saldo'] ?? 0);
+
 $data = mysqli_query(
     $connect,
     "SELECT * FROM kegiatan $whereBulan ORDER BY tanggal DESC, id_kegiatan DESC"
@@ -77,6 +92,14 @@ $data = mysqli_query(
         <?php endif; ?>
     <?php endif; ?>
 
+    <?php if ($saldoTersedia < 0): ?>
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Saldo tidak mencukupi — total pengeluaran kegiatan melebihi total infaq &amp; shodaqoh sebesar
+            <strong>Rp<?= number_format(abs($saldoTersedia), 0, ',', '.'); ?></strong>.
+        </div>
+    <?php endif; ?>
+
     <div class="page-header">
         <div>
             <h3>Data Kegiatan</h3>
@@ -92,7 +115,7 @@ $data = mysqli_query(
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-xl-6 col-md-6">
+        <div class="col-xl-4 col-md-4">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-event-fill"></i>
@@ -122,7 +145,7 @@ $data = mysqli_query(
             </div>
         </div>
 
-        <div class="col-xl-6 col-md-6">
+        <div class="col-xl-4 col-md-4">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-cash-stack"></i>
@@ -146,6 +169,34 @@ $data = mysqli_query(
                             Semua Kegiatan
                         <?php else: ?>
                             <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-4">
+            <div class="stats-card">
+                <div class="icon <?= $saldoTersedia < 0 ? 'icon-red' : 'icon-green'; ?>">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+                <div class="stats-info">
+                    <small>Saldo Tersedia</small>
+
+                    <h2>
+                        <?php if ($saldoTersedia < 0): ?>
+                            <span class="text-danger">-Rp<?= number_format(abs($saldoTersedia), 0, ',', '.'); ?></span>
+                        <?php else: ?>
+                            Rp<?= number_format($saldoTersedia, 0, ',', '.'); ?>
+                        <?php endif; ?>
+                    </h2>
+
+                    <span>
+                        <?php if ($bulanDipilih == 0): ?>
+                            Keseluruhan
+                        <?php else: ?>
+                            Arus kas <?= $namaBulan[$bulanDipilih]; ?> <?= $tahunSekarang; ?>
                         <?php endif; ?>
                     </span>
                 </div>

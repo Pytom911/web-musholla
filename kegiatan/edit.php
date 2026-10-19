@@ -4,7 +4,7 @@ require_once __DIR__ . '/../template/header.php';
 require_once "../auth/auth.php";
 requireRole(['admin','petugas']);
 
-$id = $_GET['id'] ?? 0;
+$id = (int) ($_GET['id'] ?? 0);
 
 $data = mysqli_query($connect, "SELECT * FROM kegiatan WHERE id_kegiatan='$id'");
 
@@ -17,6 +17,26 @@ if (mysqli_num_rows($data) == 0) {
 }
 
 $row = mysqli_fetch_assoc($data);
+
+// Arus kas bulan berjalan, sama dengan saldo keuangan di dashboard.
+$querySaldo = $connect->query(
+    "SELECT
+        (
+            (SELECT COALESCE(SUM(nominal), 0) FROM infaq WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+            +
+            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+            -
+            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+        ) AS saldo"
+);
+
+$saldoSaatIni = $querySaldo
+    ? (float) ($querySaldo->fetch_assoc()['saldo'] ?? 0)
+    : 0.0;
+
+// Pengeluaran data ini masih terhitung di saldo, jadi kembalikan saat menghitung batas.
+$pengeluaranLama = (float) $row['pengeluaran'];
+$saldoTersedia = $saldoSaatIni + $pengeluaranLama;
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -26,33 +46,25 @@ $row = mysqli_fetch_assoc($data);
         <?php
         $peringatan = [
             'duplikat' => [
-                    'class' => 'alert-warning',
-                    'teks' => 'Data shodaqoh untuk kelas dan tanggal tersebut sudah tersedia.'
-                ],
-                'bulan_tidak_valid' => [
-                    'class' => 'alert-warning',
-                    'teks' => 'Tanggal shodaqoh harus sesuai bulan dan tahun sekarang.'
-                ],
-                'duplikat' => [
-                    'class' => 'alert-warning',
-                    'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
-                ],
-                'invalid' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Data tidak valid. Periksa kembali tanggal, kelas, dan nominal.'
-                ],
-                    'saldo_tidak_cukup' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Saldo tidak cukup untuk melanjutkan. Pengeluaran melebihi saldo keuangan yang tersedia.'
-                ],
-                'gagal' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Data shodaqoh gagal disimpan. Silakan coba kembali.'
-                ]
-            ];
+                'class' => 'alert-warning',
+                'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
+            ],
+            'bulan_tidak_valid' => [
+                'class' => 'alert-warning',
+                'teks' => 'Tanggal kegiatan harus sesuai bulan dan tahun sekarang.'
+            ],
+            'invalid' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
+            ],
+            'gagal' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data kegiatan gagal diperbarui. Silakan coba kembali.'
+            ]
+        ];
 
-            $pesan = $peringatan[$_GET['pesan']] ?? null;
-            ?>
+        $pesan = $peringatan[$_GET['pesan']] ?? null;
+        ?>
 
         <?php if ($pesan): ?>
             <div class="alert <?= $pesan['class']; ?>" role="alert">
@@ -94,7 +106,17 @@ $row = mysqli_fetch_assoc($data);
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
 
-                    <input type="number" name="pengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" required>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" required>
+                </div>
+
+                <small class="<?= $saldoTersedia < 0 ? 'text-danger' : 'text-muted'; ?>">
+                    Saldo kas bulan ini untuk kegiatan ini:
+                    <strong>Rp<?= number_format($saldoTersedia, 0, ',', '.'); ?></strong>
+                </small>
+
+                <div class="alert alert-danger mt-2 py-2 small" id="peringatanSaldo" role="alert" hidden>
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <span id="teksPeringatanSaldo"></span>
                 </div>
             </div>
 
@@ -129,7 +151,7 @@ $row = mysqli_fetch_assoc($data);
                     Batal
                 </a>
 
-                <button type="submit" class="btn-update">
+                <button type="submit" id="tombolSimpan" class="btn-update">
                     <i class="bi bi-check-circle-fill"></i>
                     Update Data
                 </button>
@@ -141,5 +163,59 @@ $row = mysqli_fetch_assoc($data);
     </div>
 
 </div>
+
+<script>
+(function () {
+    // Kunci tombol hanya saat update.php akan menolak: saldo minus dan pengeluaran naik.
+    // Menurunkan pengeluaran tetap diizinkan agar saldo minus bisa diperbaiki.
+    const saldoTersedia = <?= json_encode($saldoTersedia); ?>;
+    const pengeluaranLama = <?= json_encode($pengeluaranLama); ?>;
+    const inputPengeluaran = document.getElementById('inputPengeluaran');
+    const tombolSimpan = document.getElementById('tombolSimpan');
+    const peringatan = document.getElementById('peringatanSaldo');
+    const teksPeringatan = document.getElementById('teksPeringatanSaldo');
+
+    const formatRupiah = (nilai) => new Intl.NumberFormat('id-ID').format(nilai);
+
+    function periksaSaldo() {
+        const nominal = Number(inputPengeluaran.value);
+        const melebihi = inputPengeluaran.value !== '' && nominal > saldoTersedia;
+        const nominalNaik = nominal > pengeluaranLama;
+
+        if (melebihi && nominalNaik) {
+            teksPeringatan.textContent =
+                'Pengeluaran melebihi saldo tersedia — kurangi minimal Rp' +
+                formatRupiah(nominal - saldoTersedia) + '.';
+            peringatan.classList.remove('alert-warning');
+            peringatan.classList.add('alert-danger');
+            peringatan.hidden = false;
+            tombolSimpan.disabled = true;
+        } else if (melebihi) {
+            teksPeringatan.textContent =
+                'Pengeluaran masih melebihi saldo tersedia (Rp' +
+                formatRupiah(saldoTersedia) +
+                '), tetapi tetap dapat disimpan karena nominal berkurang untuk memperbaiki saldo.';
+            peringatan.classList.remove('alert-danger');
+            peringatan.classList.add('alert-warning');
+            peringatan.hidden = false;
+            tombolSimpan.disabled = false;
+        } else {
+            peringatan.hidden = true;
+            tombolSimpan.disabled = false;
+        }
+    }
+
+    inputPengeluaran.addEventListener('input', periksaSaldo);
+
+    tombolSimpan.form.addEventListener('submit', function (event) {
+        periksaSaldo();
+        if (tombolSimpan.disabled) {
+            event.preventDefault();
+        }
+    });
+
+    periksaSaldo();
+})();
+</script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

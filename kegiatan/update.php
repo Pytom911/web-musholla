@@ -88,15 +88,15 @@ if (!$dataLama) {
 
 $pengeluaranLama = (float) $dataLama['pengeluaran'];
 
-// Hitung saldo setelah semua pengeluaran saat ini.
+// Arus kas bulan berjalan, sama dengan saldo keuangan di dashboard.
 $querySaldo = $connect->query(
     "SELECT
         (
-            (SELECT COALESCE(SUM(nominal), 0) FROM infaq)
+            (SELECT COALESCE(SUM(nominal), 0) FROM infaq WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
             +
-            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh)
+            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
             -
-            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan)
+            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
         ) AS saldo"
 );
 

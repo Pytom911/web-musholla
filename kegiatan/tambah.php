@@ -3,6 +3,22 @@ $pageTitle = 'Tambah Kegiatan';
 require_once __DIR__ . '/../template/header.php';
 require_once "../auth/auth.php";
 requireRole(['admin','petugas']);
+
+// Arus kas bulan berjalan, sama dengan saldo keuangan di dashboard.
+$querySaldo = $connect->query(
+    "SELECT
+        (
+            (SELECT COALESCE(SUM(nominal), 0) FROM infaq WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+            +
+            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+            -
+            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan WHERE MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE()))
+        ) AS saldo"
+);
+
+$saldoTersedia = $querySaldo
+    ? (float) ($querySaldo->fetch_assoc()['saldo'] ?? 0)
+    : 0.0;
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -22,10 +38,6 @@ requireRole(['admin','petugas']);
                 'invalid' => [
                     'class' => 'alert-danger',
                     'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
-                ],
-                'saldo_tidak_cukup' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Saldo tidak cukup untuk melanjutkan. Pengeluaran melebihi saldo keuangan yang tersedia.'
                 ],
                 'gagal' => [
                     'class' => 'alert-danger',
@@ -90,7 +102,15 @@ requireRole(['admin','petugas']);
                     <span class="input-group-text">
                         Rp
                     </span>
-                    <input type="number" name="pengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
+                </div>
+                <small class="<?= $saldoTersedia < 0 ? 'text-danger' : 'text-muted'; ?>">
+                    Saldo kas bulan ini:
+                    <strong>Rp<?= number_format($saldoTersedia, 0, ',', '.'); ?></strong>
+                </small>
+                <div class="alert alert-danger mt-2 py-2 small" id="peringatanSaldo" role="alert" hidden>
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <span id="teksPeringatanSaldo"></span>
                 </div>
             </div>
 
@@ -121,7 +141,7 @@ requireRole(['admin','petugas']);
                     Batal
                 </a>
 
-                <button type="submit" class="btn-save">
+                <button type="submit" id="tombolSimpan" class="btn-save">
                     <i class="bi bi-check-circle-fill"></i>
                     Simpan Data
                 </button>
@@ -132,5 +152,45 @@ requireRole(['admin','petugas']);
     </div>
 
 </div>
+
+<script>
+(function () {
+    // Kunci tombol saat nominal melebihi saldo; sama dengan blokir di simpan.php.
+    const saldoTersedia = <?= json_encode($saldoTersedia); ?>;
+    const inputPengeluaran = document.getElementById('inputPengeluaran');
+    const tombolSimpan = document.getElementById('tombolSimpan');
+    const peringatan = document.getElementById('peringatanSaldo');
+    const teksPeringatan = document.getElementById('teksPeringatanSaldo');
+
+    const formatRupiah = (nilai) => new Intl.NumberFormat('id-ID').format(nilai);
+
+    function periksaSaldo() {
+        const nominal = Number(inputPengeluaran.value);
+        const melebihi = inputPengeluaran.value !== '' && nominal > saldoTersedia;
+
+        if (melebihi) {
+            teksPeringatan.textContent =
+                'Pengeluaran melebihi saldo tersedia — kurangi minimal Rp' +
+                formatRupiah(nominal - saldoTersedia) + '.';
+            peringatan.hidden = false;
+            tombolSimpan.disabled = true;
+        } else {
+            peringatan.hidden = true;
+            tombolSimpan.disabled = false;
+        }
+    }
+
+    inputPengeluaran.addEventListener('input', periksaSaldo);
+
+    tombolSimpan.form.addEventListener('submit', function (event) {
+        periksaSaldo();
+        if (tombolSimpan.disabled) {
+            event.preventDefault();
+        }
+    });
+
+    periksaSaldo();
+})();
+</script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>
