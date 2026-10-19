@@ -2,7 +2,6 @@
 $pageTitle = 'Data Infaq';
 require_once '../template/header.php';
 
-
 $bulanSekarang = (int) date('n');
 $tahunSekarang = (int) date('Y');
 
@@ -36,7 +35,6 @@ if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
 } else {
     $bulanDipilih = 0;
 }
-
 
 $totalBulan = mysqli_fetch_assoc(mysqli_query(
     $connect, 
@@ -115,7 +113,7 @@ $data = mysqli_query(
                         <?php if ($bulanDipilih == 0): ?>
                             Keseluruhan
                         <?php else: ?>
-                            <?= $namaBulan[$bulanDipilih]; ?> <?= $tahunDipilih; ?>
+                            <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
                         <?php endif; ?>
                     </span>
                 </div>
@@ -158,7 +156,7 @@ $data = mysqli_query(
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama donatur...">
+                <input type="text" id="searchInput" placeholder="Cari Nama Donatur">
             </div>  
 
             <form method="GET" class="filter-box">

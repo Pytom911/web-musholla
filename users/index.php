@@ -123,7 +123,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                                 <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['nama']); ?></td>
                                 <td><span class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span></td>
-                                <td><?= htmlspecialchars($row['password']); ?></td>
+                                <td>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_user']; ?>" class="btn-edit">
@@ -139,7 +139,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5">
+                            <td colspan="6">
                                 <div class="empty-data">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Data Pengguna</h4>

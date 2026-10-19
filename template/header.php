@@ -17,7 +17,7 @@ $photos = [
 
 $defaultPhoto = $photos[$akses] ?? 'default_profile.jpg';
 $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
-?>
+?>  
 <!DOCTYPE html>
 <html lang="id">
 

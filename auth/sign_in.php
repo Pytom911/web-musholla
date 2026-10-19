@@ -19,16 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($stmt);
 
         if ($user) {
-            // password_verify untuk hash; fallback hash_equals untuk
-            // data plaintext lama (harap segera dimigrasi ke password_hash).
-            $passwordOk = password_verify($password, (string) $user['password'])
-                || hash_equals((string) $user['password'], $password);
+            // Hanya terima password yang sudah di-hash dengan password_hash().
+            if (password_verify($password, (string) $user['password'])) {
+                // Hash ulang otomatis jika algoritma/cost sudah berubah.
+                if (password_needs_rehash((string) $user['password'], PASSWORD_DEFAULT)) {
+                    $newHash = password_hash($password, PASSWORD_DEFAULT);
+                    $upStmt = mysqli_prepare($connect, 'UPDATE users SET password = ? WHERE id_user = ?');
+                    mysqli_stmt_bind_param($upStmt, 'si', $newHash, $user['id_user']);
+                    mysqli_stmt_execute($upStmt);
+                    mysqli_stmt_close($upStmt);
+                }
 
-            if ($passwordOk) {
                 session_regenerate_id(true);
 
                 $_SESSION['login'] = true;
-                $_SESSION['user_id'] = $user['id'] ?? null;
+                $_SESSION['user_id'] = $user['id_user'] ?? null;
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
                 $_SESSION['nama'] = $user['nama'] ?? $user['username'];

@@ -46,12 +46,14 @@ try {
     }
     $stmt->close();
 
-    // Simpan data user baru
+    // Simpan data user baru (password di-hash)
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+
     $stmt = $connect->prepare(
         "INSERT INTO users (nama, username, role, password)
          VALUES (?, ?, ?, ?)"
     );
-    $stmt->bind_param('ssss', $nama, $username, $role, $password);
+    $stmt->bind_param('ssss', $nama, $username, $role, $hash);
     $stmt->execute();
     $stmt->close();
 } catch (Throwable $e) {
