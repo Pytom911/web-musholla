@@ -109,6 +109,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         <th>No</th>
                         <th>Username</th>
                         <th>Nama</th>
+                        <th>Email</th>
                         <th>Role</th>
                         <th>Password</th>
                         <th>Aksi</th>
@@ -122,6 +123,13 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['nama']); ?></td>
+                                <td>
+                                    <?php if (!empty($row['email'])): ?>
+                                        <?= htmlspecialchars($row['email']); ?>
+                                    <?php else: ?>
+                                        <span class="text-muted fst-italic">Belum diisi</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><span class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span></td>
                                 <td>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</td>
                                 <td>
@@ -139,7 +147,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-data">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Data Pengguna</h4>

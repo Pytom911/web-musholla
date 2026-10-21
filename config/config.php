@@ -201,7 +201,42 @@ function detect_base_url(): string
 }
 
 
-/* ---------- 6. HELPERS ---------- */
+/* ---------- 6. EMAIL & OTP ---------- */
+
+/*
+ * Kredensial database sengaja tidak dibaca dari .env (lihat blok DATABASE).
+ * Pengaturan email/OTP boleh dioverride lewat .env.
+ */
+
+define('APP_URL', rtrim(getenv('APP_URL') ?: BASE_URL, '/') . '/');
+
+define(
+    'MAIL_FROM',
+    getenv('MAIL_FROM')
+        ?: 'Sistem Informasi Musholla <onboarding@resend.dev>'
+);
+
+define('MAIL_REPLY_TO', getenv('MAIL_REPLY_TO') ?: '');
+
+define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: '');
+
+define(
+    'OTP_TTL_MINUTES',
+    max(1, (int) (getenv('OTP_TTL_MINUTES') ?: 10))
+);
+
+define(
+    'OTP_MAX_ATTEMPTS',
+    max(1, (int) (getenv('OTP_MAX_ATTEMPTS') ?: 5))
+);
+
+define(
+    'OTP_RESEND_COOLDOWN',
+    max(0, (int) (getenv('OTP_RESEND_COOLDOWN') ?: 60))
+);
+
+
+/* ---------- 7. HELPERS ---------- */
 
 
 /**
@@ -248,6 +283,49 @@ function post(string $key, $default = '')
     return $_POST[$key] ?? $default;
 }
 
+
+/**
+ * Token CSRF per session (dibuat sekali, dipakai semua form POST).
+ */
+
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+
+/**
+ * Hidden input CSRF siap cetak di dalam <form>.
+ */
+
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf_token" value="'
+        . htmlspecialchars(csrf_token(), ENT_QUOTES)
+        . '">';
+}
+
+
+/**
+ * Validasi token CSRF dari $_POST.
+ */
+
+function csrf_check(): bool
+{
+    $token = $_POST['csrf_token'] ?? '';
+
+    return is_string($token)
+        && $token !== ''
+        && hash_equals(
+            (string) ($_SESSION['csrf_token'] ?? ''),
+            $token
+        );
+}
+
 function hari_indonesia(?string $tanggal): string
 {
     $tanggal = trim($tanggal ?? '');
@@ -279,7 +357,7 @@ function hari_indonesia(?string $tanggal): string
 }
 
 
-/* ---------- 7. SESSION ---------- */
+/* ---------- 8. SESSION ---------- */
 
 if (session_status() === PHP_SESSION_NONE) {
 
@@ -297,7 +375,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 
-/* ---------- 8. KONEKSI DATABASE ---------- */
+/* ---------- 9. KONEKSI DATABASE ---------- */
 
 mysqli_report(
     MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT
@@ -345,4 +423,10 @@ try {
     die(
         'Terjadi kesalahan sistem. Silakan coba lagi.'
     );
-}   
+}
+
+
+/* ---------- 10. EMAIL & OTP HELPERS ---------- */
+
+require_once CONFIG_PATH . '/mail.php';
+require_once CONFIG_PATH . '/otp.php';

@@ -110,6 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h1 class="login-title text-center mb-2">Login</h1>
                     <p class="login-subtitle text-center mb-4">Silakan masuk untuk melanjutkan</p>
 
+                    <?php if (($_GET['pesan'] ?? '') === 'reset_berhasil'): ?>
+                        <div class="success-msg mb-3">
+                            Password berhasil diubah. Silakan login dengan password baru.
+                        </div>
+                    <?php endif; ?>
+
                     <?php if ($error !== ''): ?>
                         <div class="error-msg mb-3">
                             <?= htmlspecialchars($error) ?>
@@ -122,10 +128,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-person input-icon"></i>
                             <input type="text" class="form-control custom-input" name="username" placeholder="Username" value="<?= htmlspecialchars($usernameInput) ?>" required>
                         </div>
-                        <div class="mb-4 input-icon-group">
+                        <div class="mb-2 input-icon-group">
                             <i class="bi bi-lock input-icon"></i>
                             <input type="password" class="form-control custom-input" name="password" id="passwordField" placeholder="Password" required>
                             <i class="bi bi-eye-slash input-icon-toggle" id="togglePassword"></i>
+                        </div>
+
+                        <div class="text-end mb-4">
+                            <a href="<?= url('auth/lupa_password.php') ?>" class="forgot-link text-small">
+                                Lupa password?
+                            </a>
                         </div>
 
                         <button type="submit" class="btn btn-signin w-100 mb-4" name="login">

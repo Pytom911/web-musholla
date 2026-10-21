@@ -10,6 +10,7 @@ if (!isset($_POST['id_user'])) {
 $id = (int)$_POST['id_user'];
 $nama = trim($_POST['nama'] ?? '');
 $username = trim($_POST['username'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
 $role = $_POST['role'] ?? '';
 $password = $_POST['password'] ?? '';
 
@@ -19,6 +20,14 @@ if (
     || !in_array($role, ['admin', 'petugas'], true)
 ) {
     redirect('users/edit.php?id=' . $id . '&pesan=gagal');
+}
+
+if ($email === '') {
+    redirect('users/edit.php?id=' . $id . '&pesan=email_kosong');
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 150) {
+    redirect('users/edit.php?id=' . $id . '&pesan=email_invalid');
 }
 
 try {
@@ -58,21 +67,33 @@ try {
     }
     $stmt->close();
 
+    // Cek duplikat email (kecuali user ini sendiri)
+    $stmt = $connect->prepare(
+        "SELECT id_user FROM users WHERE email = ? AND id_user != ? LIMIT 1"
+    );
+    $stmt->bind_param('si', $email, $id);
+    $stmt->execute();
+
+    if ($stmt->get_result()->num_rows > 0) {
+        redirect('users/edit.php?id=' . $id . '&pesan=duplikat_email');
+    }
+    $stmt->close();
+
     // Perbarui data user
     if ($password !== '') {
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $connect->prepare(
-            "UPDATE users SET nama = ?, username = ?, role = ?, password = ?
+            "UPDATE users SET nama = ?, email = ?, username = ?, role = ?, password = ?
              WHERE id_user = ?"
         );
-        $stmt->bind_param('ssssi', $nama, $username, $role, $hash, $id);
+        $stmt->bind_param('sssssi', $nama, $email, $username, $role, $hash, $id);
     } else {
         $stmt = $connect->prepare(
-            "UPDATE users SET nama = ?, username = ?, role = ?
+            "UPDATE users SET nama = ?, email = ?, username = ?, role = ?
              WHERE id_user = ?"
         );
-        $stmt->bind_param('sssi', $nama, $username, $role, $id);
+        $stmt->bind_param('ssssi', $nama, $email, $username, $role, $id);
     }
 
     $stmt->execute();

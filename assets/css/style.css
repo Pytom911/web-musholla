@@ -426,6 +426,35 @@ svg {
     text-align: center;
 }
 
+.success-msg {
+    background-color: #eaf7ee;
+    color: #145a2e;
+
+    border: 1px solid #bfe3c9;
+    border-radius: 10px;
+
+    padding: 10px 14px;
+
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.otp-input {
+    padding-left: 52px;
+    text-align: center;
+
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.45em;
+}
+
+.otp-input::placeholder {
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+
 
 /* ==============================================================
    3. DASHBOARD / ADMIN

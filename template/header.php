@@ -25,6 +25,8 @@ $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
+    <!-- SEO Engine -->
+    <meta name="google-site-verification" content="8sz5Q2yN3GPyjZQObr2cAWz9WwFQg8cbV-E_7sJ1tvU" />
     <!-- Favicon -->
     <link rel="icon" href="<?= asset('img/musholla_logo.png') ?>" type="image/png">
     <link rel="shortcut icon" href="<?= asset('img/musholla_logo.png') ?>" type="image/png">
