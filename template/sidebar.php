@@ -26,12 +26,12 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                 <span>Beranda</span>
             </div>
         </a>
-        <div class="brand-divider">
-            <span></span>
-            <i class="fst-normal fw-semibold fs-7">Master Data</i>
-            <span></span>
-        </div>
         <?php if ($isAdmin): ?>
+            <div class="brand-divider">
+                <span></span>
+                <i class="fst-normal fw-semibold fs-7">Master Data</i>
+                <span></span>
+            </div>
             <a href="<?= url('users/index.php') ?>"
                 class="sidebar-link <?= (strpos($currentPage, '/users/') !== false) ? 'active' : '' ?>">
                 <div class="sidebar-link-left">
@@ -39,21 +39,21 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                     <span>Data User</span>
                 </div>
             </a>
+            <a href="<?= url('guru/index.php') ?>"
+                class="sidebar-link <?= (strpos($currentPage, '/guru/') !== false) ? 'active' : '' ?>">
+                <div class="sidebar-link-left">
+                    <i class="bi bi-people"></i>
+                    <span>Data Guru</span>
+                </div>
+            </a>
+            <a href="<?= url('kelas/index.php') ?>"
+                class="sidebar-link <?= (strpos($currentPage, '/kelas/') !== false) ? 'active' : '' ?>">
+                <div class="sidebar-link-left">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <span>Data Kelas</span>
+                </div>
+            </a>
         <?php endif; ?>
-        <a href="<?= url('guru/index.php') ?>"
-            class="sidebar-link <?= (strpos($currentPage, '/guru/') !== false) ? 'active' : '' ?>">
-            <div class="sidebar-link-left">
-                <i class="bi bi-people"></i>
-                <span>Data Guru</span>
-            </div>
-        </a>
-        <a href="<?= url('kelas/index.php') ?>"
-            class="sidebar-link <?= (strpos($currentPage, '/kelas/') !== false) ? 'active' : '' ?>">
-            <div class="sidebar-link-left">
-                <i class="bi bi-mortarboard-fill"></i>
-                <span>Data Kelas</span>
-            </div>
-        </a>
         <div class="brand-divider">
             <span></span>
             <i class="fst-normal fw-semibold fs-7">Penjadwalan</i>
