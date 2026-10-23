@@ -1,9 +1,25 @@
 <?php
-$pageTitle = 'Tambah Kegiatan';
-require_once __DIR__ . '/../template/header.php';
+require_once "../auth/auth.php";
+requireRole(['admin']);
+$pageTitle = 'Tambah Data User';
+require_once '../template/header.php';
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
+
+<?php if (($_GET['pesan'] ?? '') === 'duplikat_username'): ?>
+    <div class="alert alert-warning">Username sudah digunakan. Silakan gunakan username lain.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'duplikat_nama'): ?>
+    <div class="alert alert-warning">Nama sudah terdaftar untuk pengguna lain. Silakan gunakan nama yang berbeda.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'duplikat_email'): ?>
+    <div class="alert alert-warning">Email sudah dipakai pengguna lain. Gunakan email lain.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'email_kosong'): ?>
+    <div class="alert alert-warning">Email wajib diisi karena dipakai untuk lupa password.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'email_invalid'): ?>
+    <div class="alert alert-warning">Format email tidak valid.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'gagal'): ?>
+    <div class="alert alert-danger">Data pengguna tidak dapat disimpan. Periksa kembali isian data.</div>
+<?php endif; ?>
 
 <div class="container-fluid">
 
@@ -14,60 +30,62 @@ require_once __DIR__ . '/../template/header.php';
 
     <div class="form-card">
 
-        <h3 class="form-title">Tambah Kegiatan</h3>
-        <p class="form-subtitle">
-            Silakan lengkapi data kegiatan musholla pada form di bawah ini.
-        </p>
+        <h3 class="form-title">Tambah Data Pengguna</h3>
+        <p class="form-subtitle">Tambahkan data pengguna baru ke dalam sistem.</p>
 
         <form action="simpan.php" method="POST">
 
             <div class="form-group">
-                <label>Nama Kegiatan <span class="required">*</span></label>
-
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-calendar-event"></i>
-                    </span>
-
-                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan" required>
-                </div>
+                <label>Username <span class="required">*</span></label>
+                <input type="text" name="username" class="form-control" placeholder="Masukkan Username" maxlength="50" required>
             </div>
 
             <div class="form-group">
-                <label>Pengeluaran <span class="required">*</span></label>
-
-                <div class="input-group">
-                    <span class="input-group-text">Rp</span>
-                    <input type="number" name="pengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
-                </div>
+                <label>Nama <span class="required">*</span></label>
+                <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama" maxlength="100" required>
             </div>
 
             <div class="form-group">
-                <label>Tanggal <span class="required">*</span></label>
+                <label>Email <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-calendar-date"></i>
+                        <i class="bi bi-envelope"></i>
                     </span>
 
-                    <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
+                    <input type="email" name="email" class="form-control" placeholder="contoh: nama@gmail.com" maxlength="150" required>
                 </div>
+
+                <small class="text-muted">Dipakai untuk mengirim kode OTP saat lupa password.</small>
             </div>
 
             <div class="form-group">
-                <label>Deskripsi</label>
+                <label>Role <span class="required">*</span></label>
 
                 <div class="input-group">
                     <span class="input-group-text">
-                        <i class="bi bi-card-text"></i>
+                        <i class="bi bi-person-badge"></i>
+                    </span>
+                    <select name="role" class="form-select" required>
+                        <option value="">Pilih Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="petugas">Petugas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Password <span class="required">*</span></label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-lock"></i>
                     </span>
 
-                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan (opsional)"></textarea>
+                    <input type="password" name="password" class="form-control" placeholder="Masukan Password" maxlength="50" required>
                 </div>
             </div>
 
             <div class="form-footer">
-
                 <a href="index.php" class="btn-cancel">
                     <i class="bi bi-arrow-left-circle"></i>
                     Batal
@@ -77,7 +95,6 @@ require_once __DIR__ . '/../template/header.php';
                     <i class="bi bi-check-circle-fill"></i>
                     Simpan Data
                 </button>
-
             </div>
 
         </form>
@@ -86,4 +103,4 @@ require_once __DIR__ . '/../template/header.php';
 
 </div>
 
-<?php require_once __DIR__ . '/../template/footer.php'; ?>
+<?php require_once '../template/footer.php'; ?>

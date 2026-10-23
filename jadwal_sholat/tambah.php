@@ -1,89 +1,137 @@
 <?php
-$pageTitle = 'Tambah Jadwal Sholat';
-require_once '../template/header.php';
+require_once __DIR__ . '/../auth/auth.php';
+requireRole(['admin', 'petugas']);
 
-$kelas = mysqli_query($connect, "SELECT * FROM kelas ORDER BY nama_kelas ASC");
+$kelas = mysqli_query(
+    $connect,
+    "SELECT * FROM kelas
+    ORDER BY nama_kelas ASC,
+    CASE tingkat
+        WHEN 'X' THEN 1
+        WHEN 'XI' THEN 2
+        WHEN 'XII' THEN 3
+        ELSE 4
+    END ASC,
+    bagian ASC"
+);
+
+$waktuSholat = ['Dzuhur', 'Ashar'];
+$enumStmt = $connect->prepare(
+    "SELECT COLUMN_TYPE
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'jadwal_sholat'
+       AND COLUMN_NAME = 'waktu_sholat'"
+);
+$enumStmt->execute();
+$enumRow = $enumStmt->get_result()->fetch_assoc();
+if ($enumRow && preg_match("/^enum\('(.*)'\)$/i", $enumRow['COLUMN_TYPE'], $m)) {
+    $waktuSholat = explode("','", $m[1]);
+}
+
+$pageTitle = 'Tambah Jadwal Sholat';
+require_once __DIR__ . '/../template/header.php';
 ?>
 
-<link rel="stylesheet" href="../assets/css/data.css">
+<link rel="stylesheet" href="<?= asset('css/data.css') ?>">
+
+<?php if (($_GET['pesan'] ?? '') === 'gagal'): ?>
+    <div class="alert alert-danger">Jadwal sholat tidak dapat disimpan. Periksa kembali isian data.</div>
+<?php endif; ?>
 
 <div class="container-fluid">
-
-    <a href="index.php" class="btn-back">
+    <a href="<?= url('jadwal_sholat/index.php') ?>" class="btn-back">
         <i class="bi bi-arrow-left"></i>
         Kembali
     </a>
 
     <div class="form-card">
-
         <h3 class="form-title">Tambah Jadwal Sholat</h3>
         <p class="form-subtitle">Tambahkan jadwal sholat baru ke dalam sistem.</p>
 
-        <form action="simpan.php" method="POST">
 
+        <form action="<?= url('jadwal_sholat/simpan.php') ?>" method="POST">
             <div class="form-group">
-                <label>Tanggal <span class="required">*</span></label>
+                <label for="tanggal">Tanggal</label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-                    <input type="date" name="tanggal" class="form-control" required>
+                    <input type="date" id="tanggal" name="tanggal" class="form-control">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Waktu Sholat <span class="required">*</span></label>
-
+                <label for="waktu_sholat">Waktu Sholat <span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-clock"></i>
                     </span>
-
-                    <select name="waktu_sholat" class="form-select" required>
+                    <select id="waktu_sholat" name="waktu_sholat" class="form-select" required>
                         <option value="">-- Pilih Waktu Sholat --</option>
-                        <option value="dzuhur">Dzuhur</option>
-                        <option value="ashar">Ashar</option>
+                        <?php foreach ($waktuSholat as $w): ?>
+                            <option value="<?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($w, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Kelas <span class="required">*</span></label>
-
+                <label for="id_kelas">Kelas <span class="required">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-mortarboard"></i>
                     </span>
-
-                    <select name="id_kelas" class="form-select" required>
+                    <select id="id_kelas" name="id_kelas" class="form-select" required>
                         <option value="">-- Pilih Kelas --</option>
 
-                        <?php while ($row = mysqli_fetch_assoc($kelas)) : ?>
-                            <option value="<?= $row['id_kelas']; ?>">
-                                <?= htmlspecialchars($row['nama_kelas']); ?> - <?= htmlspecialchars($row['tingkat']); ?>
+                        <?php
+                        $jurusanAktif = '';
+
+                        while ($row = mysqli_fetch_assoc($kelas)):
+                            $jurusan = $row['nama_kelas'];
+
+                            if ($jurusanAktif !== $jurusan) {
+                                if ($jurusanAktif !== '') {
+                                    echo '</optgroup>';
+                                }
+
+                                echo '<optgroup label="' . htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8') . '">';
+                                $jurusanAktif = $jurusan;
+                            }
+
+                            $labelKelas = $row['nama_kelas'] . ' - ' . $row['tingkat'];
+
+                            if ($row['bagian'] !== null && $row['bagian'] !== '') {
+                                $labelKelas .= ' (' . $row['bagian'] . ')';
+                            }
+                        ?>
+                            <option value="<?= (int) $row['id_kelas']; ?>">
+                                <?= htmlspecialchars($labelKelas, ENT_QUOTES, 'UTF-8'); ?>
                             </option>
                         <?php endwhile; ?>
 
+                        <?php if ($jurusanAktif !== ''): ?>
+                            </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
 
             <div class="form-footer">
-                <a href="index.php" class="btn-cancel">
+                <a href="<?= url('jadwal_sholat/index.php') ?>" class="btn-cancel">
                     <i class="bi bi-arrow-left-circle"></i>
                     Batal
                 </a>
-
                 <button type="submit" class="btn-save">
                     <i class="bi bi-check-circle-fill"></i>
                     Simpan Data
                 </button>
             </div>
-
         </form>
-
     </div>
-
 </div>
 
-<?php require_once '../template/footer.php'; ?>
+<?php require_once __DIR__ . '/../template/footer.php'; ?>

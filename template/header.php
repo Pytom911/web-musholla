@@ -13,12 +13,11 @@ $akses = $_SESSION['role'] ?? '';
 $photos = [
     'admin' => 'admin_profile.jpg',
     'petugas' => 'petugas_profile.jpg',
-    'siswa' => 'siswa_profile.jpg',
 ];
 
 $defaultPhoto = $photos[$akses] ?? 'default_profile.jpg';
 $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
-?>
+?>  
 <!DOCTYPE html>
 <html lang="id">
 
@@ -26,6 +25,11 @@ $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
+    <!-- SEO Engine -->
+    <meta name="google-site-verification" content="8sz5Q2yN3GPyjZQObr2cAWz9WwFQg8cbV-E_7sJ1tvU" />
+    <!-- Favicon -->
+    <link rel="icon" href="<?= asset('img/musholla_logo.png') ?>" type="image/png">
+    <link rel="shortcut icon" href="<?= asset('img/musholla_logo.png') ?>" type="image/png">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -81,8 +85,8 @@ $profilePhoto = basename($_SESSION['foto'] ?? $defaultPhoto);
                             </li>
                             <li><a class="dropdown-item py-2 text-danger" href="<?= url('auth/logout.php') ?>"><i
                                         class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
-                            <li><a class="dropdown-item py-2" href="<?= url('auth/sign_in.php') ?>"><i
-                                        class="bi bi-person-fill me-2"></i> Switch Account</a></li>
+                            <!-- <li><a class="dropdown-item py-2" href="<?= url('auth/change_pass.php') ?>"><i
+                             class="bi bi-key-fill"></i> Change Password</a></li> -->
                         </ul>
                     </div>
                 <?php else: ?>

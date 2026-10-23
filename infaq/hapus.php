@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once "../auth/auth.php";
+requireRole(['admin','petugas']);
 
 if (isset($_GET['id'])) {
 
@@ -12,6 +14,7 @@ if (isset($_GET['id'])) {
     } else {
         header('Location: index.php?pesan=gagal');
     }
+
 } else {
     header('Location: index.php');
 }

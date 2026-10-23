@@ -1,4 +1,6 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin']);
 $pageTitle = 'Edit Data Pengguna';
 require_once '../template/header.php';
 
@@ -13,6 +15,20 @@ if (!$row) {
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
+
+<?php if (($_GET['pesan'] ?? '') === 'duplikat_username'): ?>
+    <div class="alert alert-warning">Username sudah digunakan. Silakan gunakan username lain.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'duplikat_nama'): ?>
+    <div class="alert alert-warning">Nama sudah terdaftar untuk pengguna lain. Silakan gunakan nama yang berbeda.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'duplikat_email'): ?>
+    <div class="alert alert-warning">Email sudah dipakai pengguna lain. Gunakan email lain.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'email_kosong'): ?>
+    <div class="alert alert-warning">Email wajib diisi karena dipakai untuk lupa password.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'email_invalid'): ?>
+    <div class="alert alert-warning">Format email tidak valid.</div>
+<?php elseif (($_GET['pesan'] ?? '') === 'gagal'): ?>
+    <div class="alert alert-danger">Data pengguna tidak dapat disimpan. Periksa kembali isian data.</div>
+<?php endif; ?>
 
 <div class="container-fluid">
 
@@ -38,7 +54,7 @@ if (!$row) {
                         <i class="bi bi-person"></i>
                     </span>
 
-                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($row['username']); ?>" required>
+                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($row['username']); ?>" maxlength="50" required>
                 </div>
             </div>
 
@@ -50,8 +66,22 @@ if (!$row) {
                         <i class="bi bi-person-vcard"></i>
                     </span>
 
-                    <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($row['nama']); ?>" required>
+                    <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($row['nama']); ?>" maxlength="100" required>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-envelope"></i>
+                    </span>
+
+                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($row['email'] ?? ''); ?>" placeholder="contoh: nama@gmail.com" maxlength="150" required>
+                </div>
+
+                <small class="text-muted">Dipakai untuk mengirim kode OTP saat lupa password.</small>
             </div>
 
             <div class="form-group">
@@ -65,7 +95,6 @@ if (!$row) {
                         <option value="">Pilih Role</option>
                         <option value="admin" <?= $row['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
                         <option value="petugas" <?= $row['role'] == 'petugas' ? 'selected' : ''; ?>>Petugas</option>
-                        <option value="siswa" <?= $row['role'] == 'siswa' ? 'selected' : ''; ?>>Siswa</option>
                     </select>
                 </div>
             </div>
@@ -78,7 +107,7 @@ if (!$row) {
                         <i class="bi bi-lock"></i>
                     </span>
 
-                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                    <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password" maxlength="50">
                 </div>
             </div>
 

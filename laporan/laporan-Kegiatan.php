@@ -1,255 +1,197 @@
 <?php
-$pageTitle='Laporan Kegiatan';
+$pageTitle = 'Laporan Kegiatan';
 require_once '../template/header.php';
 
-$dari=$_GET['dari'] ?? '';
-$sampai=$_GET['sampai'] ?? '';
+$bulanSekarang = (int) date('n');
+$tahunSekarang = (int) date('Y');
 
-$where='';
-if($dari!='' && $sampai!=''){
-    $where="WHERE tanggal BETWEEN '$dari' AND '$sampai'";
+$bulanDipilih = isset($_GET['bulan'])
+    ? (int) $_GET['bulan']
+    : $bulanSekarang;
+
+if ($bulanDipilih < 0 || $bulanDipilih > 12) {
+    $bulanDipilih = $bulanSekarang;
 }
 
-$totalKegiatan=mysqli_fetch_assoc(mysqli_query($connect,"
-SELECT COUNT(*) total
-FROM kegiatan
-$where
-"));
+$tahunDipilih = $tahunSekarang;
 
-$totalPengeluaran=mysqli_fetch_assoc(mysqli_query($connect,"
-SELECT SUM(pengeluaran) total
-FROM kegiatan
-$where
-"));
+$namaBulan = [
+    1 => 'January', 
+    2 => 'February', 
+    3 => 'March', 
+    4 => 'April', 
+    5 => 'May', 
+    6 => 'June', 
+    7 => 'July', 
+    8 => 'August', 
+    9 => 'September', 
+    10 => 'October', 
+    11 => 'November', 
+    12 => 'December'
+];
 
-$totalTransaksi=mysqli_fetch_assoc(mysqli_query($connect,"
-SELECT COUNT(*) total
-FROM kegiatan
-$where
-"));
+$whereBulan = '';
 
-$bulanIni=mysqli_fetch_assoc(mysqli_query($connect,"
-SELECT SUM(pengeluaran) total
-FROM kegiatan
-WHERE MONTH(tanggal)=MONTH(CURDATE())
-AND YEAR(tanggal)=YEAR(CURDATE())
-"));
+if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
+    $whereBulan = "WHERE MONTH(tanggal) = $bulanDipilih
+        AND YEAR(tanggal) = $tahunDipilih";
+}
 
-$data=mysqli_query($connect,"
-SELECT *
-FROM kegiatan
-$where
-ORDER BY tanggal DESC,id_kegiatan DESC
-");
+$totalKegiatan = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM kegiatan $whereBulan"));
+$totalPengeluaran = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COALESCE(SUM(pengeluaran), 0) AS total FROM kegiatan $whereBulan"));
+
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalKegiatan['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
+$data = mysqli_query($connect, "SELECT * FROM kegiatan $whereBulan ORDER BY tanggal DESC, id_kegiatan DESC LIMIT $limit OFFSET $offset");
 ?>
 
-<link rel="stylesheet" href="../assets/css/data.css">
 <link rel="stylesheet" href="../assets/css/laporan.css">
+<link rel="stylesheet" href="../assets/css/data.css">
 
 <div class="container-fluid">
-
-<div class="laporan-header">
-
-    <div>
-        <h3>Laporan Kegiatan</h3>
-        <p>Kelola dan cetak laporan data kegiatan musholla.</p>
-    </div>
-
-    <a href="pdf/laporan-kegiatan-pdf.php?dari=<?= $dari ?>&sampai=<?= $sampai ?>" class="btn-export" target="_blank">
-        <i class="bi bi-file-earmark-pdf-fill"></i>
-        Export PDF
-    </a>
-
-</div>
-
-<div class="laporan-card">
-
-    <div class="filter-title">
-        <i class="bi bi-funnel-fill"></i>
-        Filter Laporan
-    </div>
-
-    <form method="GET">
-
-        <div class="row g-3">
-
-            <div class="col-lg-3">
-                <label class="form-label">Dari Tanggal</label>
-                <input type="date" name="dari" class="form-control" value="<?= $dari ?>">
-            </div>
-
-            <div class="col-lg-3">
-                <label class="form-label">Sampai Tanggal</label>
-                <input type="date" name="sampai" class="form-control" value="<?= $sampai ?>">
-            </div>
-
-            <div class="col-lg-6 d-flex align-items-end gap-2">
-
-                <button class="btn btn-filter" type="submit">
-                    <i class="bi bi-search"></i>
-                    Tampilkan
-                </button>
-
-                <a href="laporan-kegiatan.php" class="btn btn-reset">
-                    <i class="bi bi-arrow-clockwise"></i>
-                    Reset
-                </a>
-
-            </div>
-
+    <div class="laporan-header">
+        <div>
+            <h3>Laporan Kegiatan</h3>
+            <p>Seluruh data kegiatan dan pengeluaran musholla.</p>
         </div>
+        <a href="export/export-Kegiatan.php<?= $bulanDipilih > 0 ? '?bulan=' . $bulanDipilih : ''; ?>" target="_blank" class="btn-export">
+            <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
+        </a>
+    </div>
 
-    </form>
-
-</div>
-<div class="row g-4 mb-4">
-
-    <div class="col-xl-4 col-md-6">
+    <div class="row g-4 mb-4">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-event-fill"></i>
                 </div>
-
                 <div class="stats-info">
-                    <small>Total Kegiatan</small>
+                    <small>
+                        <?php if ($bulanDipilih == 0): ?>
+                            Total Kegiatan
+                        <?php else: ?>
+                            Total Kegiatan <?= $namaBulan[$bulanDipilih]; ?>
+                        <?php endif; ?>
+                    </small>
                     <h2><?= $totalKegiatan['total'] ?? 0; ?></h2>
-                    <span>Seluruh Kegiatan</span>
+                    <span>
+                        <?php if ($bulanDipilih == 0): ?>
+                            Keseluruhan
+                        <?php else: ?>
+                            <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
+                        <?php endif; ?>
+                    </span>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-6 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-cash-stack"></i>
                 </div>
-
                 <div class="stats-info">
-                    <small>Total Pengeluaran</small>
-                    <h2>Rp<?= number_format($totalPengeluaran['total'] ?? 0,0,',','.'); ?></h2>
-                    <span>Semua Kegiatan</span>
+                    <small>
+                        <?php if ($bulanDipilih == 0): ?>
+                            Total Pengeluaran
+                        <?php else: ?>
+                            Pengeluaran <?= $namaBulan[$bulanDipilih]; ?>
+                        <?php endif; ?>
+                    </small>
+                    <h2>Rp<?= number_format($totalPengeluaran['total'] ?? 0, 0, ',', '.'); ?></h2>
+                    <span>
+                        <?php if ($bulanDipilih == 0): ?>
+                            Semua Kegiatan
+                        <?php else: ?>
+                            <?= $namaBulan[$bulanDipilih]; ?> <?= date('Y'); ?>
+                        <?php endif; ?>
+                    </span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-xl-4 col-md-6">
-            <div class="stats-card">
-                <div class="icon icon-yellow">
-                    <i class="bi bi-calendar2-week-fill"></i>
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-tools">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cari nama kegiatan...">
                 </div>
-
-                <div class="stats-info">
-                    <small>Pengeluaran Bulan Ini</small>
-                    <h2>Rp<?= number_format($bulanIni['total'] ?? 0,0,',','.'); ?></h2>
-                    <span><?= date('F Y'); ?></span>
-                </div>
+                <form method="GET" class="filter-box">
+                    <select name="bulan" id="bulan" onchange="this.form.submit()">
+                        <option value="0" <?= $bulanDipilih == 0 ? 'selected' : ''; ?>>Semua Bulan</option>
+                        <?php foreach ($namaBulan as $nomor => $nama): ?>
+                            <option value="<?= $nomor; ?>" <?= $bulanDipilih == $nomor ? 'selected' : ''; ?>>
+                                <?= $nama; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
             </div>
-        </div>
-
-</div>
-    <div class="data-card">
-
-        <div class="data-toolbar">
-
-            <div class="search-box">
-                <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama kegiatan...">
-            </div>
-            <!-- <div class="filter-box">
-                <select id="showData" class="form-select">
-                    <option value="10">10 Data</option>
-                    <option value="25">25 Data</option>
-                    <option value="50">50 Data</option>
-                    <option value="100">100 Data</option>
-                </select>
-            </div> -->
-
         </div>
 
         <div class="table-responsive">
-
             <table class="table-modern" id="dataTable">
-
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Nama Kegiatan</th>
-                        <th width="180">Pengeluaran</th>
-                        <th width="170">Tanggal</th>
+                        <th>Pengeluaran</th>
                         <th>Deskripsi</th>
+                        <th>Tanggal</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
-                <?php if(mysqli_num_rows($data) > 0): ?>
-
-                    <?php $no = 1; ?>
-                    <?php while($row = mysqli_fetch_assoc($data)): ?>
-
-                    <tr>
-                        <td><?= $no++; ?></td>
-                        <td><strong><?= htmlspecialchars($row['nama_kegiatan']); ?></strong></td>
-                        <td><span class="nominal-red">Rp <?= number_format($row['pengeluaran'],0,',','.'); ?></span></td>
-                        <td><?= date('d F Y',strtotime($row['tanggal'])); ?></td>
-                        <td><?= nl2br(htmlspecialchars($row['deskripsi'])); ?></td>
-                    </tr>
-
-                <?php endwhile; ?>
-                <?php else: ?>
-                                        <tr>
-                        <td colspan="6">
-                            <div class="empty-data">
-                                <i class="bi bi-folder2-open"></i>
-                                <h4>Belum Ada Data Kegiatan</h4>
-                                <p>Silakan tambahkan kegiatan baru untuk mulai mengelola data.</p>
-                            </div>
-                        </td>
-                    </tr>
-
-                <?php endif; ?>
-
+                    <?php if (mysqli_num_rows($data) > 0): ?>
+                        <?php $no = $offset + 1; ?>
+                        <?php while ($row = mysqli_fetch_assoc($data)): ?>
+                            <?php $tanggal = date('F d Y', strtotime($row['tanggal'])); ?>
+                            <tr>
+                                <td><?= $no++; ?></td>
+                                <td><strong><?= htmlspecialchars($row['nama_kegiatan']); ?></strong></td>
+                                <td><span class="nominal-red">Rp <?= number_format($row['pengeluaran'], 0, ',', '.'); ?></span></td>
+                                <td><strong><?= nl2br(htmlspecialchars($row['deskripsi'])); ?></strong></td>
+                                <td><?= $tanggal; ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-report">
+                                    <i class="bi bi-folder2-open"></i>
+                                    <h5>Belum Ada Data Kegiatan</h5>
+                                    <p>Belum terdapat data kegiatan yang tersimpan dalam sistem.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
-
             </table>
-
         </div>
 
         <div class="table-footer">
-
             <div class="table-info">
-                Total Data :
-                <strong><?= mysqli_num_rows($data); ?></strong>
+                Total Data : <strong><?= $totalDataAll; ?></strong>
             </div>
-
-            <!-- <nav>
-                <ul class="pagination mb-0">
-
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="bi bi-chevron-left"></i>
-                        </span>
-                    </li>
-
-                    <li class="page-item active">
-                        <span class="page-link">1</span>
-                    </li>
-
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="bi bi-chevron-right"></i>
-                        </span>
-                    </li>
-
-                </ul>
-            </nav> -->
-
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
-
     </div>
-
 </div>
 
-<script src="../assets/js/data.js"></script>
-
-<?php require_once __DIR__ . '/../template/footer.php'; ?>
+<script src="../assets/js/script.js"></script>
+<?php require_once '../template/footer.php'; ?>

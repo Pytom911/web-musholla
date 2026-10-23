@@ -1,11 +1,30 @@
 <?php
+require_once "../auth/auth.php";
+requireRole(['admin']);
 $pageTitle = 'Data Pengguna';
 require_once '../template/header.php';
 
 $totalUser = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users"));
 $totalPetugas = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users WHERE role='petugas'"));
 $totalAdmin = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS total FROM users WHERE role='admin'"));
-$data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
+
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = $totalUser['total'] ?? 0;
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
+$data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC LIMIT $limit OFFSET $offset");
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -61,7 +80,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
         <div class="col-xl-4 col-md-6">
             <div class="stats-card">
 
-                <div class="icon icon-green">
+                <div class="icon icon-yellow">
                     <i class="bi bi-person-badge"></i>
                 </div>
 
@@ -91,11 +110,12 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
         </div>
 
     </div>
+
     <div class="data-card">
         <div class="data-toolbar">
             <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama atau username...">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari usernama ...">
             </div>
         </div>
 
@@ -103,32 +123,39 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
             <table class="table-modern" id="dataTable">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
+                        <th>No</th>
                         <th>Username</th>
                         <th>Nama</th>
-                        <th width="180">Role</th>
-                        <th width="180">Password</th>
-                        <th width="220">Aksi</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Password</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1;
+                        <?php $no = $offset + 1;
                         while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td><strong><?= htmlspecialchars($row['username']); ?></strong></td>
                                 <td><?= htmlspecialchars($row['nama']); ?></td>
-                                <td><span
-                                        class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span>
+                                <td>
+                                    <?php if (!empty($row['email'])): ?>
+                                        <?= htmlspecialchars($row['email']); ?>
+                                    <?php else: ?>
+                                        <span class="text-muted fst-italic">Belum diisi</span>
+                                    <?php endif; ?>
                                 </td>
-                                <td><?= htmlspecialchars($row['password']); ?></td>
+                                <td><span class="role-badge role-<?= htmlspecialchars($row['role']); ?>"><?= htmlspecialchars(ucfirst($row['role'])); ?></span></td>
+                                <td>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</td>
                                 <td>
                                     <div class="action-group">
                                         <a href="edit.php?id=<?= $row['id_user']; ?>" class="btn-edit">
                                             <i class="fas fa-pen"></i> Edit
                                         </a>
-                                        <a href="hapus.php?id=<?= $row['id_user']; ?>" class="btn-delete">
+                                        <a href="hapus.php?id=<?= $row['id_user']; ?>" class="btn-delete"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
                                             <i class="fas fa-trash"></i> Hapus
                                         </a>
                                     </div>
@@ -137,7 +164,7 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5">
+                            <td colspan="7">
                                 <div class="empty-data">
                                     <i class="fas fa-folder-open"></i>
                                     <h4>Belum Ada Data Pengguna</h4>
@@ -152,13 +179,14 @@ $data = mysqli_query($connect, "SELECT * FROM users ORDER BY id_user ASC");
         <div class="table-footer">
             <div class="table-info">
                 Total Data :
-                <strong><?= mysqli_num_rows($data); ?></strong>
+                <strong><?= $totalDataAll; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 
 </div>
 
-<script src="../assets/js/data.js"></script>
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

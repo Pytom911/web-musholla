@@ -190,6 +190,31 @@
 }
 
 /*==========================
+  FILTER BOX
+==========================*/
+
+.filter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-box label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filter-box select {
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+}
+
+/*==========================
   SEARCH BOX
 ==========================*/
 
@@ -224,34 +249,6 @@
     border-color:var(--primary);
     box-shadow:0 0 0 4px rgba(17,136,72,.10);
 }
-
-/*==========================
-  FILTER BULAN
-==========================*/
-
-.filter-box{
-    width:240px;
-}
-
-.filter-box select{
-    width:100%;
-    height:50px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:0 16px;
-    background:#fff;
-    color:var(--text);
-    font-size:15px;
-    outline:none;
-    cursor:pointer;
-    transition:var(--transition);
-}
-
-.filter-box select:focus{
-    border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(17,136,72,.10);
-}
-
 /*==========================
   TABLE WRAPPER
 ==========================*/
@@ -265,6 +262,61 @@
     width:100%;
     border-collapse:collapse;
     background:#fff;
+}
+
+.table-modern thead th {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-modern tbody td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-modern .action-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.table-modern .btn-edit,
+.table-modern .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 85px;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.table-modern .btn-edit {
+    background: #fbbf00;
+    color: #fff;
+}
+
+.table-modern .btn-delete {
+    background: #ef4444;
+    color: #fff;
+}
+
+.table-modern .btn-edit:hover {
+    background: #e0a800;
+    color: #fff;
+}
+
+.table-modern .btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
 }
 
 .table-modern thead th{
@@ -336,9 +388,34 @@
     color:#d97706;
 }
 
-.role-siswa{
+.JURUSAN-PPLG{
+    background:#e7f8ec;
+    color:#d16e0a;
+}
+
+.JURUSAN-TKJT{
     background:#e7f8ec;
     color:#16a34a;
+}
+
+.JURUSAN-DKV{
+    background:#e7f8ec;
+    color:#1b7ece;
+}
+
+.JURUSAN-AKL{
+    background:#e7f8ec;
+    color:#c6e117;
+}
+
+.JURUSAN-MPLB{
+    background:#e7f8ec;
+    color:#ff3bfc;
+}
+
+.JURUSAN-Pemasaran{
+    background:#e7f8ec;
+    color:#e91a1a;
 }
 
 /*==========================
@@ -535,6 +612,18 @@
 .input-group-text{
     background:#f8fafc;
     border:1px solid #dcdfe4;
+}
+
+.nominal-preview{
+    display:block;
+    margin-top:6px;
+    color:var(--text-light);
+    font-size:14px;
+}
+
+.nominal-preview span{
+    color:var(--primary);
+    font-weight:700;
 }
 
 /*==========================
