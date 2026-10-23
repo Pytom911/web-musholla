@@ -91,7 +91,24 @@ $totalJadwalHariIni = mysqli_fetch_assoc(mysqli_query($connect, "
 
 /* =========================
    DATA SESUAI FILTER
-========================= */
+========================== */
+
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalJadwal['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 
 // Saat bulan tertentu dipilih, urutkan per tanggal (ASC).
 // Saat "Semua Bulan", urutkan terbaru dahulu seperti biasa.
@@ -110,12 +127,13 @@ $stmtData = $connect->prepare(
     LEFT JOIN guru
         ON jadwal_imam.id_guru = guru.id_guru
     $whereSql
-    ORDER BY $urutanSql"
+    ORDER BY $urutanSql
+    LIMIT ? OFFSET ?"
 );
 
-if ($jenisBind !== '') {
-    $stmtData->bind_param($jenisBind, ...$nilaiBind);
-}
+$jenisBindData = $jenisBind . 'ii';
+$nilaiBindData = array_merge($nilaiBind, [$limit, $offset]);
+$stmtData->bind_param($jenisBindData, ...$nilaiBindData);
 
 $stmtData->execute();
 $data = $stmtData->get_result();
@@ -226,7 +244,7 @@ $tautanExport = url('laporan/export/export-Imam.php')
 
                     <?php if (mysqli_num_rows($data) > 0): ?>
 
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
 
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
 
@@ -302,9 +320,11 @@ $tautanExport = url('laporan/export/export-Imam.php')
             <div class="table-info">
                 Total Data :
                 <strong>
-                    <?= $totalJadwal['total'] ?? 0; ?>
+                    <?= $totalDataAll; ?>
                 </strong>
             </div>
+
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
 
         </div>
 

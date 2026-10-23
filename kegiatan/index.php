@@ -62,9 +62,27 @@ $ringkasSaldo = mysqli_fetch_assoc(mysqli_query(
 
 $saldoTersedia = (float) ($ringkasSaldo['saldo'] ?? 0);
 
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$queryCount = mysqli_query($connect, "SELECT COUNT(*) AS total FROM kegiatan $whereBulan");
+$totalDataAll = mysqli_fetch_assoc($queryCount);
+$totalHalaman = ceil(($totalDataAll['total'] ?? 0) / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
+
 $data = mysqli_query(
     $connect,
-    "SELECT * FROM kegiatan $whereBulan ORDER BY tanggal DESC, id_kegiatan DESC"
+    "SELECT * FROM kegiatan $whereBulan ORDER BY tanggal DESC, id_kegiatan DESC LIMIT $limit OFFSET $offset"
 );
 ?>
 
@@ -177,7 +195,7 @@ $data = mysqli_query(
 
         <div class="col-xl-4 col-md-4">
             <div class="stats-card">
-                <div class="icon <?= $saldoTersedia < 0 ? 'icon-red' : 'icon-green'; ?>">
+                <div class="icon icon-blue">
                     <i class="bi bi-wallet2"></i>
                 </div>
 
@@ -246,7 +264,7 @@ $data = mysqli_query(
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr data-tanggal="<?= htmlspecialchars($row['tanggal']); ?>">
                                 <td>
@@ -311,8 +329,9 @@ $data = mysqli_query(
         <div class="table-footer">
             <div class="table-info">
                 Total Data :
-                <strong><?= mysqli_num_rows($data); ?></strong>
+                <strong><?= $totalDataAll['total'] ?? 0; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 

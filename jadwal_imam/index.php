@@ -68,6 +68,23 @@ $totalBulan = mysqli_fetch_assoc(mysqli_query($connect, "
 "));
 
 // Data jadwal imam berdasarkan filter bulan
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$queryCountImam = mysqli_query($connect, "SELECT COUNT(*) AS total FROM jadwal_imam $whereBulan");
+$totalDataAll = mysqli_fetch_assoc($queryCountImam);
+$totalHalaman = (int) ceil(($totalDataAll['total'] ?? 0) / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 $data = mysqli_query($connect, "
     SELECT
         jadwal_imam.id_imam,
@@ -78,6 +95,7 @@ $data = mysqli_query($connect, "
     LEFT JOIN guru ON jadwal_imam.id_guru = guru.id_guru
     $whereBulan
     ORDER BY jadwal_imam.tanggal ASC, jadwal_imam.id_imam ASC
+    LIMIT $limit OFFSET $offset
 ");
 
 // Jadwal Imam Hari Ini
@@ -230,7 +248,7 @@ $jadwalImamBesok = mysqli_query($connect, "
                 <tbody>
                     <?php if ($data && mysqli_num_rows($data) > 0): ?>
 
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
 
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
@@ -309,94 +327,16 @@ $jadwalImamBesok = mysqli_query($connect, "
         <div class="table-footer">
             <div class="table-info">
                 Total Data:
-                <strong id="totalData"><?= $data ? mysqli_num_rows($data) : 0; ?></strong>
+                <strong id="totalData"><?= $totalDataAll['total'] ?? 0; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
 
     </div>
 
 </div>
 
-<!-- Pencarian Gabungan -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('dataTable');
-    const tbody = table.querySelector('tbody');
-    const totalData = document.getElementById('totalData');
-    const noSearchResult = document.getElementById('noSearchResult');
-
-    const rows = Array.from(tbody.querySelectorAll('tr')).filter(function (row) {
-        return !row.querySelector('.empty-data');
-    });
-
-    const totalAwal = rows.length;
-
-    rows.forEach(function (row) {
-        const cells = row.querySelectorAll('td');
-
-        // Simpan tanggal asli untuk pencarian.
-        const tanggalText = cells[3] ? cells[3].textContent.trim() : '';
-        const tanggalMatch = tanggalText.match(/^([A-Za-z]+)\s+(\d{1,2})\s+(\d{4})$/);
-
-        row.dataset.nama = cells[1]
-            ? cells[1].textContent.toLowerCase().trim()
-            : '';
-
-        row.dataset.sholat = cells[2]
-            ? cells[2].textContent.toLowerCase().trim()
-            : '';
-
-        row.dataset.tanggal = tanggalMatch ? tanggalMatch[2] : '';
-        row.dataset.bulan = tanggalMatch ? tanggalMatch[1].toLowerCase() : '';
-        row.dataset.tahun = tanggalMatch ? tanggalMatch[3] : '';
-        row.dataset.tanggalTeks = tanggalText.toLowerCase();
-    });
-
-    searchInput.addEventListener('input', function () {
-        const keyword = this.value.toLowerCase().trim();
-        const keywords = keyword.split(/\s+/).filter(Boolean);
-        let jumlahTampil = 0;
-
-        rows.forEach(function (row) {
-            const teksUmum = [
-                row.dataset.nama,
-                row.dataset.sholat,
-                row.dataset.tanggalTeks
-            ].join(' ');
-
-            const cocok = keywords.every(function (kata) {
-
-                // Angka satu atau dua digit dicocokkan sebagai tanggal.
-                if (/^\d{1,2}$/.test(kata)) {
-                    return row.dataset.tanggal === String(parseInt(kata, 10)) ||
-                        row.dataset.sholat.includes(kata) ||
-                        row.dataset.nama.includes(kata);
-                }
-
-                return teksUmum.includes(kata);
-            });
-
-            row.style.display = cocok ? '' : 'none';
-
-            if (cocok) {
-                jumlahTampil++;
-            }
-        });
-
-        totalData.textContent = keyword === '' ? totalAwal : jumlahTampil;
-
-        noSearchResult.style.display =
-            keyword !== '' && jumlahTampil === 0 ? 'block' : 'none';
-
-        const emptyRow = tbody.querySelector('.empty-data');
-
-        if (emptyRow) {
-            emptyRow.closest('tr').style.display =
-                keyword === '' ? '' : 'none';
-        }
-    });
-});
-</script>
+<!-- Pencarian -->
+<script src="../assets/js/script.js"></script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

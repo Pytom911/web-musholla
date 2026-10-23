@@ -52,6 +52,22 @@ $totalTransaksi = mysqli_fetch_assoc(mysqli_query(
     "SELECT COUNT(*) AS total FROM shodaqoh $whereBulan"
 ));
 
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalTransaksi['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 $data = mysqli_query(
     $connect,
     "SELECT 
@@ -62,7 +78,8 @@ $data = mysqli_query(
     FROM shodaqoh 
     JOIN kelas ON shodaqoh.id_kelas = kelas.id_kelas 
     $whereBulan 
-    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC"
+    ORDER BY shodaqoh.tanggal DESC, shodaqoh.id_shodaqoh DESC
+    LIMIT $limit OFFSET $offset"
 );
 ?>
 
@@ -196,7 +213,7 @@ $data = mysqli_query(
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td>
@@ -248,9 +265,10 @@ $data = mysqli_query(
             <div class="table-info">
                 Total Data : 
                 <strong>
-                    <?= $totalTransaksi['total'] ?? 0; ?>
+                    <?= $totalDataAll; ?>
                 </strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>

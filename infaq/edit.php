@@ -18,6 +18,33 @@ if (!$row) {
 
 <div class="container-fluid">
 
+    <?php if (isset($_GET['pesan'])): ?>
+        <?php
+        $peringatan = [
+            'bulan_tidak_valid' => [
+                'class' => 'alert-warning',
+                'teks' => 'Tanggal infaq harus sesuai bulan dan tahun sekarang.'
+            ],
+            'invalid' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data tidak valid. Periksa kembali tanggal dan nominal.'
+            ],
+            'gagal' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data infaq gagal diperbarui. Silakan coba kembali.'
+            ]
+        ];
+
+        $pesan = $peringatan[$_GET['pesan']] ?? null;
+        ?>
+
+        <?php if ($pesan): ?>
+            <div class="alert <?= $pesan['class']; ?>" role="alert">
+                <?= htmlspecialchars($pesan['teks'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+
     <a href="index.php" class="btn-back">
         <i class="bi bi-arrow-left"></i>
         Kembali
@@ -50,8 +77,12 @@ if (!$row) {
                         Rp
                     </span>
 
-                    <input type="number" name="nominal" class="form-control" value="<?= $row['nominal']; ?>" min="1000" required>
+                    <input type="number" name="nominal" class="form-control" value="<?= $row['nominal']; ?>" min="1000" data-nominal-input="previewNominal" required>
                 </div>
+
+                <span class="nominal-preview">
+                    Nominal: <span id="previewNominal">0</span>
+                </span>
             </div>
             <div class="form-group">
                 <label>Tanggal <span class="required">*</span></label>
@@ -82,5 +113,7 @@ if (!$row) {
     </div>
 
 </div>
+
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

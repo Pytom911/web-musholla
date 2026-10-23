@@ -146,7 +146,24 @@ $totalKelas = $stmtTotalKelas->get_result()->fetch_assoc();
 
 /* =========================
    DATA SESUAI FILTER
-========================= */
+========================== */
+
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalJadwal['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 
 // Saat bulan tertentu dipilih, urutkan per tanggal.
 // Saat "Semua Bulan", urutkan: hari ini -> mendatang -> lampau.
@@ -182,12 +199,13 @@ $stmtData = $connect->prepare(
      FROM jadwal_sholat
      LEFT JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
      $whereSql
-     ORDER BY $urutanSql"
+     ORDER BY $urutanSql
+     LIMIT ? OFFSET ?"
 );
 
-if ($jenisBind !== '') {
-    $stmtData->bind_param($jenisBind, ...$nilaiBind);
-}
+$jenisBindData = $jenisBind . 'ii';
+$nilaiBindData = array_merge($nilaiBind, [$limit, $offset]);
+$stmtData->bind_param($jenisBindData, ...$nilaiBindData);
 
 $stmtData->execute();
 $data = $stmtData->get_result();
@@ -326,7 +344,7 @@ $tautanExport = url('laporan/export/export-Jadwal.php')
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <?php
                             $tanggal = !empty($row['tanggal'])
@@ -366,11 +384,12 @@ $tautanExport = url('laporan/export/export-Jadwal.php')
         <div class="table-footer">
             <div class="table-info">
                 Total Data:
-                <strong><?= (int) ($totalJadwal['total'] ?? 0) ?></strong>
+                <strong><?= $totalDataAll ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>
 
-<script src="<?= asset('js/laporan.js') ?>"></script>
+<script src="<?= asset('js/script.js') ?>"></script>
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

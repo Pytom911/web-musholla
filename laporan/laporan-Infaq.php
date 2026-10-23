@@ -71,10 +71,27 @@ $totalTransaksi = mysqli_fetch_assoc(mysqli_query(
      FROM infaq $whereBulan"
 ));
 
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalTransaksi['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 $data = mysqli_query(
     $connect,
     "SELECT * FROM infaq $whereBulan
-     ORDER BY tanggal DESC, id_infaq DESC"
+     ORDER BY tanggal DESC, id_infaq DESC
+     LIMIT $limit OFFSET $offset"
 );
 ?>
 
@@ -193,7 +210,7 @@ $data = mysqli_query(
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
@@ -225,8 +242,9 @@ $data = mysqli_query(
 
         <div class="table-footer">
             <div class="table-info">
-                Total Data : <strong><?= $totalTransaksi['total'] ?? 0; ?></strong>
+                Total Data : <strong><?= $totalDataAll; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>

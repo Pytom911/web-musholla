@@ -8,11 +8,28 @@ $totalKelas = mysqli_fetch_assoc(
 $totalNamaKelas = mysqli_fetch_assoc(
     mysqli_query($connect, "SELECT COUNT(DISTINCT nama_kelas) AS total FROM kelas")
 );
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = (int) ($totalKelas['total'] ?? 0);
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 $data = mysqli_query(
     $connect,
     "SELECT id_kelas, nama_kelas, tingkat, bagian
      FROM kelas
-     ORDER BY FIELD(tingkat, 'X', 'XI', 'XII'), nama_kelas ASC, id_kelas ASC"
+     ORDER BY FIELD(tingkat, 'X', 'XI', 'XII'), nama_kelas ASC, id_kelas ASC
+     LIMIT $limit OFFSET $offset"
 );
 $dataCount = mysqli_num_rows($data);
 $canManage = $isPetugas || $isAdmin;
@@ -97,7 +114,7 @@ $canManage = $isPetugas || $isAdmin;
                 </thead>
                 <tbody>
                     <?php if ($dataCount > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <?php
                             $badgeClass = preg_replace(
@@ -153,8 +170,9 @@ $canManage = $isPetugas || $isAdmin;
         <div class="table-footer">
             <div class="table-info">
                 Total Data:
-                <strong><?= $dataCount ?></strong>
+                <strong><?= $totalDataAll ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>

@@ -4,9 +4,27 @@ require_once '../template/header.php';
 $totalGuru = mysqli_fetch_assoc(mysqli_query($connect, "
     SELECT COUNT(*) AS total FROM guru
 "));
+
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$totalDataAll = $totalGuru['total'] ?? 0;
+$totalHalaman = (int) ceil($totalDataAll / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
 $data = mysqli_query($connect, "
     SELECT * FROM guru
     ORDER BY nip ASC
+    LIMIT $limit OFFSET $offset
 ");
 ?>
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -70,7 +88,7 @@ $data = mysqli_query($connect, "
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
-                        <?php $no = 1; ?>
+                        <?php $no = $offset + 1; ?>
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
                             <tr>
                                 <td><?= $no++; ?></td>
@@ -110,8 +128,9 @@ $data = mysqli_query($connect, "
         </div>
         <div class="table-footer">
             <div class="table-info">
-                Total Data : <strong><?= mysqli_num_rows($data); ?></strong>
+                Total Data : <strong><?= $totalDataAll; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>

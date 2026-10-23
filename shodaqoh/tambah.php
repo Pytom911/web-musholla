@@ -119,8 +119,12 @@ $kelas = mysqli_query(
                     <span class="input-group-text">
                         Rp
                     </span>
-                    <input type="number" name="nominal" class="form-control" placeholder="Masukkan nominal shodaqoh" min="1000" required>
+                    <input type="number" name="nominal" class="form-control" placeholder="Masukkan nominal shodaqoh" min="1000" data-nominal-input="previewNominal" required>
                 </div>
+
+                <span class="nominal-preview">
+                    Nominal: <span id="previewNominal">0</span>
+                </span>
             </div>
 
             <div class="form-footer">
@@ -136,5 +140,7 @@ $kelas = mysqli_query(
         </form>
     </div>
 </div>
+
+<script src="../assets/js/script.js"></script>
 
 <?php require_once '../template/footer.php'; ?>

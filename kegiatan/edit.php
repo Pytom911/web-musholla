@@ -57,6 +57,10 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
                 'class' => 'alert-danger',
                 'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
             ],
+            'saldo_tidak_cukup' => [
+                'class' => 'alert-danger',
+                'teks' => 'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.'
+            ],
             'gagal' => [
                 'class' => 'alert-danger',
                 'teks' => 'Data kegiatan gagal diperbarui. Silakan coba kembali.'
@@ -106,8 +110,12 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
 
-                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" required>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" data-nominal-input="previewPengeluaran" required>
                 </div>
+
+                <span class="nominal-preview">
+                    Nominal: <span id="previewPengeluaran">0</span>
+                </span>
 
                 <small class="<?= $saldoTersedia < 0 ? 'text-danger' : 'text-muted'; ?>">
                     Saldo kas bulan ini untuk kegiatan ini:
@@ -164,18 +172,28 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
 
 </div>
 
+<script src="../assets/js/script.js"></script>
 <script>
 (function () {
-    // Kunci tombol hanya saat update.php akan menolak: saldo minus dan pengeluaran naik.
+    // Sama dengan update.php: blokir hanya saat saldo minus dan pengeluaran naik.
     // Menurunkan pengeluaran tetap diizinkan agar saldo minus bisa diperbaiki.
     const saldoTersedia = <?= json_encode($saldoTersedia); ?>;
     const pengeluaranLama = <?= json_encode($pengeluaranLama); ?>;
     const inputPengeluaran = document.getElementById('inputPengeluaran');
-    const tombolSimpan = document.getElementById('tombolSimpan');
     const peringatan = document.getElementById('peringatanSaldo');
     const teksPeringatan = document.getElementById('teksPeringatanSaldo');
 
     const formatRupiah = (nilai) => new Intl.NumberFormat('id-ID').format(nilai);
+
+    function melebihiSaldo() {
+        const nominal = Number(inputPengeluaran.value);
+
+        return (
+            inputPengeluaran.value !== '' &&
+            nominal > saldoTersedia &&
+            nominal > pengeluaranLama
+        );
+    }
 
     function periksaSaldo() {
         const nominal = Number(inputPengeluaran.value);
@@ -189,7 +207,6 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
             peringatan.classList.remove('alert-warning');
             peringatan.classList.add('alert-danger');
             peringatan.hidden = false;
-            tombolSimpan.disabled = true;
         } else if (melebihi) {
             teksPeringatan.textContent =
                 'Pengeluaran masih melebihi saldo tersedia (Rp' +
@@ -198,19 +215,24 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
             peringatan.classList.remove('alert-danger');
             peringatan.classList.add('alert-warning');
             peringatan.hidden = false;
-            tombolSimpan.disabled = false;
         } else {
             peringatan.hidden = true;
-            tombolSimpan.disabled = false;
         }
     }
 
     inputPengeluaran.addEventListener('input', periksaSaldo);
 
-    tombolSimpan.form.addEventListener('submit', function (event) {
-        periksaSaldo();
-        if (tombolSimpan.disabled) {
+    inputPengeluaran.form.addEventListener('submit', function (event) {
+        if (melebihiSaldo()) {
             event.preventDefault();
+
+            teksPeringatan.textContent =
+                'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.';
+            peringatan.classList.remove('alert-warning');
+            peringatan.classList.add('alert-danger');
+            peringatan.hidden = false;
+            peringatan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            inputPengeluaran.focus();
         }
     });
 

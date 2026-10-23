@@ -37,23 +37,41 @@ if ($bulanDipilih >= 1 && $bulanDipilih <= 12) {
 }
 
 $totalBulan = mysqli_fetch_assoc(mysqli_query(
-    $connect, 
-    "SELECT SUM(nominal) AS total FROM infaq $whereBulan"
+    $connect,
+    "SELECT COALESCE(SUM(nominal), 0) AS total FROM infaq $whereBulan"
 ));
 
 $totalDonatur = mysqli_fetch_assoc(mysqli_query(
-    $connect, 
+    $connect,
     "SELECT COUNT(DISTINCT nama_donatur) AS total FROM infaq"
 ));
 
 $totalTransaksi = mysqli_fetch_assoc(mysqli_query(
-    $connect, 
+    $connect,
     "SELECT COUNT(*) AS total FROM infaq"
 ));
 
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$queryCount = mysqli_query($connect, "SELECT COUNT(*) AS total FROM infaq $whereBulan");
+$totalDataAll = mysqli_fetch_assoc($queryCount);
+$totalHalaman = ceil(($totalDataAll['total'] ?? 0) / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
+
 $data = mysqli_query(
-    $connect, 
-    "SELECT * FROM infaq $whereBulan ORDER BY tanggal DESC, id_infaq DESC"
+    $connect,
+    "SELECT * FROM infaq $whereBulan ORDER BY tanggal DESC, id_infaq DESC LIMIT $limit OFFSET $offset"
 );
 ?>
 
@@ -194,7 +212,7 @@ $data = mysqli_query(
                 <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
                         <?php 
-                        $no = 1;
+                        $no = $offset + 1;
                         while ($row = mysqli_fetch_assoc($data)): 
                         ?>
                             <tr data-tanggal="<?= $row['tanggal']; ?>">
@@ -209,7 +227,7 @@ $data = mysqli_query(
                                                 <i class="fas fa-pen"></i> Edit
                                             </a>
                                             <a href="hapus.php?id=<?= $row['id_infaq']; ?>" class="btn-delete"
-                                               onclick="return confirm('Apakah Anda yakin ingin menghapus data infaq ini?')">
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus data infaq ini?')">
                                                 <i class="fas fa-trash"></i> Hapus
                                             </a>
                                         </div>
@@ -235,8 +253,9 @@ $data = mysqli_query(
         <div class="table-footer">
             <div class="table-info">
                 Total Data :
-                <strong><?= mysqli_num_rows($data); ?></strong>
+                <strong><?= $totalDataAll['total'] ?? 0; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 

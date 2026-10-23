@@ -39,6 +39,10 @@ $saldoTersedia = $querySaldo
                     'class' => 'alert-danger',
                     'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
                 ],
+                'saldo_tidak_cukup' => [
+                    'class' => 'alert-danger',
+                    'teks' => 'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.'
+                ],
                 'gagal' => [
                     'class' => 'alert-danger',
                     'teks' => 'Data kegiatan gagal disimpan. Silakan coba kembali.'
@@ -54,21 +58,6 @@ $saldoTersedia = $querySaldo
             </div>
         <?php endif; ?>
     <?php endif; ?>
-    <div class="breadcrumb-wrapper">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="<?= url() ?>">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="<?= url('kegiatan/index.php') ?>">Kegiatan</a>
-                </li>
-                <li class="breadcrumb-item active">
-                    Tambah Kegiatan
-                </li>
-            </ol>
-        </nav>
-    </div>
 
     <a href="<?= url('kegiatan/index.php') ?>" class="btn-back">
         <i class="bi bi-arrow-left"></i>
@@ -99,11 +88,14 @@ $saldoTersedia = $querySaldo
             <div class="form-group">
                 <label>Pengeluaran<span class="required">*</span></label>
                 <div class="input-group">
-                    <span class="input-group-text">
+                    <spa    n class="input-group-text">
                         Rp
-                    </span>
-                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" required>
+                    </spa>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" data-nominal-input="previewPengeluaran" required>
                 </div>
+                <span class="nominal-preview">
+                    Nominal: <span id="previewPengeluaran">0</span>
+                </span>
                 <small class="<?= $saldoTersedia < 0 ? 'text-danger' : 'text-muted'; ?>">
                     Saldo kas bulan ini:
                     <strong>Rp<?= number_format($saldoTersedia, 0, ',', '.'); ?></strong>
@@ -153,39 +145,47 @@ $saldoTersedia = $querySaldo
 
 </div>
 
+<script src="../assets/js/script.js"></script>
 <script>
 (function () {
-    // Kunci tombol saat nominal melebihi saldo; sama dengan blokir di simpan.php.
+    // Tampilkan peringatan saat nominal melebihi saldo; simpan tetap diblokir di simpan.php.
     const saldoTersedia = <?= json_encode($saldoTersedia); ?>;
     const inputPengeluaran = document.getElementById('inputPengeluaran');
-    const tombolSimpan = document.getElementById('tombolSimpan');
     const peringatan = document.getElementById('peringatanSaldo');
     const teksPeringatan = document.getElementById('teksPeringatanSaldo');
 
     const formatRupiah = (nilai) => new Intl.NumberFormat('id-ID').format(nilai);
 
-    function periksaSaldo() {
+    function melebihiSaldo() {
         const nominal = Number(inputPengeluaran.value);
-        const melebihi = inputPengeluaran.value !== '' && nominal > saldoTersedia;
 
-        if (melebihi) {
+        return inputPengeluaran.value !== '' && nominal > saldoTersedia;
+    }
+
+    function periksaSaldo() {
+        if (melebihiSaldo()) {
+            const nominal = Number(inputPengeluaran.value);
+
             teksPeringatan.textContent =
                 'Pengeluaran melebihi saldo tersedia — kurangi minimal Rp' +
                 formatRupiah(nominal - saldoTersedia) + '.';
             peringatan.hidden = false;
-            tombolSimpan.disabled = true;
         } else {
             peringatan.hidden = true;
-            tombolSimpan.disabled = false;
         }
     }
 
     inputPengeluaran.addEventListener('input', periksaSaldo);
 
-    tombolSimpan.form.addEventListener('submit', function (event) {
-        periksaSaldo();
-        if (tombolSimpan.disabled) {
+    inputPengeluaran.form.addEventListener('submit', function (event) {
+        if (melebihiSaldo()) {
             event.preventDefault();
+
+            teksPeringatan.textContent =
+                'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.';
+            peringatan.hidden = false;
+            peringatan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            inputPengeluaran.focus();
         }
     });
 

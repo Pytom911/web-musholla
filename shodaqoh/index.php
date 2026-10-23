@@ -53,6 +53,24 @@ $totalKelas = mysqli_fetch_assoc(
     "SELECT COUNT(DISTINCT id_kelas) AS total FROM shodaqoh $whereBulan"
 ));
 
+$limit = 10;
+$page = isset($_GET['halaman']) ? (int) $_GET['halaman'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$queryCount = mysqli_query($connect, "SELECT COUNT(*) AS total FROM shodaqoh $whereBulan");
+$totalDataAll = mysqli_fetch_assoc($queryCount);
+$totalHalaman = ceil(($totalDataAll['total'] ?? 0) / $limit);
+if ($totalHalaman < 1) {
+    $totalHalaman = 1;
+}
+if ($page > $totalHalaman) {
+    $page = $totalHalaman;
+}
+
+$offset = ($page - 1) * $limit;
+
 $data = mysqli_query(
     $connect,
     "SELECT shodaqoh.*, kelas.nama_kelas, kelas.tingkat, kelas.bagian
@@ -75,7 +93,8 @@ $data = mysqli_query(
         WHEN shodaqoh.tanggal < CURDATE() THEN shodaqoh.tanggal
         ELSE NULL
     END DESC,
-    shodaqoh.id_shodaqoh DESC"
+    shodaqoh.id_shodaqoh DESC
+    LIMIT $limit OFFSET $offset"
 );
 
 $dataCount = mysqli_num_rows($data);
@@ -231,7 +250,7 @@ $dataCount = mysqli_num_rows($data);
                 <tbody>
                     <?php if ($dataCount > 0): ?>
                         <?php 
-                        $no = 1; 
+                        $no = $offset + 1;
                         while ($row = mysqli_fetch_assoc($data)): 
                         ?>
                             <tr>
@@ -304,8 +323,9 @@ $dataCount = mysqli_num_rows($data);
         <div class="table-footer">
             <div class="table-info">
                 Total Data :
-                <strong><?= $dataCount; ?></strong>
+                <strong><?= $totalDataAll['total'] ?? 0; ?></strong>
             </div>
+            <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
     </div>
 </div>
