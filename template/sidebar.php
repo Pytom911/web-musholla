@@ -52,7 +52,7 @@ $currentFile = basename($_SERVER['PHP_SELF']);
                     <i class="bi bi-mortarboard-fill"></i>
                     <span>Data Kelas</span>
                 </div>
-            </a>
+            </a>  
         <?php endif; ?>
         <div class="brand-divider">
             <span></span>

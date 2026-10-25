@@ -213,7 +213,7 @@ $data = mysqli_query(
                     <?php if (mysqli_num_rows($data) > 0): ?>
                         <?php 
                         $no = $offset + 1;
-                        while ($row = mysqli_fetch_assoc($data)): 
+                        while ($row = mysqli_fetch_assoc($data)):   
                         ?>
                             <tr data-tanggal="<?= $row['tanggal']; ?>">
                                 <td><?= $no++; ?></td>

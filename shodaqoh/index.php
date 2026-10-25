@@ -237,7 +237,7 @@ $dataCount = mysqli_num_rows($data);
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama Kelas</th>
+                        <th>Nama Jurusan</th>
                         <th>Tingkat</th>
                         <th>Bagian</th>
                         <th>Nominal</th>
@@ -252,15 +252,21 @@ $dataCount = mysqli_num_rows($data);
                         <?php 
                         $no = $offset + 1;
                         while ($row = mysqli_fetch_assoc($data)): 
+                            $badgeClassSh = preg_replace(
+                                '/[^a-zA-Z0-9_-]/',
+                                '-',
+                                (string) $row['nama_kelas']
+                            );
+                            $badgeClassSh = $badgeClassSh !== '' ? $badgeClassSh : 'kelas';
                         ?>
                             <tr>
                                 <td>
                                     <?= $no++; ?>
                                 </td>
                                 <td>
-                                    <strong>
-                                        <?= htmlspecialchars($row['nama_kelas']); ?>
-                                    </strong>
+                                    <span class="role-badge JURUSAN-<?= htmlspecialchars($badgeClassSh, ENT_QUOTES, 'UTF-8') ?>">
+                                        <?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?>
+                                    </span>
                                 </td>
                                 <td>
                                     <?= htmlspecialchars($row['tingkat']); ?>

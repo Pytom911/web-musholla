@@ -65,7 +65,7 @@ if (!$row) {
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                    <input type="text" name="nama_donatur" maxlength="50"  class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
                 </div>
             </div>
 

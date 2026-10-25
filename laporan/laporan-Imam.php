@@ -318,7 +318,7 @@ $tautanExport = url('laporan/export/export-Imam.php')
         <div class="table-footer">
 
             <div class="table-info">
-                Total Data :
+                Menampilkan <strong><?= mysqli_num_rows($data); ?></strong> data dari <strong><?= $totalDataAll; ?></strong> data
                 <strong>
                     <?= $totalDataAll; ?>
                 </strong>
