@@ -94,27 +94,27 @@ load_env(ROOT_PATH . '/.env');
 
 define(
     'DB_HOST',
-    getenv('DB_HOST') ?: 'localhost'
+    getenv('DB_HOST') ?: 'host'
 );
 
 define(
     'DB_PORT',
-    (int) (getenv('DB_PORT') ?: 3306)
+    (int) (getenv('DB_PORT') ?: 0000)
 );
 
 define(
     'DB_USER',
-    getenv('DB_USER') ?: 'root'
+    getenv('DB_USER') ?: 'user'
 );
 
 define(
     'DB_PASS',
-    getenv('DB_PASS') ?: ''
+    getenv('DB_PASS') ?: 'pass'
 );
 
 define(
     'DB_NAME',
-    getenv('DB_NAME') ?: 'db_musholla'
+    getenv('DB_NAME') ?: 'name'
 );
 
 
