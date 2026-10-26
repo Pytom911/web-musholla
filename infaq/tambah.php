@@ -54,7 +54,7 @@ requireRole(['admin','petugas']);
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control" placeholder="Masukkan nama donatur" required>
+                    <input type="text" name="nama_donatur" class="form-control" maxlength="50" placeholder="Masukkan nama donatur" required>
                 </div>
             </div>
 

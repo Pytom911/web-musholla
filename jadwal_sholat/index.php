@@ -307,7 +307,7 @@ $canManage = $isPetugas || $isAdmin;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Jurusan</th>
+                        <th>Nama Jurusan</th>
                         <th>Tingkat</th>
                         <th>Bagian</th>
                         <th>Hari</th>
@@ -332,10 +332,21 @@ $canManage = $isPetugas || $isAdmin;
                             $hari = $timestampTanggal
                                 ? hari_indonesia($row['tanggal'])
                                 : '-';
+
+                            $badgeClassJs = preg_replace(
+                                '/[^a-zA-Z0-9_-]/',
+                                '-',
+                                (string) $row['nama_kelas']
+                            );
+                            $badgeClassJs = $badgeClassJs !== '' ? $badgeClassJs : 'kelas';
                             ?>
                                 <tr>
                                 <td><?= $no++ ?></td>
-                                <td><strong><?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?></strong></td>
+                                <td>
+                                    <span class="role-badge JURUSAN-<?= htmlspecialchars($badgeClassJs, ENT_QUOTES, 'UTF-8') ?>">
+                                        <?= htmlspecialchars((string) $row['nama_kelas'], ENT_QUOTES, 'UTF-8') ?>
+                                    </span>
+                                </td>
                                 <td><?= htmlspecialchars((string) $row['tingkat'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <?= $row['bagian'] !== null && $row['bagian'] !== ''

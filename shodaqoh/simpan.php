@@ -33,6 +33,11 @@ if (!$validTanggal) {
     exit;
 }
 
+if ($formatTanggal->format('N') !== '5') {
+    header('Location: tambah.php?pesan=bukan_jumat');
+    exit;
+}
+
 if ($formatTanggal->format('Y-m') !== date('Y-m')) {
     header('Location: tambah.php?pesan=bulan_tidak_valid');
     exit;

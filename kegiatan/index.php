@@ -280,10 +280,10 @@ $data = mysqli_query(
                                         Rp <?= number_format($row['pengeluaran'], 0, ',', '.'); ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <strong>
+                                <td class="deskripsi-cell">
+                                    <div class="deskripsi-text">
                                         <?= nl2br(htmlspecialchars($row['deskripsi'])); ?>
-                                    </strong>
+                                    </div>
                                 </td>
                                 <td>
                                     <?= date('F d Y', strtotime($row['tanggal'])); ?>

@@ -148,7 +148,7 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
                         <i class="bi bi-card-text"></i>
                     </span>
 
-                    <textarea name="deskripsi" class="form-control" rows="4" placeholder="Masukkan deskripsi kegiatan" required><?= htmlspecialchars($row['deskripsi']); ?></textarea>
+                    <textarea name="deskripsi" class="form-control" rows="4" maxlength="150" placeholder="Masukkan deskripsi kegiatan" required><?= htmlspecialchars($row['deskripsi']); ?></textarea>
                 </div>
             </div>
 

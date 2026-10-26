@@ -316,16 +316,10 @@ $tautanExport = url('laporan/export/export-Imam.php')
         </div>
 
         <div class="table-footer">
-
             <div class="table-info">
-                Total Data :
-                <strong>
-                    <?= $totalDataAll; ?>
-                </strong>
+                Total Data :<strong><?= $totalDataAll; ?></strong>
             </div>
-
             <?php require __DIR__ . '/../template/pagination.php'; ?>
-
         </div>
 
     </div>

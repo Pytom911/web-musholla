@@ -65,7 +65,7 @@ if (!$row) {
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                    <input type="text" name="nama_donatur" class="form-control"  maxlength="50" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
                 </div>
             </div>
 
@@ -92,7 +92,7 @@ if (!$row) {
                         <i class="bi bi-calendar-event"></i>
                     </span>
 
-                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required>
+                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" readonly>
                 </div>
             </div>
 

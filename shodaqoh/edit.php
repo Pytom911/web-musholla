@@ -79,7 +79,7 @@ $kelas = mysqli_query(
                     <span class="input-group-text">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" required>
+                    <input type="date" name="tanggal" class="form-control" value="<?= $row['tanggal']; ?>" readonly>
                 </div>
             </div>
 

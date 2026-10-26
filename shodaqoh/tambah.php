@@ -32,6 +32,10 @@ $kelas = mysqli_query(
                     'class' => 'alert-warning',
                     'teks' => 'Tanggal shodaqoh harus sesuai bulan dan tahun sekarang.'
                 ],
+                'bukan_jumat' => [
+                    'class' => 'alert-warning',
+                    'teks' => 'Data shodaqoh hanya dapat ditambahkan pada hari Jumat.'
+                ],
                 'invalid' => [
                     'class' => 'alert-danger',
                     'teks' => 'Data tidak valid. Periksa kembali tanggal, kelas, dan nominal.'
@@ -67,7 +71,7 @@ $kelas = mysqli_query(
                     <span class="input-group-text">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-                    <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d'); ?>" required>
+                    <input type="date" name="tanggal" id="tanggalShodaqoh" class="form-control" value="<?= date('Y-m-d'); ?>" required>
                 </div>
             </div>
 
@@ -142,5 +146,31 @@ $kelas = mysqli_query(
 </div>
 
 <script src="../assets/js/script.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tanggal = document.getElementById("tanggalShodaqoh");
+
+    if (!tanggal) return;
+
+    const periksaHariJumat = function () {
+        const nilai = tanggal.value;
+
+        if (!nilai) {
+            tanggal.setCustomValidity("");
+            return;
+        }
+
+        const hari = new Date(nilai + "T00:00:00").getDay();
+
+        tanggal.setCustomValidity(
+            hari === 5 ? "" : "Data shodaqoh hanya dapat ditambahkan pada hari Jumat."
+        );
+    };
+
+    tanggal.addEventListener("input", periksaHariJumat);
+    tanggal.addEventListener("change", periksaHariJumat);
+    periksaHariJumat();
+});
+</script>
 
 <?php require_once '../template/footer.php'; ?>

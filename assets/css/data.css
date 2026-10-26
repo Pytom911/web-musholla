@@ -341,6 +341,31 @@
     background:#f9fbfd;
 }
 
+/* Memastikan tabel tidak melebar karena teks panjang */
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Kolom deskripsi kegiatan */
+.table-modern td.deskripsi-cell {
+    width: 30%;
+    white-space: normal;
+    vertical-align: middle;
+}
+
+/* Bungkus teks panjang tanpa membuat tabel melebar */
+.table-modern .deskripsi-text {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-height: 1.6;
+}
+
 /*==========================
   NOMINAL
 ==========================*/
