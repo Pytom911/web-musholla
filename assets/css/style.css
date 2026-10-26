@@ -1260,6 +1260,10 @@ svg {
     background-color: #2563EB;
 }
 
+.schedule-icon.orange {
+    background-color: #F59E0B;
+}
+
 
 /* ==============================================================
    CARD HEADING
@@ -1448,6 +1452,18 @@ svg {
     color: #2563EB;
 }
 
+.schedule-item-icon.orange {
+    background-color: #FEF3C7;
+
+    color: #D97706;
+}
+
+.schedule-item-icon.red {
+    background-color: #FEE2E2;
+
+    color: #DC2626;
+}
+
 
 /* ==============================================================
    ITEM CONTENT
@@ -1550,6 +1566,104 @@ svg {
     font-size: 0.68rem;
 
     line-height: 1.5;
+}
+
+
+/* ==============================================================
+   KEGIATAN TERBARU (AKTIVITAS GABUNGAN)
+============================================================== */
+
+.schedule-card-aktivitas {
+    grid-column: 1 / -1;
+}
+
+.activity-more {
+    margin-left: auto;
+
+    white-space: nowrap;
+}
+
+.activity-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px 16px;
+}
+
+.activity-item {
+    text-decoration: none;
+
+    color: inherit;
+
+    transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+    background-color: #F1F5F9;
+}
+
+.activity-meta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.activity-meta span {
+    margin-bottom: 0;
+
+    font-size: 0.65rem;
+}
+
+.activity-meta .activity-badge {
+    padding: 1px 7px;
+
+    border-radius: 999px;
+
+    font-size: 0.6rem;
+
+    font-weight: 700;
+
+    line-height: 1.5;
+}
+
+.activity-badge.infaq {
+    background-color: #DCFCE7;
+
+    color: #15803D;
+}
+
+.activity-badge.shodaqoh {
+    background-color: #DBEAFE;
+
+    color: #1D4ED8;
+}
+
+.activity-badge.kegiatan {
+    background-color: #FEE2E2;
+
+    color: #B91C1C;
+}
+
+.activity-nominal {
+    flex-shrink: 0;
+
+    font-size: 0.8rem;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.activity-nominal.masuk {
+    color: #16A34A;
+}
+
+.activity-nominal.keluar {
+    color: #DC2626;
 }
 
 
@@ -1753,6 +1867,10 @@ svg {
     }
 
     .schedule-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-list {
         grid-template-columns: 1fr;
     }
 

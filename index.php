@@ -38,6 +38,61 @@
     $tanggalHariIni = date('Y-m-d');
 
     /* =========================
+    AKTIVITAS TERBARU (GABUNGAN)
+    ========================= */
+
+    $batasAktivitas = 8;
+
+    $stmtAktivitasTerbaru = $connect->prepare(
+        "SELECT 'infaq' AS jenis, i.id_infaq AS id, i.tanggal,
+                i.nama_donatur AS judul, i.nominal AS nominal,
+                NULL AS keterangan
+        FROM infaq i
+        UNION ALL
+        SELECT 'shodaqoh', s.id_shodaqoh, s.tanggal,
+                CONCAT('Shodaqoh Jumat ', k.tingkat, ' ', k.nama_kelas, ' ', k.bagian),
+                s.nominal, NULL
+        FROM shodaqoh s
+        LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+        UNION ALL
+        SELECT 'kegiatan', g.id_kegiatan, g.tanggal,
+                g.nama_kegiatan, g.pengeluaran, g.deskripsi
+        FROM kegiatan g
+        ORDER BY tanggal DESC, id DESC
+        LIMIT ?"
+    );
+    $stmtAktivitasTerbaru->bind_param('i', $batasAktivitas);
+    $stmtAktivitasTerbaru->execute();
+
+    $aktivitasTerbaru = $stmtAktivitasTerbaru
+        ->get_result()
+        ->fetch_all(MYSQLI_ASSOC);
+
+    $jenisAktivitas = [
+        'infaq' => [
+            'label' => 'Infaq',
+            'icon' => 'bi-box2-heart',
+            'warna' => 'green',
+            'tanda' => '+',
+            'kelas' => 'masuk'
+        ],
+        'shodaqoh' => [
+            'label' => 'Shodaqoh',
+            'icon' => 'bi-coin',
+            'warna' => 'blue',
+            'tanda' => '+',
+            'kelas' => 'masuk'
+        ],
+        'kegiatan' => [
+            'label' => 'Pengeluaran',
+            'icon' => 'bi-cash-stack',
+            'warna' => 'red',
+            'tanda' => '-',
+            'kelas' => 'keluar'
+        ]
+    ];
+
+    /* =========================
     JADWAL IMAM HARI INI
     ========================= */
 
@@ -830,6 +885,103 @@
 
                         <span>
                             Belum ada jadwal imam berikutnya.
+                        </span>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <!-- =====================================================
+                5. KEGIATAN TERBARU (INFAQ, SHODAQOH, PENGELUARAN)
+            ====================================================== -->
+            <div class="schedule-card schedule-card-aktivitas">
+
+                <div class="schedule-card-header">
+
+                    <div class="schedule-icon orange">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <div class="schedule-card-heading">
+                        <span>Riwayat Keuangan</span>
+                        <h5>Kegiatan Terbaru</h5>
+                    </div>
+
+                </div>
+
+
+                <?php if (count($aktivitasTerbaru) > 0): ?>
+
+                    <div class="schedule-list activity-list">
+
+                        <?php foreach ($aktivitasTerbaru as $aktivitas): ?>
+
+                            <?php
+                            $metaAktivitas = $jenisAktivitas[$aktivitas['jenis']] ?? [
+                                'label' => ucfirst((string) $aktivitas['jenis']),
+                                'icon' => 'bi-dot',
+                                'warna' => 'green',
+                                'tanda' => '',
+                                'kelas' => 'masuk'
+                            ];
+
+                            $judulAktivitas = $aktivitas['jenis'] === 'kegiatan'
+                                ? mb_strimwidth((string) $aktivitas['judul'], 0, 42, '…')
+                                : (string) $aktivitas['judul'];
+                            ?>
+
+                            <a href="<?= url($aktivitas['jenis'] . '/index.php') ?>" class="schedule-item activity-item">
+
+                                <div class="schedule-item-icon <?= $metaAktivitas['warna'] ?>">
+                                    <i class="bi <?= $metaAktivitas['icon'] ?>"></i>
+                                </div>
+
+                                <div class="schedule-item-content">
+
+                                    <div class="activity-meta">
+
+                                        <span class="activity-badge <?= $aktivitas['jenis'] ?>">
+                                            <?= htmlspecialchars($metaAktivitas['label']) ?>
+                                        </span>
+
+                                        <span class="activity-date">
+                                            <?= htmlspecialchars(hari_indonesia($aktivitas['tanggal'])) ?>,
+                                            <?= htmlspecialchars(date('d/m/Y', strtotime($aktivitas['tanggal']))) ?>
+                                        </span>
+
+                                    </div>
+
+                                    <strong><?= htmlspecialchars($judulAktivitas) ?></strong>
+
+                                </div>
+
+                                <span class="activity-nominal <?= $metaAktivitas['kelas'] ?>">
+                                    <?= htmlspecialchars($metaAktivitas['tanda']) ?>Rp<?= number_format((float) $aktivitas['nominal'], 0, ',', '.') ?>
+                                </span>
+
+                            </a>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="schedule-empty">
+
+                        <div class="schedule-empty-icon">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+
+                        <strong>
+                            Belum ada aktivitas
+                        </strong>
+
+                        <span>
+                            Belum ada data infaq, shodaqoh, maupun pengeluaran kegiatan.
                         </span>
 
                     </div>
