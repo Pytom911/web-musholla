@@ -26,28 +26,28 @@ $saldoTersedia = $querySaldo
 <div class="container-fluid">
     <?php if (isset($_GET['pesan'])): ?>
         <?php
-            $peringatan = [
-                'duplikat' => [
-                    'class' => 'alert-warning',
-                    'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
-                ],
-                'bulan_tidak_valid' => [
-                    'class' => 'alert-warning',
-                    'teks' => 'Tanggal kegiatan harus sesuai bulan dan tahun sekarang.'
-                ],
-                'invalid' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
-                ],
-                'saldo_tidak_cukup' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.'
-                ],
-                'gagal' => [
-                    'class' => 'alert-danger',
-                    'teks' => 'Data kegiatan gagal disimpan. Silakan coba kembali.'
-                ]
-            ];
+        $peringatan = [
+            'duplikat' => [
+                'class' => 'alert-warning',
+                'teks' => 'Kegiatan dengan nama, nominal pengeluaran, dan tanggal tersebut sudah tersedia.'
+            ],
+            'bulan_tidak_valid' => [
+                'class' => 'alert-warning',
+                'teks' => 'Tanggal kegiatan harus sesuai bulan dan tahun sekarang.'
+            ],
+            'invalid' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data kegiatan tidak valid. Periksa kembali nama, deskripsi, pengeluaran, dan tanggal.'
+            ],
+            'saldo_tidak_cukup' => [
+                'class' => 'alert-danger',
+                'teks' => 'Pengeluaran lebih besar dari saldo saat ini. Harap isi ulang nominal pengeluaran.'
+            ],
+            'gagal' => [
+                'class' => 'alert-danger',
+                'teks' => 'Data kegiatan gagal disimpan. Silakan coba kembali.'
+            ]
+        ];
 
             $pesan = $peringatan[$_GET['pesan']] ?? null;
             ?>
@@ -86,12 +86,12 @@ $saldoTersedia = $querySaldo
             </div>
 
             <div class="form-group">
-                <label>Pengeluaran<span class="required">*</span></label>
+                <label>Pengeluaran</label>
                 <div class="input-group">
-                    <spa    n class="input-group-text">
+                    <span class="input-group-text">
                         Rp
-                    </spa>
-                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" min="0" data-nominal-input="previewPengeluaran" required>
+                    </span>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" placeholder="Masukkan nominal pengeluaran" data-nominal-input="previewPengeluaran" value="0">
                 </div>
                 <span class="nominal-preview">
                     Nominal: <span id="previewPengeluaran">0</span>

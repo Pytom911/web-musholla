@@ -7,7 +7,7 @@ if (isset($_GET['id'])) {
 
     $id = (int)$_GET['id'];
 
-    $query = mysqli_query($connect, "DELETE FROM infaq WHERE id_infaq='$id'");
+    $query = $connect->query("DELETE FROM infaq WHERE id_infaq='$id'");
 
     if ($query) {
         header('Location: index.php?pesan=hapus');

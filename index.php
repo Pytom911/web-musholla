@@ -34,6 +34,16 @@ $qTotalPengeluaran = $connect->query(
 
 $totalPengeluaran = (float) $qTotalPengeluaran->fetch_assoc()['total'];
 
+$qTotalPemasukanKegiatan = $connect->query(
+    "SELECT COALESCE(SUM(i.nominal), 0) AS total
+     FROM infaq i
+     JOIN kegiatan k ON k.id_kegiatan = i.id_kegiatan
+     WHERE MONTH(k.tanggal) = MONTH(CURDATE())
+       AND YEAR(k.tanggal) = YEAR(CURDATE())"
+);
+
+$totalPemasukanKegiatan = (float) ($qTotalPemasukanKegiatan ? $qTotalPemasukanKegiatan->fetch_assoc()['total'] : 0);
+
 $saldoKeuangan = $totalInfaq + $totalshodaqoh - $totalPengeluaran;
 $tanggalHariIni = date('Y-m-d');
 
@@ -286,7 +296,7 @@ $waktuAshar = '14:50 - 15:10';
 
 <!-- Keuangan -->
 <div class="row g-3 mt-1">
-    <div class="col-12 col-sm-6 col-xl-6">
+    <div class="col-12 col-sm-6 col-xl-4">
         <div class="stat-card">
             <div>
                 <div class="stat-header">
@@ -305,7 +315,26 @@ $waktuAshar = '14:50 - 15:10';
         </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-xl-6">
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="bi bi-arrow-down-left-circle"></i>
+                    </div>
+                    <h3 class="stat-title">Pemasukan</h3>
+                </div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalPemasukanKegiatan, 0, ',', '.') ?>
+                </div>
+                <span class="jadwal-kelas">
+                    Infaq Yang Terhubung Ke Kegiatan
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-4">
         <div class="stat-card">
             <div>
                 <div class="stat-header">
@@ -336,6 +365,10 @@ $waktuAshar = '14:50 - 15:10';
         <h4 class="section-title">
             Jadwal Sholat & Imam
         </h4>
+
+        <a href="<?= url('jadwal_imam/index.php') ?>" class="section-link">
+            Lihat Semua →
+        </a>
     </div>
 
 

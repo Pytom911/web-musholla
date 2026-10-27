@@ -16,6 +16,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const kegiatanSelect = document.querySelector("[data-kegiatan-select]");
+  const donaturInput = document.querySelector("[data-donatur-input]");
+  const donaturRequired = document.querySelector("[data-donatur-required]");
+
+  if (kegiatanSelect && donaturInput) {
+    const updateDonaturRequirement = () => {
+      const isOptional = kegiatanSelect.value !== "";
+
+      donaturInput.required = !isOptional;
+      donaturInput.placeholder = isOptional
+        ? "Opsional (sudah memilih kegiatan)"
+        : "Masukkan nama donatur";
+
+      if (donaturRequired) {
+        donaturRequired.style.display = isOptional ? "none" : "";
+      }
+    };
+
+    kegiatanSelect.addEventListener("change", updateDonaturRequirement);
+    updateDonaturRequirement();
+  }
+
   const formatter = new Intl.NumberFormat("id-ID");
 
   document.querySelectorAll("[data-nominal-input]").forEach((input) => {

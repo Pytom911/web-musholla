@@ -12,6 +12,11 @@ if (!$row) {
     echo "<script>alert('Data tidak ditemukan!');window.location='index.php';</script>";
     exit;
 }
+
+$dataKegiatan = mysqli_query(
+    $connect,
+    "SELECT id_kegiatan, nama_kegiatan FROM kegiatan ORDER BY nama_kegiatan ASC"
+);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -60,13 +65,36 @@ if (!$row) {
             <input type="hidden" name="id_infaq" value="<?= $row['id_infaq']; ?>">
 
             <div class="form-group">
-                <label>Nama Donatur <span class="required">*</span></label>
+                <label>Nama Donatur <span class="required" data-donatur-required>*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control"  maxlength="50" value="<?= htmlspecialchars($row['nama_donatur']); ?>" required>
+                    <input type="text" name="nama_donatur" class="form-control" maxlength="50" value="<?= htmlspecialchars($row['nama_donatur']); ?>" data-donatur-input required>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nama Kegiatan</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-event"></i>
+                    </span>
+                    <select name="id_kegiatan" class="form-select" data-kegiatan-select>
+                        <option value="">-- Tidak terkait kegiatan --</option>
+                        <?php while ($kegiatan = mysqli_fetch_assoc($dataKegiatan)): ?>
+                            <option
+                                value="<?= (int) $kegiatan['id_kegiatan']; ?>"
+                                <?= (int) ($row['id_kegiatan'] ?? 0) === (int) $kegiatan['id_kegiatan'] ? 'selected' : ''; ?>
+                            >
+                                <?= htmlspecialchars($kegiatan['nama_kegiatan'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <small class="text-muted">
+                    Opsional. Pilih kegiatan jika infaq ini merupakan pemasukan kegiatan tersebut.
+                </small>
             </div>
 
             <div class="form-group">

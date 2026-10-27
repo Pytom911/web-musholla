@@ -18,9 +18,18 @@ $tanggal = $_POST['tanggal'] ?? '';
 if (
     $nama === '' ||
     $deskripsi === '' ||
-    $pengeluaranInput === '' ||
     $tanggal === '' ||
-    mb_strlen($nama) > 50 ||
+    mb_strlen($nama) > 50
+) {
+    header('Location: tambah.php?pesan=invalid');
+    exit;
+}
+
+if ($pengeluaranInput === '') {
+    $pengeluaranInput = '0';
+}
+
+if (
     !is_numeric($pengeluaranInput) ||
     !is_finite((float) $pengeluaranInput) ||
     (float) $pengeluaranInput < 0
@@ -86,7 +95,7 @@ $cek = $connect->prepare(
     'SELECT id_kegiatan
      FROM kegiatan
      WHERE nama_kegiatan = ?
-       AND pengeluaran = ?
+       AND COALESCE(pengeluaran, 0) = ?
        AND tanggal = ?
      LIMIT 1'
 );

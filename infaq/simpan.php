@@ -11,8 +11,44 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $nama = trim($_POST['nama_donatur'] ?? '');
 $nominal = filter_input(INPUT_POST, 'nominal', FILTER_VALIDATE_INT);
 $tanggal = trim($_POST['tanggal'] ?? '');
+$idKegiatanInput = trim($_POST['id_kegiatan'] ?? '');
 
-if ($nama === '' || !$nominal || $nominal < 1000 || $tanggal === '') {
+if (!$nominal || $nominal < 1000 || $tanggal === '') {
+    header('Location: tambah.php?pesan=invalid');
+    exit;
+}
+
+$idKegiatan = null;
+
+if ($idKegiatanInput !== '') {
+    $idKegiatan = filter_var($idKegiatanInput, FILTER_VALIDATE_INT);
+
+    if (!$idKegiatan || $idKegiatan < 1) {
+        header('Location: tambah.php?pesan=invalid');
+        exit;
+    }
+
+    $cekKegiatan = $connect->prepare(
+        'SELECT id_kegiatan FROM kegiatan WHERE id_kegiatan = ? LIMIT 1'
+    );
+
+    if (!$cekKegiatan) {
+        header('Location: tambah.php?pesan=gagal');
+        exit;
+    }
+
+    $cekKegiatan->bind_param('i', $idKegiatan);
+    $cekKegiatan->execute();
+    $kegiatanAda = $cekKegiatan->get_result()->num_rows > 0;
+    $cekKegiatan->close();
+
+    if (!$kegiatanAda) {
+        header('Location: tambah.php?pesan=invalid');
+        exit;
+    }
+}
+
+if ($idKegiatan === null && $nama === '') {
     header('Location: tambah.php?pesan=invalid');
     exit;
 }
@@ -31,21 +67,21 @@ if ($formatTanggal->format('Y-m') !== date('Y-m')) {
     exit;
 }
 
-$stmt = mysqli_prepare(
-    $connect,
-    "INSERT INTO infaq (nama_donatur, nominal, tanggal)
-     VALUES (?, ?, ?)"
+$stmt = $connect->prepare(
+    "INSERT INTO infaq (nama_donatur, nominal, tanggal, id_kegiatan) VALUES (?, ?, ?, ?)"
 );
+if (!$stmt) {
+    header('Location: tambah.php?pesan=gagal');
+    exit;
+}
+$stmt->bind_param('sisi', $nama, $nominal, $tanggal, $idKegiatan);
 
-mysqli_stmt_bind_param($stmt, 'sis', $nama, $nominal, $tanggal);
-
-if (mysqli_stmt_execute($stmt)) {
-    mysqli_stmt_close($stmt);
+if ($stmt->execute()) {
+    $stmt->close();
     header('Location: index.php?pesan=simpan');
     exit;
 }
 
-mysqli_stmt_close($stmt);
-
+$stmt->close();
 header('Location: tambah.php?pesan=gagal');
 exit;

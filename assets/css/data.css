@@ -58,6 +58,7 @@
 
 .page-header p{
     margin-top:8px;
+    margin-bottom:0;
     color:var(--text-light);
     font-size:17px;
 }
@@ -79,6 +80,8 @@
     font-weight:600;
     transition:var(--transition);
     box-shadow:0 10px 20px rgba(17,136,72,.25);
+    margin-top:0px;
+    margin-left: 0px;
 }
 
 .btn-add:hover{
@@ -280,7 +283,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
     flex-wrap: nowrap;
 }
 
@@ -290,9 +293,9 @@
     align-items: center;
     justify-content: center;
     gap: 7px;
-    min-width: 85px;
+    min-width: 70px;
     height: 38px;
-    padding: 0 14px;
+    padding: 0 10px;
     border-radius: 10px;
     white-space: nowrap;
     text-decoration: none;
@@ -324,13 +327,13 @@
     color:var(--text);
     font-size:15px;
     font-weight:700;
-    padding:18px;
+    padding:18px 16px;
     border-bottom:1px solid var(--border);
     white-space:nowrap;
 }
 
 .table-modern tbody td{
-    padding:18px;
+    padding:18px 16px;
     border-bottom:1px solid #f1f5f9;
     color:var(--text);
     vertical-align:middle;
@@ -379,6 +382,16 @@
     font-weight:700;
     font-size:15px;
     background:#fdecec;
+    padding:6px 14px;
+    border-radius:30px;
+}
+
+.nominal-green{
+    display:inline-block;
+    color:#16a34a;
+    font-weight:700;
+    font-size:15px;
+    background:#ecfdf3;
     padding:6px 14px;
     border-radius:30px;
 }

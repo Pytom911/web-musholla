@@ -47,18 +47,51 @@ $totalPengeluaran = mysqli_fetch_assoc(mysqli_query(
     "SELECT COALESCE(SUM(pengeluaran), 0) AS total FROM kegiatan $whereBulan"
 ));
 
-// Arus kas bulan terpilih, sama dengan saldo keuangan di dashboard; "Semua Bulan" tanpa filter.
-$ringkasSaldo = mysqli_fetch_assoc(mysqli_query(
-    $connect,
-    "SELECT
-        (
-            (SELECT COALESCE(SUM(nominal), 0) FROM infaq $whereBulan)
-            +
-            (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh $whereBulan)
-            -
-            (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan $whereBulan)
-        ) AS saldo"
-));
+// Pemasukan kegiatan = total infaq yang terhubung ke kegiatan.
+if (!$whereBulan) {
+    $totalPemasukanKegiatan = mysqli_fetch_assoc(mysqli_query(
+        $connect,
+        "SELECT COALESCE(SUM(nominal), 0) AS total
+         FROM infaq
+         WHERE id_kegiatan IS NOT NULL"
+    ));
+} else {
+    $totalPemasukanKegiatan = mysqli_fetch_assoc(mysqli_query(
+        $connect,
+        "SELECT COALESCE(SUM(infaq.nominal), 0) AS total
+         FROM infaq
+         JOIN kegiatan ON kegiatan.id_kegiatan = infaq.id_kegiatan
+         WHERE MONTH(kegiatan.tanggal) = $bulanDipilih AND YEAR(kegiatan.tanggal) = $tahunSekarang"
+    ));
+}
+
+// Arus kas bulan terpilih, sama dengan saldo keuangan di dashboard.
+// Pemasukan kegiatan berasal dari infaq, jadi tidak ditambahkan lagi agar tidak terhitung dua kali.
+if (!$whereBulan) {
+    $ringkasSaldo = mysqli_fetch_assoc(mysqli_query(
+        $connect,
+        "SELECT
+            (
+                (SELECT COALESCE(SUM(nominal), 0) FROM infaq)
+                +
+                (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh)
+                -
+                (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan)
+            ) AS saldo"
+    ));
+} else {
+    $ringkasSaldo = mysqli_fetch_assoc(mysqli_query(
+        $connect,
+        "SELECT
+            (
+                (SELECT COALESCE(SUM(nominal), 0) FROM infaq WHERE MONTH(tanggal) = $bulanDipilih AND YEAR(tanggal) = $tahunSekarang)
+                +
+                (SELECT COALESCE(SUM(nominal), 0) FROM shodaqoh WHERE MONTH(tanggal) = $bulanDipilih AND YEAR(tanggal) = $tahunSekarang)
+                -
+                (SELECT COALESCE(SUM(pengeluaran), 0) FROM kegiatan WHERE MONTH(tanggal) = $bulanDipilih AND YEAR(tanggal) = $tahunSekarang)
+            ) AS saldo"
+    ));
+}
 
 $saldoTersedia = (float) ($ringkasSaldo['saldo'] ?? 0);
 
@@ -82,7 +115,11 @@ $offset = ($page - 1) * $limit;
 
 $data = mysqli_query(
     $connect,
-    "SELECT * FROM kegiatan $whereBulan ORDER BY tanggal DESC, id_kegiatan DESC LIMIT $limit OFFSET $offset"
+    "SELECT k.*, COALESCE((SELECT SUM(i.nominal) FROM infaq i WHERE i.id_kegiatan = k.id_kegiatan), 0) AS pemasukan 
+     FROM kegiatan k 
+     $whereBulan 
+     ORDER BY k.tanggal DESC, k.id_kegiatan DESC 
+     LIMIT $limit OFFSET $offset"
 );
 ?>
 
@@ -133,7 +170,7 @@ $data = mysqli_query(
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-xl-4 col-md-4">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-green">
                     <i class="bi bi-calendar-event-fill"></i>
@@ -163,7 +200,7 @@ $data = mysqli_query(
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-4">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-red">
                     <i class="bi bi-cash-stack"></i>
@@ -193,7 +230,7 @@ $data = mysqli_query(
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-4">
+        <div class="col-xl-4 col-md-6">
             <div class="stats-card">
                 <div class="icon icon-blue">
                     <i class="bi bi-wallet2"></i>
@@ -254,6 +291,7 @@ $data = mysqli_query(
                     <tr>
                         <th>No</th>
                         <th>Nama Kegiatan</th>
+                        <th>Pemasukan</th>
                         <th>Pengeluaran</th>
                         <th>Deskripsi</th>
                         <th>Tanggal</th>
@@ -276,8 +314,13 @@ $data = mysqli_query(
                                     </strong>
                                 </td>
                                 <td>
+                                    <span class="nominal">
+                                        Rp <?= number_format($row['pemasukan'] ?? 0, 0, ',', '.'); ?>
+                                    </span>
+                                </td>
+                                <td>
                                     <span class="nominal-red">
-                                        Rp <?= number_format($row['pengeluaran'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($row['pengeluaran'] ?? 0, 0, ',', '.'); ?>
                                     </span>
                                 </td>
                                 <td class="deskripsi-cell">
@@ -306,7 +349,7 @@ $data = mysqli_query(
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="<?= ($isPetugas || $isAdmin) ? '7' : '6'; ?>">
                                 <div class="empty-data">
                                     <i class="bi bi-folder2-open"></i>
                                     <h4>Belum Ada Data Kegiatan</h4>

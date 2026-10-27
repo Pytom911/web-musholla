@@ -35,7 +35,7 @@ $saldoSaatIni = $querySaldo
     : 0.0;
 
 // Pengeluaran data ini masih terhitung di saldo, jadi kembalikan saat menghitung batas.
-$pengeluaranLama = (float) $row['pengeluaran'];
+$pengeluaranLama = (float) ($row['pengeluaran'] ?? 0);
 $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
 ?>
 
@@ -105,12 +105,12 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
             </div>
 
             <div class="form-group">
-                <label>Pengeluaran <span class="required">*</span></label>
+                <label>Pengeluaran</label>
 
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
 
-                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" value="<?= $row['pengeluaran']; ?>" min="0" data-nominal-input="previewPengeluaran" required>
+                    <input type="number" name="pengeluaran" id="inputPengeluaran" class="form-control" value="<?= $row['pengeluaran'] ?? 0; ?>" min="0" data-nominal-input="previewPengeluaran">
                 </div>
 
                 <span class="nominal-preview">
@@ -186,18 +186,18 @@ $saldoTersedia = $saldoSaatIni + $pengeluaranLama;
     const formatRupiah = (nilai) => new Intl.NumberFormat('id-ID').format(nilai);
 
     function melebihiSaldo() {
-        const nominal = Number(inputPengeluaran.value);
+        const nominal = Number(inputPengeluaran.value || 0);
 
         return (
-            inputPengeluaran.value !== '' &&
+            Number(inputPengeluaran.value || 0) >= 0 &&
             nominal > saldoTersedia &&
             nominal > pengeluaranLama
         );
     }
 
     function periksaSaldo() {
-        const nominal = Number(inputPengeluaran.value);
-        const melebihi = inputPengeluaran.value !== '' && nominal > saldoTersedia;
+        const nominal = Number(inputPengeluaran.value || 0);
+        const melebihi = Number(inputPengeluaran.value || 0) >= 0 && nominal > saldoTersedia;
         const nominalNaik = nominal > pengeluaranLama;
 
         if (melebihi && nominalNaik) {

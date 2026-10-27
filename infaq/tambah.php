@@ -3,6 +3,11 @@ $pageTitle = 'Tambah Data Infaq';
 require_once '../template/header.php';
 require_once "../auth/auth.php";
 requireRole(['admin','petugas']);
+
+$dataKegiatan = mysqli_query(
+    $connect,
+    "SELECT id_kegiatan, nama_kegiatan FROM kegiatan ORDER BY nama_kegiatan ASC"
+);
 ?>
 
 <link rel="stylesheet" href="../assets/css/data.css">
@@ -49,13 +54,33 @@ requireRole(['admin','petugas']);
         <form action="simpan.php" method="POST">
 
             <div class="form-group">
-                <label>Nama Donatur <span class="required">*</span></label>
+                <label>Nama Donatur <span class="required" data-donatur-required>*</span></label>
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-person"></i>
                     </span>
-                    <input type="text" name="nama_donatur" class="form-control" maxlength="50" placeholder="Masukkan nama donatur" required>
+                    <input type="text" name="nama_donatur" class="form-control" maxlength="50" placeholder="Masukkan nama donatur" data-donatur-input>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nama Kegiatan</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar-event"></i>
+                    </span>
+                    <select name="id_kegiatan" class="form-select" data-kegiatan-select>
+                        <option value="">-- Tidak terkait kegiatan --</option>
+                        <?php while ($kegiatan = mysqli_fetch_assoc($dataKegiatan)): ?>
+                            <option value="<?= (int) $kegiatan['id_kegiatan']; ?>">
+                                <?= htmlspecialchars($kegiatan['nama_kegiatan'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <small class="text-muted">
+                    Opsional. Pilih kegiatan jika infaq ini merupakan pemasukan kegiatan tersebut.
+                </small>
             </div>
 
             <div class="form-group">

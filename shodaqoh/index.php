@@ -211,7 +211,7 @@ $dataCount = mysqli_num_rows($data);
         <div class="data-toolbar">
             <div class="search-box">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama kelas...">
+                <input type="text" id="searchInput" placeholder="Cari nama jurusan...">
             </div>
             <form method="GET" class="filter-box">
                 <select name="bulan" id="bulan" onchange="this.form.submit()">
@@ -280,7 +280,7 @@ $dataCount = mysqli_num_rows($data);
                                     </span>
                                 </td>
                                 <td>
-                                    <?= date('F d Y', strtotime($row['tanggal'])); ?>
+                                    <?= date('d-m-Y', strtotime($row['tanggal'])); ?>
                                 </td>
                                 <?php if ($isPetugas || $isAdmin): ?>
                                     <td>

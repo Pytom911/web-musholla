@@ -34,7 +34,16 @@ if (
     $nama === '' ||
     mb_strlen($nama) > 50 ||
     $deskripsi === '' ||
-    $pengeluaranInput === '' ||
+    $tanggal === ''
+) {
+    $kembaliEdit('invalid');
+}
+
+if ($pengeluaranInput === '') {
+    $pengeluaranInput = '0';
+}
+
+if (
     !is_numeric($pengeluaranInput) ||
     !is_finite((float) $pengeluaranInput) ||
     (float) $pengeluaranInput < 0
@@ -128,7 +137,7 @@ $cekDuplikat = $connect->prepare(
     'SELECT id_kegiatan
      FROM kegiatan
      WHERE nama_kegiatan = ?
-       AND pengeluaran = ?
+       AND COALESCE(pengeluaran, 0) = ?
        AND tanggal = ?
        AND id_kegiatan <> ?
      LIMIT 1'
