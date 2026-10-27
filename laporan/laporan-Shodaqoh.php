@@ -263,7 +263,10 @@ $data = mysqli_query(
 
         <div class="table-footer">
             <div class="table-info">
-                Total Data : <strong><?= $totalDataAll; ?></strong>
+                Menampilkan <strong><?= mysqli_num_rows($data); ?></strong> data dari <strong><?= $totalDataAll; ?></strong> data
+                <strong>
+                    <?= $totalDataAll; ?>
+                </strong>
             </div>
             <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>

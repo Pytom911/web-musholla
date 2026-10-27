@@ -341,13 +341,6 @@
     background:#f9fbfd;
 }
 
-/* Memastikan tabel tidak melebar karena teks panjang */
-.table-responsive {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-}
-
 /* Kolom deskripsi kegiatan */
 .table-modern td.deskripsi-cell {
     width: 30%;

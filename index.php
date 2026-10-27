@@ -1,228 +1,119 @@
-    <?php
-    $pageTitle = 'Beranda - Sistem Informasi Musholla';
-    require_once __DIR__ . '/template/header.php';
+<?php
+$pageTitle = 'Beranda - Sistem Informasi Musholla';
+require_once __DIR__ . '/template/header.php';
 
-    $DataTotalInfaq = $connect->query(
-        "SELECT COALESCE(SUM(nominal), 0) AS total
-        FROM infaq
-        WHERE MONTH(tanggal) = MONTH(CURDATE())
-        AND YEAR(tanggal) = YEAR(CURDATE())"
-    );
+$DataTotalInfaq = $connect->query(
+    "SELECT COALESCE(SUM(nominal), 0) AS total
+     FROM infaq
+     WHERE MONTH(tanggal) = MONTH(CURDATE())
+       AND YEAR(tanggal) = YEAR(CURDATE())"
+);
 
-    $totalInfaq = (float) $DataTotalInfaq->fetch_assoc()['total'];
+$totalInfaq = (float) $DataTotalInfaq->fetch_assoc()['total'];
 
-    $DataTotalShodaqoh = $connect->query(
-        "SELECT COALESCE(SUM(nominal), 0) AS total
-        FROM shodaqoh
-        WHERE MONTH(tanggal) = MONTH(CURDATE())
-        AND YEAR(tanggal) = YEAR(CURDATE())"
-    );
+$DataTotalShodaqoh = $connect->query(
+    "SELECT COALESCE(SUM(nominal), 0) AS total
+     FROM shodaqoh
+     WHERE MONTH(tanggal) = MONTH(CURDATE())
+       AND YEAR(tanggal) = YEAR(CURDATE())"
+);
 
-    $totalshodaqoh = (float) $DataTotalShodaqoh->fetch_assoc()['total'];
+$totalshodaqoh = (float) $DataTotalShodaqoh->fetch_assoc()['total'];
 
-    $qTotalKegiatan = $connect->query(
-        'SELECT COUNT(*) AS total FROM kegiatan'
-    );
-    $totalKegiatan = (int) $qTotalKegiatan->fetch_assoc()['total'];
+$qTotalKegiatan = $connect->query(
+    'SELECT COUNT(*) AS total FROM kegiatan'
+);
+$totalKegiatan = (int) $qTotalKegiatan->fetch_assoc()['total'];
 
-    $qTotalPengeluaran = $connect->query(
-        "SELECT COALESCE(SUM(pengeluaran), 0) AS total
-        FROM kegiatan
-        WHERE MONTH(tanggal) = MONTH(CURDATE())
-        AND YEAR(tanggal) = YEAR(CURDATE())"
-    );
+$qTotalPengeluaran = $connect->query(
+    "SELECT COALESCE(SUM(pengeluaran), 0) AS total
+     FROM kegiatan
+     WHERE MONTH(tanggal) = MONTH(CURDATE())
+       AND YEAR(tanggal) = YEAR(CURDATE())"
+);
 
-    $totalPengeluaran = (float) $qTotalPengeluaran->fetch_assoc()['total'];
+$totalPengeluaran = (float) $qTotalPengeluaran->fetch_assoc()['total'];
 
-    $saldoKeuangan = $totalInfaq + $totalshodaqoh - $totalPengeluaran;
-    $tanggalHariIni = date('Y-m-d');
+$saldoKeuangan = $totalInfaq + $totalshodaqoh - $totalPengeluaran;
+$tanggalHariIni = date('Y-m-d');
 
-    /* =========================
-    AKTIVITAS TERBARU (GABUNGAN)
-    ========================= */
+/* =========================
+   JADWAL IMAM HARI INI
+========================= */
 
-    $batasAktivitas = 8;
+$stmtJadwalImamHariIni = $connect->prepare(
+    "SELECT
+        jadwal_imam.id_imam,
+        jadwal_imam.tanggal,
+        jadwal_imam.waktu_sholat,
+        guru.nama_guru
+     FROM jadwal_imam
+     JOIN guru ON jadwal_imam.id_guru = guru.id_guru
+     WHERE jadwal_imam.tanggal = ?
+     ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
+              jadwal_imam.id_imam ASC"
+);
+$stmtJadwalImamHariIni->bind_param('s', $tanggalHariIni);
+$stmtJadwalImamHariIni->execute();
+$jadwalImamHariIni = $stmtJadwalImamHariIni->get_result();
 
-    $stmtAktivitasTerbaru = $connect->prepare(
-        "SELECT 'infaq' AS jenis, i.id_infaq AS id, i.tanggal,
-                i.nama_donatur AS judul, i.nominal AS nominal,
-                NULL AS keterangan
-        FROM infaq i
-        UNION ALL
-        SELECT 'shodaqoh', s.id_shodaqoh, s.tanggal,
-                CONCAT('Shodaqoh Jumat ', k.tingkat, ' ', k.nama_kelas, ' ', k.bagian),
-                s.nominal, NULL
-        FROM shodaqoh s
-        LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-        UNION ALL
-        SELECT 'kegiatan', g.id_kegiatan, g.tanggal,
-                g.nama_kegiatan, g.pengeluaran, g.deskripsi
-        FROM kegiatan g
-        ORDER BY tanggal DESC, id DESC
-        LIMIT ?"
-    );
-    $stmtAktivitasTerbaru->bind_param('i', $batasAktivitas);
-    $stmtAktivitasTerbaru->execute();
+/* =========================
+   JADWAL IMAM BERIKUTNYA
+========================= */
 
-    $aktivitasTerbaru = $stmtAktivitasTerbaru
-        ->get_result()
-        ->fetch_all(MYSQLI_ASSOC);
+$stmtTanggalImamBerikutnya = $connect->prepare(
+    "SELECT MIN(tanggal) AS tanggal
+     FROM jadwal_imam
+     WHERE tanggal > ?"
+);
+$stmtTanggalImamBerikutnya->bind_param('s', $tanggalHariIni);
+$stmtTanggalImamBerikutnya->execute();
+$resultTanggalImamBerikutnya = $stmtTanggalImamBerikutnya->get_result();
+$rowTanggalImamBerikutnya = $resultTanggalImamBerikutnya
+    ? $resultTanggalImamBerikutnya->fetch_assoc()
+    : null;
+$tanggalImamBerikutnya = $rowTanggalImamBerikutnya['tanggal'] ?? null;
+$jadwalImamBerikutnya = null;
 
-    $jenisAktivitas = [
-        'infaq' => [
-            'label' => 'Infaq',
-            'icon' => 'bi-box2-heart',
-            'warna' => 'green',
-            'tanda' => '+',
-            'kelas' => 'masuk'
-        ],
-        'shodaqoh' => [
-            'label' => 'Shodaqoh',
-            'icon' => 'bi-coin',
-            'warna' => 'blue',
-            'tanda' => '+',
-            'kelas' => 'masuk'
-        ],
-        'kegiatan' => [
-            'label' => 'Pengeluaran',
-            'icon' => 'bi-cash-stack',
-            'warna' => 'red',
-            'tanda' => '-',
-            'kelas' => 'keluar'
-        ]
-    ];
-
-    /* =========================
-    JADWAL IMAM HARI INI
-    ========================= */
-
-    $stmtJadwalImamHariIni = $connect->prepare(
+if ($tanggalImamBerikutnya !== null) {
+    $stmtJadwalImamBerikutnya = $connect->prepare(
         "SELECT
             jadwal_imam.id_imam,
             jadwal_imam.tanggal,
             jadwal_imam.waktu_sholat,
             guru.nama_guru
-        FROM jadwal_imam
-        JOIN guru ON jadwal_imam.id_guru = guru.id_guru
-        WHERE jadwal_imam.tanggal = ?
-        ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
-                jadwal_imam.id_imam ASC"
+         FROM jadwal_imam
+         JOIN guru ON jadwal_imam.id_guru = guru.id_guru
+         WHERE jadwal_imam.tanggal = ?
+         ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
+                  jadwal_imam.id_imam ASC"
     );
-    $stmtJadwalImamHariIni->bind_param('s', $tanggalHariIni);
-    $stmtJadwalImamHariIni->execute();
-    $jadwalImamHariIni = $stmtJadwalImamHariIni->get_result();
+    $stmtJadwalImamBerikutnya->bind_param('s', $tanggalImamBerikutnya);
+    $stmtJadwalImamBerikutnya->execute();
+    $jadwalImamBerikutnya = $stmtJadwalImamBerikutnya->get_result();
+}
 
-    /* =========================
-    JADWAL IMAM BERIKUTNYA
-    ========================= */
+/* =========================
+   JADWAL SHOLAT BERIKUTNYA
+========================= */
 
-    $stmtTanggalImamBerikutnya = $connect->prepare(
-        "SELECT MIN(tanggal) AS tanggal
-        FROM jadwal_imam
-        WHERE tanggal > ?"
-    );
-    $stmtTanggalImamBerikutnya->bind_param('s', $tanggalHariIni);
-    $stmtTanggalImamBerikutnya->execute();
-    $resultTanggalImamBerikutnya = $stmtTanggalImamBerikutnya->get_result();
-    $rowTanggalImamBerikutnya = $resultTanggalImamBerikutnya
-        ? $resultTanggalImamBerikutnya->fetch_assoc()
-        : null;
-    $tanggalImamBerikutnya = $rowTanggalImamBerikutnya['tanggal'] ?? null;
-    $jadwalImamBerikutnya = null;
+$stmtTanggalSholatBerikutnya = $connect->prepare(
+    "SELECT MIN(tanggal) AS tanggal
+     FROM jadwal_sholat
+     WHERE tanggal > ?
+       AND waktu_sholat IN ('Dzuhur', 'Ashar')"
+);
+$stmtTanggalSholatBerikutnya->bind_param('s', $tanggalHariIni);
+$stmtTanggalSholatBerikutnya->execute();
+$resultTanggalSholatBerikutnya = $stmtTanggalSholatBerikutnya->get_result();
+$rowTanggalSholatBerikutnya = $resultTanggalSholatBerikutnya
+    ? $resultTanggalSholatBerikutnya->fetch_assoc()
+    : null;
+$tanggalSholatBerikutnya = $rowTanggalSholatBerikutnya['tanggal'] ?? null;
+$jadwalSholatBerikutnya = null;
 
-    if ($tanggalImamBerikutnya !== null) {
-        $stmtJadwalImamBerikutnya = $connect->prepare(
-            "SELECT
-                jadwal_imam.id_imam,
-                jadwal_imam.tanggal,
-                jadwal_imam.waktu_sholat,
-                guru.nama_guru
-            FROM jadwal_imam
-            JOIN guru ON jadwal_imam.id_guru = guru.id_guru
-            WHERE jadwal_imam.tanggal = ?
-            ORDER BY FIELD(jadwal_imam.waktu_sholat, 'Dzuhur', 'Ashar'),
-                    jadwal_imam.id_imam ASC"
-        );
-        $stmtJadwalImamBerikutnya->bind_param('s', $tanggalImamBerikutnya);
-        $stmtJadwalImamBerikutnya->execute();
-        $jadwalImamBerikutnya = $stmtJadwalImamBerikutnya->get_result();
-    }
-
-    /* =========================
-    JADWAL SHOLAT BERIKUTNYA
-    ========================= */
-
-    $stmtTanggalSholatBerikutnya = $connect->prepare(
-        "SELECT MIN(tanggal) AS tanggal
-        FROM jadwal_sholat
-        WHERE tanggal > ?
-        AND waktu_sholat IN ('Dzuhur', 'Ashar')"
-    );
-    $stmtTanggalSholatBerikutnya->bind_param('s', $tanggalHariIni);
-    $stmtTanggalSholatBerikutnya->execute();
-    $resultTanggalSholatBerikutnya = $stmtTanggalSholatBerikutnya->get_result();
-    $rowTanggalSholatBerikutnya = $resultTanggalSholatBerikutnya
-        ? $resultTanggalSholatBerikutnya->fetch_assoc()
-        : null;
-    $tanggalSholatBerikutnya = $rowTanggalSholatBerikutnya['tanggal'] ?? null;
-    $jadwalSholatBerikutnya = null;
-
-    if ($tanggalSholatBerikutnya !== null) {
-        $stmtJadwalSholatBerikutnya = $connect->prepare(
-            "SELECT
-                jadwal_sholat.id_jadwal,
-                jadwal_sholat.tanggal,
-                jadwal_sholat.waktu_sholat,
-                kelas.nama_kelas,
-                kelas.tingkat,
-                kelas.bagian
-            FROM jadwal_sholat
-            JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
-            WHERE jadwal_sholat.tanggal = ?
-            AND jadwal_sholat.waktu_sholat IN ('Dzuhur', 'Ashar')
-            ORDER BY
-                FIELD(jadwal_sholat.waktu_sholat, 'Dzuhur', 'Ashar'),
-                FIELD(kelas.tingkat, 'X', 'XI', 'XII'),
-                kelas.nama_kelas ASC,
-                kelas.id_kelas ASC"
-        );
-        $stmtJadwalSholatBerikutnya->bind_param('s', $tanggalSholatBerikutnya);
-        $stmtJadwalSholatBerikutnya->execute();
-        $jadwalSholatBerikutnya = $stmtJadwalSholatBerikutnya->get_result();
-    }
-
-    // Pisahkan kelas berikutnya berdasarkan waktu sholat
-    $kelasDzuhurBerikutnya = [];
-    $kelasAsharBerikutnya = [];
-
-    if ($jadwalSholatBerikutnya !== null) {
-        while ($row = $jadwalSholatBerikutnya->fetch_assoc()) {
-            if ($row['waktu_sholat'] === 'Dzuhur') {
-                $kelasDzuhurBerikutnya[] = $row;
-            } elseif ($row['waktu_sholat'] === 'Ashar') {
-                $kelasAsharBerikutnya[] = $row;
-            }
-        }
-    }
-
-    $jadwalImamDashboard = [
-        [
-            'judul' => 'Jadwal Hari Ini',
-            'tanggal' => $tanggalHariIni,
-            'data' => $jadwalImamHariIni
-        ],
-        [
-            'judul' => 'Jadwal Berikutnya',
-            'tanggal' => $tanggalImamBerikutnya,
-            'data' => $jadwalImamBerikutnya
-        ]
-    ];
-
-    /* =========================
-    JADWAL SHOLAT HARI INI
-    ========================= */
-
-    $stmtJadwalHariIni = $connect->prepare(
+if ($tanggalSholatBerikutnya !== null) {
+    $stmtJadwalSholatBerikutnya = $connect->prepare(
         "SELECT
             jadwal_sholat.id_jadwal,
             jadwal_sholat.tanggal,
@@ -230,769 +121,722 @@
             kelas.nama_kelas,
             kelas.tingkat,
             kelas.bagian
-        FROM jadwal_sholat
-        JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
-        WHERE jadwal_sholat.tanggal = ?
-        AND jadwal_sholat.waktu_sholat IN ('Dzuhur', 'Ashar')
-        ORDER BY
+         FROM jadwal_sholat
+         JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
+         WHERE jadwal_sholat.tanggal = ?
+           AND jadwal_sholat.waktu_sholat IN ('Dzuhur', 'Ashar')
+         ORDER BY
             FIELD(jadwal_sholat.waktu_sholat, 'Dzuhur', 'Ashar'),
             FIELD(kelas.tingkat, 'X', 'XI', 'XII'),
             kelas.nama_kelas ASC,
             kelas.id_kelas ASC"
     );
+    $stmtJadwalSholatBerikutnya->bind_param('s', $tanggalSholatBerikutnya);
+    $stmtJadwalSholatBerikutnya->execute();
+    $jadwalSholatBerikutnya = $stmtJadwalSholatBerikutnya->get_result();
+}
 
-    $stmtJadwalHariIni->bind_param('s', $tanggalHariIni);
-    $stmtJadwalHariIni->execute();
-    $jadwalHariIni = $stmtJadwalHariIni->get_result();
+// Pisahkan kelas berikutnya berdasarkan waktu sholat
+$kelasDzuhurBerikutnya = [];
+$kelasAsharBerikutnya = [];
 
-    // Pisahkan kelas berdasarkan waktu sholat
-    $kelasDzuhur = [];
-    $kelasAshar = [];
-
-    while ($row = $jadwalHariIni->fetch_assoc()) {
+if ($jadwalSholatBerikutnya !== null) {
+    while ($row = $jadwalSholatBerikutnya->fetch_assoc()) {
         if ($row['waktu_sholat'] === 'Dzuhur') {
-            $kelasDzuhur[] = $row;
+            $kelasDzuhurBerikutnya[] = $row;
         } elseif ($row['waktu_sholat'] === 'Ashar') {
-            $kelasAshar[] = $row;
+            $kelasAsharBerikutnya[] = $row;
         }
     }
+}
 
-    // Waktu masing-masing sholat
-    $waktuDzuhur = '11:50 - 13:00';
-    $waktuAshar = '14:50 - 15:10';
-    ?>
+$jadwalImamDashboard = [
+    [
+        'judul' => 'Jadwal Hari Ini',
+        'tanggal' => $tanggalHariIni,
+        'data' => $jadwalImamHariIni
+    ],
+    [
+        'judul' => 'Jadwal Berikutnya',
+        'tanggal' => $tanggalImamBerikutnya,
+        'data' => $jadwalImamBerikutnya
+    ]
+];
 
-    <!-- Hero Section -->
-    <section class="hero-banner">
-        <div class="hero-content">
-            <p class="hero-subtitle">Selamat Datang di</p>
-            <h1 class="hero-title">Sistem Informasi Musholla SMK Negeri 1 Kraksaan</h1>
-            <p class="hero-desc">
-                mengelola seluruh informasi data guru agama dan data seluruh kelas
-                <u>SMKN 1 Kraksaan</u>
-            </p>
-            <p class="hero-desc">
-                Jadwal Sholat dan imam, Kegiatan Keagamaan, keuangan infaq dan shodaqoh,
-                dan laporan musholla dalam satu sistem yang mudah di akses.
-            </p>
-        </div>
-        <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="hero-logo-large">
-    </section>
+/* =========================
+   JADWAL SHOLAT HARI INI
+========================= */
 
-    <!-- Total -->
-    <div class="row g-3">
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <div class="stat-icon green">
-                            <i class="bi bi-box2-heart"></i>
-                        </div>
-                        <h3 class="stat-title">Total Infaq</h3>
+$stmtJadwalHariIni = $connect->prepare(
+    "SELECT
+        jadwal_sholat.id_jadwal,
+        jadwal_sholat.tanggal,
+        jadwal_sholat.waktu_sholat,
+        kelas.nama_kelas,
+        kelas.tingkat,
+        kelas.bagian
+     FROM jadwal_sholat
+     JOIN kelas ON jadwal_sholat.id_kelas = kelas.id_kelas
+     WHERE jadwal_sholat.tanggal = ?
+       AND jadwal_sholat.waktu_sholat IN ('Dzuhur', 'Ashar')
+     ORDER BY
+        FIELD(jadwal_sholat.waktu_sholat, 'Dzuhur', 'Ashar'),
+        FIELD(kelas.tingkat, 'X', 'XI', 'XII'),
+        kelas.nama_kelas ASC,
+        kelas.id_kelas ASC"
+);
+
+$stmtJadwalHariIni->bind_param('s', $tanggalHariIni);
+$stmtJadwalHariIni->execute();
+$jadwalHariIni = $stmtJadwalHariIni->get_result();
+
+// Pisahkan kelas berdasarkan waktu sholat
+$kelasDzuhur = [];
+$kelasAshar = [];
+
+while ($row = $jadwalHariIni->fetch_assoc()) {
+    if ($row['waktu_sholat'] === 'Dzuhur') {
+        $kelasDzuhur[] = $row;
+    } elseif ($row['waktu_sholat'] === 'Ashar') {
+        $kelasAshar[] = $row;
+    }
+}
+
+// Waktu masing-masing sholat
+$waktuDzuhur = '11:50 - 13:00';
+$waktuAshar = '14:50 - 15:10';
+?>
+
+<!-- Hero Section -->
+<section class="hero-banner">
+    <div class="hero-content">
+        <p class="hero-subtitle">Selamat Datang di</p>
+        <h1 class="hero-title">Sistem Informasi Musholla SMK Negeri 1 Kraksaan</h1>
+        <p class="hero-desc">
+            mengelola seluruh informasi data guru agama dan data seluruh kelas
+            <u>SMKN 1 Kraksaan</u>
+        </p>
+        <p class="hero-desc">
+            Jadwal Sholat dan imam, Kegiatan Keagamaan, keuangan infaq dan shodaqoh,
+            dan laporan musholla dalam satu sistem yang mudah di akses.
+        </p>
+    </div>
+    <img src="<?= asset('img/musholla_logo.png') ?>" alt="Logo Musholla" class="hero-logo-large">
+</section>
+
+<!-- Total -->
+<div class="row g-3">
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="bi bi-box2-heart"></i>
                     </div>
-                    <div class="stat-value">
-                        Rp<?= number_format($totalInfaq, 0, ',', '.') ?>
-                    </div>
+                    <h3 class="stat-title">Total Infaq</h3>
                 </div>
-                <a href="<?= url('infaq/index.php') ?>" class="stat-link">
-                    Lihat detail &rarr;
-                </a>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <div class="stat-icon blue">
-                            <i class="bi bi-coin"></i>
-                        </div>
-                        <h3 class="stat-title">Total Shodaqoh Jumat</h3>
-                    </div>
-                    <div class="stat-value">
-                        Rp<?= number_format($totalshodaqoh, 0, ',', '.') ?>
-                    </div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalInfaq, 0, ',', '.') ?>
                 </div>
-                <a href="<?= url('shodaqoh/index.php') ?>" class="stat-link">
-                    Lihat detail &rarr;
-                </a>
             </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-4">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <div class="stat-icon orange">
-                            <i class="bi bi-card-checklist"></i>
-                        </div>
-                        <h3 class="stat-title">Total Kegiatan</h3>
-                    </div>
-                    <div class="stat-value">
-                        <?= $totalKegiatan ?>
-                    </div>
-                </div>
-                <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">
-                    Lihat detail &rarr;
-                </a>
-            </div>
+            <a href="<?= url('infaq/index.php') ?>" class="stat-link">
+                Lihat detail &rarr;
+            </a>
         </div>
     </div>
 
-    <!-- Keuangan -->
-    <div class="row g-3 mt-1">
-        <div class="col-12 col-sm-6 col-xl-6">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <div class="stat-icon purple">
-                            <i class="bi bi-wallet2"></i>
-                        </div>
-                        <h3 class="stat-title">Saldo Keuangan</h3>
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="bi bi-coin"></i>
                     </div>
-                    <div class="stat-value">
-                        Rp<?= number_format($saldoKeuangan, 0, ',', '.') ?>
-                    </div>
-                    <span class="jadwal-kelas">
-                        keuangan dari total infaq, shodaqoh, dan kegiatan
-                    </span>
+                    <h3 class="stat-title">Total Shodaqoh</h3>
+                </div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalshodaqoh, 0, ',', '.') ?>
                 </div>
             </div>
+            <a href="<?= url('shodaqoh/index.php') ?>" class="stat-link">
+                Lihat detail &rarr;
+            </a>
         </div>
+    </div>
 
-        <div class="col-12 col-sm-6 col-xl-6">
-            <div class="stat-card">
-                <div>
-                    <div class="stat-header">
-                        <div class="stat-icon red">
-                            <i class="bi bi-cash-stack"></i>
-                        </div>
-                        <h3 class="stat-title">Total Pengeluaran</h3>
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon orange">
+                        <i class="bi bi-card-checklist"></i>
                     </div>
-                    <div class="stat-value">
-                        Rp<?= number_format($totalPengeluaran, 0, ',', '.') ?>
+                    <h3 class="stat-title">Total Kegiatan</h3>
+                </div>
+                <div class="stat-value">
+                    <?= $totalKegiatan ?>
+                </div>
+            </div>
+            <a href="<?= url('kegiatan/index.php') ?>" class="stat-link">
+                Lihat detail &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Keuangan -->
+<div class="row g-3 mt-1">
+    <div class="col-12 col-sm-6 col-xl-6">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="bi bi-wallet2"></i>
                     </div>
+                    <h3 class="stat-title">Saldo Keuangan</h3>
+                </div>
+                <div class="stat-value">
+                    Rp<?= number_format($saldoKeuangan, 0, ',', '.') ?>
                 </div>
                 <span class="jadwal-kelas">
-                    Pengeluaran dari kegiatan musholla
+                    keuangan dari total infaq, shodaqoh, dan kegiatan
                 </span>
             </div>
         </div>
     </div>
 
-    <!-- =========================================================
-        JADWAL SHOLAT & IMAM
-    ========================================================= -->
-
-    <div class="schedule-section">
-
-        <!-- Header -->
-        <div class="section-header">
-            <h4 class="section-title">
-                Jadwal Sholat & Imam
-            </h4>
-
-            <a href="<?= url('jadwal_imam/index.php') ?>" class="section-link">
-                Lihat Semua →
-            </a>
+    <div class="col-12 col-sm-6 col-xl-6">
+        <div class="stat-card">
+            <div>
+                <div class="stat-header">
+                    <div class="stat-icon red">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <h3 class="stat-title">Total Pengeluaran</h3>
+                </div>
+                <div class="stat-value">
+                    Rp<?= number_format($totalPengeluaran, 0, ',', '.') ?>
+                </div>
+            </div>
+            <span class="jadwal-kelas">
+                Pengeluaran dari kegiatan musholla
+            </span>
         </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     JADWAL SHOLAT & IMAM
+========================================================= -->
+
+<div class="schedule-section">
+
+    <!-- Header -->
+    <div class="section-header">
+        <h4 class="section-title">
+            Jadwal Sholat & Imam
+        </h4>
+    </div>
 
 
-        <!-- 4 CARD DALAM SATU GRID -->
-        <div class="schedule-grid">
+    <!-- 4 CARD DALAM SATU GRID -->
+    <div class="schedule-grid">
 
 
-            <!-- =====================================================
-                1. JADWAL SHOLAT HARI INI
-            ====================================================== -->
-            <div class="schedule-card">
+        <!-- =====================================================
+             1. JADWAL SHOLAT HARI INI
+        ====================================================== -->
+        <div class="schedule-card">
 
-                <div class="schedule-card-header">
+            <div class="schedule-card-header">
 
-                    <div class="schedule-icon green">
-                        <i class="bi bi-clock"></i>
-                    </div>
-
-                    <div class="schedule-card-heading">
-                        <span>Jadwal Sholat</span>
-                        <h5>Hari Ini</h5>
-                    </div>
-
+                <div class="schedule-icon green">
+                    <i class="bi bi-clock"></i>
                 </div>
 
-
-                <?php if ($tanggalHariIni !== null): ?>
-
-                    <div class="schedule-date">
-                        <i class="bi bi-calendar3"></i>
-
-                        <?= htmlspecialchars(hari_indonesia($tanggalHariIni)) ?>,
-                        <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalHariIni))) ?>
-
-                    </div>
-
-                <?php endif; ?>
-
-
-                <?php if (
-                    $tanggalHariIni !== null &&
-                    $jadwalHariIni !== null &&
-                    mysqli_num_rows($jadwalHariIni) > 0
-                ): ?>
-
-                    <!-- Dzuhur -->
-                    <div class="schedule-sholat-block">
-
-                        <div class="schedule-time-box">
-
-                            <span class="schedule-label">
-                                Waktu Sholat Dzuhur
-                            </span>
-
-                            <strong class="schedule-time">
-                                <?= htmlspecialchars($waktuDzuhur) ?>
-                            </strong>
-
-                        </div>
-
-                        <div class="schedule-divider"></div>
-
-                        <div class="schedule-list">
-
-                            <?php foreach ($kelasDzuhur as $barisJadwal): ?>
-
-                                <div class="schedule-item">
-
-                                    <div class="schedule-item-icon green">
-                                        <i class="bi bi-mortarboard-fill"></i>
-                                    </div>
-
-                                    <div class="schedule-item-content">
-
-                                        <span>Kelas</span>
-
-                                        <strong>
-                                            <?= htmlspecialchars($barisJadwal['tingkat']) ?>
-                                            <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
-                                            <?= htmlspecialchars($barisJadwal['bagian']) ?>
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            <?php endforeach; ?>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Ashar -->
-                    <div class="schedule-sholat-block">
-
-                        <div class="schedule-time-box">
-
-                            <span class="schedule-label">
-                                Waktu Sholat Ashar
-                            </span>
-
-                            <strong class="schedule-time">
-                                <?= htmlspecialchars($waktuAshar) ?>
-                            </strong>
-
-                        </div>
-
-                        <div class="schedule-divider"></div>
-
-                        <div class="schedule-list">
-
-                            <?php foreach ($kelasAshar as $barisJadwal): ?>
-
-                                <div class="schedule-item">
-
-                                    <div class="schedule-item-icon green">
-                                        <i class="bi bi-mortarboard-fill"></i>
-                                    </div>
-
-                                    <div class="schedule-item-content">
-
-                                        <span>Kelas</span>
-
-                                        <strong>
-                                            <?= htmlspecialchars($barisJadwal['tingkat']) ?>
-                                            <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
-                                            <?= htmlspecialchars($barisJadwal['bagian']) ?>
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            <?php endforeach; ?>
-
-                        </div>
-
-                    </div>
-
-                <?php else: ?>
-
-                    <div class="schedule-empty">
-
-                        <div class="schedule-empty-icon">
-                            <i class="bi bi-calendar-x"></i>
-                        </div>
-
-                        <strong>
-                            Belum ada jadwal
-                        </strong>
-
-                        <span>
-                            Belum ada jadwal sholat untuk hari ini.
-                        </span>
-
-                    </div>
-
-                <?php endif; ?>
+                <div class="schedule-card-heading">
+                    <span>Jadwal Sholat</span>
+                    <h5>Hari Ini</h5>
+                </div>
 
             </div>
 
 
+            <?php if ($tanggalHariIni !== null): ?>
 
-            <!-- =====================================================
-                2. JADWAL SHOLAT BERIKUTNYA
-            ====================================================== -->
-            <div class="schedule-card">
+                <div class="schedule-date">
+                    <i class="bi bi-calendar3"></i>
 
-                <div class="schedule-card-header">
-
-                    <div class="schedule-icon green">
-                        <i class="bi bi-calendar-event"></i>
-                    </div>
-
-                    <div class="schedule-card-heading">
-                        <span>Jadwal Sholat</span>
-                        <h5>Jadwal Berikutnya</h5>
-                    </div>
+                    <?= htmlspecialchars(hari_indonesia($tanggalHariIni)) ?>,
+                    <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalHariIni))) ?>
 
                 </div>
 
-
-                <?php if ($tanggalSholatBerikutnya !== null): ?>
-
-                    <div class="schedule-date">
-                        <i class="bi bi-calendar3"></i>
-
-                        <?= htmlspecialchars(hari_indonesia($tanggalSholatBerikutnya)) ?>,
-                        <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalSholatBerikutnya))) ?>
-
-                    </div>
-
-                <?php endif; ?>
+            <?php endif; ?>
 
 
-                <?php if (
-                    $tanggalSholatBerikutnya !== null &&
-                    (count($kelasDzuhurBerikutnya) > 0 || count($kelasAsharBerikutnya) > 0)
-                ): ?>
+            <?php if (
+                $tanggalHariIni !== null &&
+                $jadwalHariIni !== null &&
+                mysqli_num_rows($jadwalHariIni) > 0
+            ): ?>
 
-                    <!-- Dzuhur -->
-                    <div class="schedule-sholat-block">
+                <!-- Dzuhur -->
+                <div class="schedule-sholat-block">
 
-                        <div class="schedule-time-box">
+                    <div class="schedule-time-box">
 
-                            <span class="schedule-label">
-                                Waktu Sholat Dzuhur
-                            </span>
-
-                            <strong class="schedule-time">
-                                <?= htmlspecialchars($waktuDzuhur) ?>
-                            </strong>
-
-                        </div>
-
-                        <div class="schedule-divider"></div>
-
-                        <div class="schedule-list">
-
-                            <?php foreach ($kelasDzuhurBerikutnya as $barisJadwal): ?>
-
-                                <div class="schedule-item">
-
-                                    <div class="schedule-item-icon green">
-                                        <i class="bi bi-mortarboard-fill"></i>
-                                    </div>
-
-                                    <div class="schedule-item-content">
-
-                                        <span>Kelas</span>
-
-                                        <strong>
-                                            <?= htmlspecialchars($barisJadwal['tingkat']) ?>
-                                            <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
-                                            <?= htmlspecialchars($barisJadwal['bagian']) ?>
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            <?php endforeach; ?>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Ashar -->
-                    <div class="schedule-sholat-block">
-
-                        <div class="schedule-time-box">
-
-                            <span class="schedule-label">
-                                Waktu Sholat Ashar
-                            </span>
-
-                            <strong class="schedule-time">
-                                <?= htmlspecialchars($waktuAshar) ?>
-                            </strong>
-
-                        </div>
-
-                        <div class="schedule-divider"></div>
-
-                        <div class="schedule-list">
-
-                            <?php foreach ($kelasAsharBerikutnya as $barisJadwal): ?>
-
-                                <div class="schedule-item">
-
-                                    <div class="schedule-item-icon green">
-                                        <i class="bi bi-mortarboard-fill"></i>
-                                    </div>
-
-                                    <div class="schedule-item-content">
-
-                                        <span>Kelas</span>
-
-                                        <strong>
-                                            <?= htmlspecialchars($barisJadwal['tingkat']) ?>
-                                            <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
-                                            <?= htmlspecialchars($barisJadwal['bagian']) ?>
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            <?php endforeach; ?>
-
-                        </div>
-
-                    </div>
-
-                <?php else: ?>
-
-                    <div class="schedule-empty">
-
-                        <div class="schedule-empty-icon">
-                            <i class="bi bi-calendar-x"></i>
-                        </div>
-
-                        <strong>
-                            Belum ada jadwal
-                        </strong>
-
-                        <span>
-                            Belum ada jadwal sholat berikutnya.
+                        <span class="schedule-label">
+                            Waktu Sholat Dzuhur
                         </span>
 
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-
-
-            <!-- =====================================================
-                3. JADWAL IMAM HARI INI
-            ====================================================== -->
-            <div class="schedule-card">
-
-                <div class="schedule-card-header">
-
-                    <div class="schedule-icon blue">
-                        <i class="bi bi-person-badge"></i>
-                    </div>
-
-                    <div class="schedule-card-heading">
-                        <span>Jadwal Imam</span>
-                        <h5>Hari Ini</h5>
-                    </div>
-
-                </div>
-
-
-                <?php if ($tanggalHariIni !== null): ?>
-
-                    <div class="schedule-date">
-                        <i class="bi bi-calendar3"></i>
-
-                        <?= htmlspecialchars(hari_indonesia($tanggalHariIni)) ?>,
-                        <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalHariIni))) ?>
+                        <strong class="schedule-time">
+                            <?= htmlspecialchars($waktuDzuhur) ?>
+                        </strong>
 
                     </div>
 
-                <?php endif; ?>
-
-
-                <?php if (
-                    $tanggalHariIni !== null &&
-                    $jadwalImamHariIni !== null &&
-                    mysqli_num_rows($jadwalImamHariIni) > 0
-                ): ?>
+                    <div class="schedule-divider"></div>
 
                     <div class="schedule-list">
 
-                        <?php while ($barisImam = mysqli_fetch_assoc($jadwalImamHariIni)): ?>
+                        <?php foreach ($kelasDzuhur as $barisJadwal): ?>
 
-                            <div class="schedule-item imam">
+                            <div class="schedule-item">
 
-                                <div class="schedule-item-icon blue">
-                                    <i class="bi bi-person-fill"></i>
+                                <div class="schedule-item-icon green">
+                                    <i class="bi bi-mortarboard-fill"></i>
                                 </div>
 
                                 <div class="schedule-item-content">
 
-                                    <span>
-                                        <?= htmlspecialchars($barisImam['waktu_sholat']) ?>
-                                    </span>
+                                    <span>Kelas</span>
 
                                     <strong>
-                                        <?= htmlspecialchars($barisImam['nama_guru']) ?>
+                                        <?= htmlspecialchars($barisJadwal['tingkat']) ?>
+                                        <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
+                                        <?= htmlspecialchars($barisJadwal['bagian']) ?>
                                     </strong>
 
                                 </div>
 
                             </div>
-
-                        <?php endwhile; ?>
-
-                    </div>
-
-
-                <?php else: ?>
-
-                    <div class="schedule-empty">
-
-                        <div class="schedule-empty-icon">
-                            <i class="bi bi-person-x"></i>
-                        </div>
-
-                        <strong>
-                            Belum ada jadwal imam
-                        </strong>
-
-                        <span>
-                            Belum ada jadwal imam untuk hari ini.
-                        </span>
-
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-
-
-            <!-- =====================================================
-                4. JADWAL IMAM BERIKUTNYA
-            ====================================================== -->
-            <div class="schedule-card">
-
-                <div class="schedule-card-header">
-
-                    <div class="schedule-icon blue">
-                        <i class="bi bi-person-lines-fill"></i>
-                    </div>
-
-                    <div class="schedule-card-heading">
-                        <span>Jadwal Imam</span>
-                        <h5>Jadwal Berikutnya</h5>
-                    </div>
-
-                </div>
-
-
-                <?php if ($tanggalImamBerikutnya !== null): ?>
-
-                    <div class="schedule-date">
-                        <i class="bi bi-calendar3"></i>
-
-                        <?= htmlspecialchars(hari_indonesia($tanggalImamBerikutnya)) ?>,
-                        <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalImamBerikutnya))) ?>
-
-                    </div>
-
-                <?php endif; ?>
-
-
-                <?php if (
-                    $tanggalImamBerikutnya !== null &&
-                    $jadwalImamBerikutnya !== null &&
-                    mysqli_num_rows($jadwalImamBerikutnya) > 0
-                ): ?>
-
-                    <div class="schedule-list">
-
-                        <?php while ($barisImam = mysqli_fetch_assoc($jadwalImamBerikutnya)): ?>
-
-                            <div class="schedule-item imam">
-
-                                <div class="schedule-item-icon blue">
-                                    <i class="bi bi-person-fill"></i>
-                                </div>
-
-                                <div class="schedule-item-content">
-
-                                    <span>
-                                        <?= htmlspecialchars($barisImam['waktu_sholat']) ?>
-                                    </span>
-
-                                    <strong>
-                                        <?= htmlspecialchars($barisImam['nama_guru']) ?>
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        <?php endwhile; ?>
-
-                    </div>
-
-
-                <?php else: ?>
-
-                    <div class="schedule-empty">
-
-                        <div class="schedule-empty-icon">
-                            <i class="bi bi-person-x"></i>
-                        </div>
-
-                        <strong>
-                            Belum ada jadwal imam
-                        </strong>
-
-                        <span>
-                            Belum ada jadwal imam berikutnya.
-                        </span>
-
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-
-            <!-- =====================================================
-                5. KEGIATAN TERBARU (INFAQ, SHODAQOH, PENGELUARAN)
-            ====================================================== -->
-            <div class="schedule-card schedule-card-aktivitas">
-
-                <div class="schedule-card-header">
-
-                    <div class="schedule-icon orange">
-                        <i class="bi bi-activity"></i>
-                    </div>
-
-                    <div class="schedule-card-heading">
-                        <span>Riwayat Keuangan</span>
-                        <h5>Kegiatan Terbaru</h5>
-                    </div>
-
-                </div>
-
-
-                <?php if (count($aktivitasTerbaru) > 0): ?>
-
-                    <div class="schedule-list activity-list">
-
-                        <?php foreach ($aktivitasTerbaru as $aktivitas): ?>
-
-                            <?php
-                            $metaAktivitas = $jenisAktivitas[$aktivitas['jenis']] ?? [
-                                'label' => ucfirst((string) $aktivitas['jenis']),
-                                'icon' => 'bi-dot',
-                                'warna' => 'green',
-                                'tanda' => '',
-                                'kelas' => 'masuk'
-                            ];
-
-                            $judulAktivitas = $aktivitas['jenis'] === 'kegiatan'
-                                ? mb_strimwidth((string) $aktivitas['judul'], 0, 42, '…')
-                                : (string) $aktivitas['judul'];
-                            ?>
-
-                            <a href="<?= url($aktivitas['jenis'] . '/index.php') ?>" class="schedule-item activity-item">
-
-                                <div class="schedule-item-icon <?= $metaAktivitas['warna'] ?>">
-                                    <i class="bi <?= $metaAktivitas['icon'] ?>"></i>
-                                </div>
-
-                                <div class="schedule-item-content">
-
-                                    <div class="activity-meta">
-
-                                        <span class="activity-badge <?= $aktivitas['jenis'] ?>">
-                                            <?= htmlspecialchars($metaAktivitas['label']) ?>
-                                        </span>
-
-                                        <span class="activity-date">
-                                            <?= htmlspecialchars(hari_indonesia($aktivitas['tanggal'])) ?>,
-                                            <?= htmlspecialchars(date('d/m/Y', strtotime($aktivitas['tanggal']))) ?>
-                                        </span>
-
-                                    </div>
-
-                                    <strong><?= htmlspecialchars($judulAktivitas) ?></strong>
-
-                                </div>
-
-                                <span class="activity-nominal <?= $metaAktivitas['kelas'] ?>">
-                                    <?= htmlspecialchars($metaAktivitas['tanda']) ?>Rp<?= number_format((float) $aktivitas['nominal'], 0, ',', '.') ?>
-                                </span>
-
-                            </a>
 
                         <?php endforeach; ?>
 
                     </div>
 
-                <?php else: ?>
+                </div>
 
-                    <div class="schedule-empty">
+                <!-- Ashar -->
+                <div class="schedule-sholat-block">
 
-                        <div class="schedule-empty-icon">
-                            <i class="bi bi-inbox"></i>
-                        </div>
+                    <div class="schedule-time-box">
 
-                        <strong>
-                            Belum ada aktivitas
-                        </strong>
-
-                        <span>
-                            Belum ada data infaq, shodaqoh, maupun pengeluaran kegiatan.
+                        <span class="schedule-label">
+                            Waktu Sholat Ashar
                         </span>
+
+                        <strong class="schedule-time">
+                            <?= htmlspecialchars($waktuAshar) ?>
+                        </strong>
 
                     </div>
 
-                <?php endif; ?>
+                    <div class="schedule-divider"></div>
+
+                    <div class="schedule-list">
+
+                        <?php foreach ($kelasAshar as $barisJadwal): ?>
+
+                            <div class="schedule-item">
+
+                                <div class="schedule-item-icon green">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </div>
+
+                                <div class="schedule-item-content">
+
+                                    <span>Kelas</span>
+
+                                    <strong>
+                                        <?= htmlspecialchars($barisJadwal['tingkat']) ?>
+                                        <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
+                                        <?= htmlspecialchars($barisJadwal['bagian']) ?>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                </div>
+
+            <?php else: ?>
+
+                <div class="schedule-empty">
+
+                    <div class="schedule-empty-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+
+                    <strong>
+                        Belum ada jadwal
+                    </strong>
+
+                    <span>
+                        Belum ada jadwal sholat untuk hari ini.
+                    </span>
+
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             2. JADWAL SHOLAT BERIKUTNYA
+        ====================================================== -->
+        <div class="schedule-card">
+
+            <div class="schedule-card-header">
+
+                <div class="schedule-icon green">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+
+                <div class="schedule-card-heading">
+                    <span>Jadwal Sholat</span>
+                    <h5>Jadwal Berikutnya</h5>
+                </div>
 
             </div>
 
 
+            <?php if ($tanggalSholatBerikutnya !== null): ?>
+
+                <div class="schedule-date">
+                    <i class="bi bi-calendar3"></i>
+
+                    <?= htmlspecialchars(hari_indonesia($tanggalSholatBerikutnya)) ?>,
+                    <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalSholatBerikutnya))) ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                $tanggalSholatBerikutnya !== null &&
+                (count($kelasDzuhurBerikutnya) > 0 || count($kelasAsharBerikutnya) > 0)
+            ): ?>
+
+                <!-- Dzuhur -->
+                <div class="schedule-sholat-block">
+
+                    <div class="schedule-time-box">
+
+                        <span class="schedule-label">
+                            Waktu Sholat Dzuhur
+                        </span>
+
+                        <strong class="schedule-time">
+                            <?= htmlspecialchars($waktuDzuhur) ?>
+                        </strong>
+
+                    </div>
+
+                    <div class="schedule-divider"></div>
+
+                    <div class="schedule-list">
+
+                        <?php foreach ($kelasDzuhurBerikutnya as $barisJadwal): ?>
+
+                            <div class="schedule-item">
+
+                                <div class="schedule-item-icon green">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </div>
+
+                                <div class="schedule-item-content">
+
+                                    <span>Kelas</span>
+
+                                    <strong>
+                                        <?= htmlspecialchars($barisJadwal['tingkat']) ?>
+                                        <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
+                                        <?= htmlspecialchars($barisJadwal['bagian']) ?>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                </div>
+
+                <!-- Ashar -->
+                <div class="schedule-sholat-block">
+
+                    <div class="schedule-time-box">
+
+                        <span class="schedule-label">
+                            Waktu Sholat Ashar
+                        </span>
+
+                        <strong class="schedule-time">
+                            <?= htmlspecialchars($waktuAshar) ?>
+                        </strong>
+
+                    </div>
+
+                    <div class="schedule-divider"></div>
+
+                    <div class="schedule-list">
+
+                        <?php foreach ($kelasAsharBerikutnya as $barisJadwal): ?>
+
+                            <div class="schedule-item">
+
+                                <div class="schedule-item-icon green">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </div>
+
+                                <div class="schedule-item-content">
+
+                                    <span>Kelas</span>
+
+                                    <strong>
+                                        <?= htmlspecialchars($barisJadwal['tingkat']) ?>
+                                        <?= htmlspecialchars($barisJadwal['nama_kelas']) ?>
+                                        <?= htmlspecialchars($barisJadwal['bagian']) ?>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                </div>
+
+            <?php else: ?>
+
+                <div class="schedule-empty">
+
+                    <div class="schedule-empty-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+
+                    <strong>
+                        Belum ada jadwal
+                    </strong>
+
+                    <span>
+                        Belum ada jadwal sholat berikutnya.
+                    </span>
+
+                </div>
+
+            <?php endif; ?>
+
         </div>
+
+
+
+        <!-- =====================================================
+             3. JADWAL IMAM HARI INI
+        ====================================================== -->
+        <div class="schedule-card">
+
+            <div class="schedule-card-header">
+
+                <div class="schedule-icon blue">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+
+                <div class="schedule-card-heading">
+                    <span>Jadwal Imam</span>
+                    <h5>Hari Ini</h5>
+                </div>
+
+            </div>
+
+
+            <?php if ($tanggalHariIni !== null): ?>
+
+                <div class="schedule-date">
+                    <i class="bi bi-calendar3"></i>
+
+                    <?= htmlspecialchars(hari_indonesia($tanggalHariIni)) ?>,
+                    <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalHariIni))) ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                $tanggalHariIni !== null &&
+                $jadwalImamHariIni !== null &&
+                mysqli_num_rows($jadwalImamHariIni) > 0
+            ): ?>
+
+                <div class="schedule-list">
+
+                    <?php while ($barisImam = mysqli_fetch_assoc($jadwalImamHariIni)): ?>
+
+                        <div class="schedule-item imam">
+
+                            <div class="schedule-item-icon blue">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+
+                            <div class="schedule-item-content">
+
+                                <span>
+                                    <?= htmlspecialchars($barisImam['waktu_sholat']) ?>
+                                </span>
+
+                                <strong>
+                                    <?= htmlspecialchars($barisImam['nama_guru']) ?>
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                </div>
+
+
+            <?php else: ?>
+
+                <div class="schedule-empty">
+
+                    <div class="schedule-empty-icon">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+
+                    <strong>
+                        Belum ada jadwal imam
+                    </strong>
+
+                    <span>
+                        Belum ada jadwal imam untuk hari ini.
+                    </span>
+
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             4. JADWAL IMAM BERIKUTNYA
+        ====================================================== -->
+        <div class="schedule-card">
+
+            <div class="schedule-card-header">
+
+                <div class="schedule-icon blue">
+                    <i class="bi bi-person-lines-fill"></i>
+                </div>
+
+                <div class="schedule-card-heading">
+                    <span>Jadwal Imam</span>
+                    <h5>Jadwal Berikutnya</h5>
+                </div>
+
+            </div>
+
+
+            <?php if ($tanggalImamBerikutnya !== null): ?>
+
+                <div class="schedule-date">
+                    <i class="bi bi-calendar3"></i>
+
+                    <?= htmlspecialchars(hari_indonesia($tanggalImamBerikutnya)) ?>,
+                    <?= htmlspecialchars(date('d/m/Y', strtotime($tanggalImamBerikutnya))) ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                $tanggalImamBerikutnya !== null &&
+                $jadwalImamBerikutnya !== null &&
+                mysqli_num_rows($jadwalImamBerikutnya) > 0
+            ): ?>
+
+                <div class="schedule-list">
+
+                    <?php while ($barisImam = mysqli_fetch_assoc($jadwalImamBerikutnya)): ?>
+
+                        <div class="schedule-item imam">
+
+                            <div class="schedule-item-icon blue">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+
+                            <div class="schedule-item-content">
+
+                                <span>
+                                    <?= htmlspecialchars($barisImam['waktu_sholat']) ?>
+                                </span>
+
+                                <strong>
+                                    <?= htmlspecialchars($barisImam['nama_guru']) ?>
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                </div>
+
+
+            <?php else: ?>
+
+                <div class="schedule-empty">
+
+                    <div class="schedule-empty-icon">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+
+                    <strong>
+                        Belum ada jadwal imam
+                    </strong>
+
+                    <span>
+                        Belum ada jadwal imam berikutnya.
+                    </span>
+
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+
 
     </div>
 
-    <?php require_once __DIR__ . '/template/footer.php'; ?>
+</div>
+
+<?php require_once __DIR__ . '/template/footer.php'; ?>

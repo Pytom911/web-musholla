@@ -252,6 +252,10 @@ $html = '
         color: #6b7280;
         font-size: 9px;
     }
+    .nominal {
+    font-weight: bold;
+    color: #16a34a;
+    }
 </style>
 </head>
 <body>
@@ -272,7 +276,7 @@ $html = '
     <tr>
         <td>
             <span class="summary-label">TOTAL SHODAQOH</span>
-            <span class="summary-value">Rp ' . number_format($totalNominal, 0, ',', '.') . '</span>
+            <span class="summary-value" class="nominal">Rp ' . number_format($totalNominal, 0, ',', '.') . '</span>
         </td>
         <td>
             <span class="summary-label">JUMLAH KELAS</span>

@@ -186,7 +186,7 @@ $data = mysqli_query($connect, "SELECT * FROM kegiatan $whereBulan ORDER BY tang
 
         <div class="table-footer">
             <div class="table-info">
-                Total Data : <strong><?= $totalDataAll; ?></strong>
+                Menampilkan <strong><?= mysqli_num_rows($data); ?></strong> data dari <strong><?= $totalDataAll; ?></strong> data
             </div>
             <?php require __DIR__ . '/../template/pagination.php'; ?>
         </div>
